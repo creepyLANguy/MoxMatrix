@@ -63,7 +63,8 @@ namespace MoxMatrix
       inputBox.Text += @"countersp" + Environment.NewLine;
       inputBox.Text += @"dreamtide" + Environment.NewLine;
       inputBox.Text += @"asdasfdsfserf" + Environment.NewLine;
-      //
+      inputBox.Text += @"godtoucher" + Environment.NewLine;
+      inputBox.Text += @"esper sentinal" + Environment.NewLine;
     }
 
     private async void btn_go_Click(object sender, EventArgs e)
@@ -196,16 +197,26 @@ namespace MoxMatrix
       var csvLines = new List<string>();
 
       // Header row with retailer names
-      var headerRow = "Card Name," + string.Join(",", retailerNames);
+      var headerRow = "," + string.Join(",", retailerNames);
       csvLines.Add(headerRow);
 
       // Rows with card names and prices
       foreach (var cardName in cardNames)
       {
         var row = new List<string> { cardName };
-        
-        //AL.
-        //TODO
+
+        foreach (var retailerName in retailerNames)
+        {
+          var key = (cardName, retailerName);
+          if (cheapestProducts.TryGetValue(key, out var product) && product.Price.HasValue)
+          {
+            row.Add((product.Price.Value/100).ToString());
+          }
+          else
+          {
+            row.Add(string.Empty);
+          }
+        }
 
         csvLines.Add(string.Join(",", row));
       }
@@ -214,8 +225,10 @@ namespace MoxMatrix
       var totalRow = new List<string> { "Total Price" };
       foreach (var retailerName in retailerNames)
       {
-        //AL.
-        //TODO
+        var totalPrice = cheapestProducts
+            .Where(cp => cp.Key.retailerName == retailerName && cp.Value.Price.HasValue)
+            .Sum(cp => cp.Value.Price.Value);
+        totalRow.Add((totalPrice/100).ToString());
       }
       csvLines.Add(string.Join(",", totalRow));
 
@@ -224,9 +237,9 @@ namespace MoxMatrix
     }
 
     //AL.
+    //TODO - seems broken cos art card for dreamtide whale is still appearing.
     //Use this to hide things like art cards
     private bool ShouldShowProduct(Product product) 
-      => BlackListTerms.All(blackListTerm 
-        => !product.Name.ToLower().Contains(blackListTerm) && product.Price is > 0);
+      => BlackListTerms.All(blackListTerm => !product.Name.ToLower().Contains(blackListTerm) && product.Price is > 0);
   }
 }

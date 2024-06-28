@@ -66,15 +66,15 @@ namespace MoxMatrix
       //
     }
 
-    private void btn_go_Click(object sender, EventArgs e)
+    private async void btn_go_Click(object sender, EventArgs e)
     {
       Text += " - Processing...";
       btn_go.Text = @"Querying prices from each store...";
       Enabled = false;
 
-      var cardMatches = GetCardMatchesList();
+      var cardMatches = await GetCardMatchesListAsync();
 
-      var priceList = GetPriceList(cardMatches);
+      var priceList = await GetPriceListAsync(cardMatches);
 
       //AL.
       //Do something with the price list.
@@ -85,41 +85,42 @@ namespace MoxMatrix
       Enabled = true;
     }
 
-    List<Card> GetCardMatchesList()
-    { 
-      List<Card> cardMatches = new();
+    public async Task<List<Card>> GetCardMatchesListAsync()
+    {
+      List<Card> cardMatches = new List<Card>();
 
       var cardsInput = inputBox.Text.Split(Environment.NewLine).Where(it => it.Length > 0);
-      foreach (var input in cardsInput)
-      {
-        var match = GetCardMatch(input);
-        if (match == null)
-        {
-          continue;
-        }
+      var tasks = cardsInput.Select(input => GetCardMatchAsync(input)).ToList();
 
-        cardMatches.Add(match);
+      var results = await Task.WhenAll(tasks);
+
+      foreach (var match in results)
+      {
+        if (match != null)
+        {
+          cardMatches.Add(match);
+        }
       }
 
       return cardMatches;
     }
 
-    Card? GetCardMatch(string input)
+    private async Task<Card?> GetCardMatchAsync(string input)
     {
       using var httpClient = new HttpClient();
       var uri = CardMatchEndpoint + input;
-      var response = httpClient.GetAsync(uri).GetAwaiter().GetResult();
-      var results = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
+      var response = await httpClient.GetAsync(uri);
+      var results = await response.Content.ReadAsStringAsync();
       var cardsResponse = JsonConvert.DeserializeObject<CardsResponse>(results);
+
       if (cardsResponse == null)
       {
         return null;
       }
-      var matchEvaluations = new List<int>();
-      foreach (var card in cardsResponse.Cards)
-      {
-        matchEvaluations.Add(GetMatchEvaluation(input, card.Name));
-      }
+
+      var matchEvaluations = cardsResponse.Cards
+        .Select(card => GetMatchEvaluation(input, card.Name))
+        .ToList();
 
       try
       {
@@ -130,7 +131,6 @@ namespace MoxMatrix
         Console.WriteLine(e);
         return null;
       }
-
     }
 
     int GetMatchEvaluation(string source1, string source2)
@@ -164,26 +164,22 @@ namespace MoxMatrix
       return matrix[source1Length, source2Length];
     }
 
-    List<PriceResponse> GetPriceList(List<Card> cardMatches)
-    { 
-      List<PriceResponse> priceList = new();
 
-      foreach (var cardMatch in cardMatches)
-      {
-        using var httpClient = new HttpClient();
-        var uri = PricesEndpoint.Replace("{id}", cardMatch.Id) + RetailersFilter;
-        var response = httpClient.GetAsync(uri).GetAwaiter().GetResult();
-        var results = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-        var pricesResponse = JsonConvert.DeserializeObject<PriceResponse>(results);
-        if (pricesResponse == null)
-        {
-          continue;
-        }
+    public async Task<List<PriceResponse>> GetPriceListAsync(List<Card> cardMatches)
+    {
+      var tasks = cardMatches.Select(cardMatch => GetPriceAsync(cardMatch)).ToList();
+      var results = await Task.WhenAll(tasks);
+      return results.Where(result => result != null).ToList();
+    }
 
-        priceList.Add(pricesResponse);
-      }
-
-      return priceList;
+    private async Task<PriceResponse?> GetPriceAsync(Card cardMatch)
+    {
+      using var httpClient = new HttpClient();
+      var uri = PricesEndpoint.Replace("{id}", cardMatch.Id) + RetailersFilter;
+      var response = await httpClient.GetAsync(uri);
+      var results = await response.Content.ReadAsStringAsync();
+      var pricesResponse = JsonConvert.DeserializeObject<PriceResponse>(results);
+      return pricesResponse;
     }
 
     //AL.

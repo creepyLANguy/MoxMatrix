@@ -57,18 +57,20 @@ namespace MoxMatrix
     {
       //AL.
       //DEBUG
-      inputBox.Text += "mox" + Environment.NewLine;
-      inputBox.Text += "opportunis" + Environment.NewLine;
-      inputBox.Text += "countersp" + Environment.NewLine;
-      inputBox.Text += "dreamtide" + Environment.NewLine;
-      inputBox.Text += "asdasfdsfserf" + Environment.NewLine;
-      //btn_go_Click(btn_go, null);
+      inputBox.Text += @"mox" + Environment.NewLine;
+      inputBox.Text += @"opportunis" + Environment.NewLine;
+      inputBox.Text += @"countersp" + Environment.NewLine;
+      inputBox.Text += @"dreamtide" + Environment.NewLine;
+      inputBox.Text += @"asdasfdsfserf" + Environment.NewLine;
       //
     }
 
     private async void btn_go_Click(object sender, EventArgs e)
     {
-      Text += " - Processing...";
+      const string buttonDefault = @"Go!";
+      const string processingText = @" - Processing...";
+
+      Text += processingText;
       btn_go.Text = @"Querying prices from each store...";
       Enabled = false;
 
@@ -80,32 +82,22 @@ namespace MoxMatrix
       //Do something with the price list.
 
 
-      Text = Text.Replace(" - Processing...", "");
-      btn_go.Text = @"Go!";
+      Text = Text.Replace(processingText, string.Empty);
+      btn_go.Text = buttonDefault;
       Enabled = true;
     }
 
     public async Task<List<Card>> GetCardMatchesListAsync()
     {
-      List<Card> cardMatches = new List<Card>();
-
       var cardsInput = inputBox.Text.Split(Environment.NewLine).Where(it => it.Length > 0);
-      var tasks = cardsInput.Select(input => GetCardMatchAsync(input)).ToList();
+      var tasks = cardsInput.Select(GetCardMatchAsync).ToList();
 
       var results = await Task.WhenAll(tasks);
 
-      foreach (var match in results)
-      {
-        if (match != null)
-        {
-          cardMatches.Add(match);
-        }
-      }
-
-      return cardMatches;
+      return results.OfType<Card>().ToList();
     }
 
-    private async Task<Card?> GetCardMatchAsync(string input)
+    private static async Task<Card?> GetCardMatchAsync(string input)
     {
       using var httpClient = new HttpClient();
       var uri = CardMatchEndpoint + input;
@@ -133,7 +125,7 @@ namespace MoxMatrix
       }
     }
 
-    int GetMatchEvaluation(string source1, string source2)
+    private static int GetMatchEvaluation(string source1, string source2)
     {
       var source1Length = source1.Length;
       var source2Length = source2.Length;
@@ -167,7 +159,7 @@ namespace MoxMatrix
 
     public async Task<List<PriceResponse>> GetPriceListAsync(List<Card> cardMatches)
     {
-      var tasks = cardMatches.Select(cardMatch => GetPriceAsync(cardMatch)).ToList();
+      var tasks = cardMatches.Select(GetPriceAsync).ToList();
       var results = await Task.WhenAll(tasks);
       return results.Where(result => result != null).ToList();
     }
@@ -178,23 +170,12 @@ namespace MoxMatrix
       var uri = PricesEndpoint.Replace("{id}", cardMatch.Id) + RetailersFilter;
       var response = await httpClient.GetAsync(uri);
       var results = await response.Content.ReadAsStringAsync();
-      var pricesResponse = JsonConvert.DeserializeObject<PriceResponse>(results);
-      return pricesResponse;
+      return JsonConvert.DeserializeObject<PriceResponse>(results);
     }
 
     //AL.
     //Use this to hide things like art cards
-    bool ShouldShowProduct(Product product)
-    {
-      foreach (var blackListTerm in BlackListTerms) 
-      {
-        if (product.Name.ToLower().Contains(blackListTerm))
-        {
-          return false;
-        }
-      }
-
-      return true;
-    }
+    private bool ShouldShowProduct(Product product) 
+      => BlackListTerms.All(blackListTerm => !product.Name.ToLower().Contains(blackListTerm));
   }
 }

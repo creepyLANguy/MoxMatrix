@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using System.Diagnostics;
 using System.Text;
 
 namespace MoxMatrix
@@ -58,13 +59,13 @@ namespace MoxMatrix
     {
       //AL.
       //DEBUG
-      inputBox.Text += @"mox" + Environment.NewLine;
+      inputBox.Text += @"mox t" + Environment.NewLine;
       inputBox.Text += @"opportunis" + Environment.NewLine;
       inputBox.Text += @"countersp" + Environment.NewLine;
       inputBox.Text += @"dreamtide" + Environment.NewLine;
-      inputBox.Text += @"asdasfdsfserf" + Environment.NewLine;
-      inputBox.Text += @"godtoucher" + Environment.NewLine;
-      inputBox.Text += @"esper sentinal" + Environment.NewLine;
+      inputBox.Text += @"somerandomstring" + Environment.NewLine;
+      inputBox.Text += @"asmora" + Environment.NewLine;
+      inputBox.Text += @"esper sen" + Environment.NewLine;
     }
 
     private async void btn_go_Click(object sender, EventArgs e)
@@ -284,11 +285,15 @@ namespace MoxMatrix
       using var saveFileDialog = new SaveFileDialog();
       saveFileDialog.Filter = "CSV files (*.csv)|*.csv";
       saveFileDialog.Title = "Save as CSV file";
-      saveFileDialog.FileName = "data.csv";
+      saveFileDialog.FileName = "MoxMatrix_Export.csv";
 
       if (saveFileDialog.ShowDialog() == DialogResult.OK)
       {
-        ExportDataGridViewToCSV(saveFileDialog.FileName);
+        var fileName = saveFileDialog.FileName;
+
+        ExportDataGridViewToCSV(fileName);
+
+        OpenFile(fileName);
       }
     }
 
@@ -322,6 +327,30 @@ namespace MoxMatrix
 
       // Write to file
       File.WriteAllText(filePath, csvContent.ToString(), Encoding.UTF8);
+    }
+
+    void OpenFile(string fileName)
+    {
+      try
+      {
+        Process.Start(new ProcessStartInfo(fileName) { UseShellExecute = true });
+      }
+      catch (Exception ex)
+      {
+        MessageBox.Show($"Error opening file: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+      }
+    }
+
+    private void dataGridView1_RowPrePaint(object sender, DataGridViewRowPrePaintEventArgs e)
+    {
+      if (e.RowIndex % 2 == 0)
+      {
+        dataGridView1.Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.AliceBlue;
+      }
+      else
+      {
+        dataGridView1.Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.White;
+      }
     }
   }
 }

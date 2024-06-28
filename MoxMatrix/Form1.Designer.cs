@@ -67,11 +67,14 @@ namespace MoxMatrix
       // 
       dataGridView1.AllowUserToOrderColumns = true;
       dataGridView1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+      dataGridView1.BackgroundColor = SystemColors.Control;
       dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-      dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleRight;
+      dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleCenter;
       dataGridViewCellStyle1.BackColor = SystemColors.Window;
       dataGridViewCellStyle1.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
       dataGridViewCellStyle1.ForeColor = SystemColors.ControlText;
+      dataGridViewCellStyle1.Format = "C2";
+      dataGridViewCellStyle1.NullValue = null;
       dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
       dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
       dataGridViewCellStyle1.WrapMode = DataGridViewTriState.False;
@@ -81,6 +84,7 @@ namespace MoxMatrix
       dataGridView1.RowTemplate.Height = 25;
       dataGridView1.Size = new Size(1557, 456);
       dataGridView1.TabIndex = 2;
+      dataGridView1.RowPrePaint += dataGridView1_RowPrePaint;
       // 
       // btn_save
       // 

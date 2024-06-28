@@ -28,12 +28,49 @@
     /// </summary>
     private void InitializeComponent()
     {
-      this.components = new System.ComponentModel.Container();
-      this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.ClientSize = new System.Drawing.Size(800, 450);
-      this.Text = "Form1";
+      inputBox = new TextBox();
+      btn_go = new Button();
+      SuspendLayout();
+      // 
+      // inputBox
+      // 
+      inputBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+      inputBox.Location = new Point(12, 12);
+      inputBox.Multiline = true;
+      inputBox.Name = "inputBox";
+      inputBox.PlaceholderText = "Input each card name on a new line...";
+      inputBox.ScrollBars = ScrollBars.Both;
+      inputBox.Size = new Size(422, 263);
+      inputBox.TabIndex = 0;
+      // 
+      // btn_go
+      // 
+      btn_go.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+      btn_go.Location = new Point(12, 281);
+      btn_go.Name = "btn_go";
+      btn_go.Size = new Size(422, 55);
+      btn_go.TabIndex = 1;
+      btn_go.Text = "Go";
+      btn_go.UseVisualStyleBackColor = true;
+      btn_go.Click += btn_go_Click;
+      // 
+      // Form1
+      // 
+      AutoScaleDimensions = new SizeF(7F, 15F);
+      AutoScaleMode = AutoScaleMode.Font;
+      ClientSize = new Size(446, 871);
+      Controls.Add(btn_go);
+      Controls.Add(inputBox);
+      Name = "Form1";
+      Text = "Mox Matrix (beta)";
+      Load += Form1_Load;
+      ResumeLayout(false);
+      PerformLayout();
     }
 
     #endregion
+
+    private TextBox inputBox;
+    private Button btn_go;
   }
 }

@@ -31,6 +31,7 @@ namespace MoxMatrix
     /// </summary>
     private void InitializeComponent()
     {
+      DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
       inputBox = new TextBox();
       btn_go = new Button();
       dataGridView1 = new DataGridView();
@@ -67,6 +68,14 @@ namespace MoxMatrix
       dataGridView1.AllowUserToOrderColumns = true;
       dataGridView1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
       dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+      dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleRight;
+      dataGridViewCellStyle1.BackColor = SystemColors.Window;
+      dataGridViewCellStyle1.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+      dataGridViewCellStyle1.ForeColor = SystemColors.ControlText;
+      dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
+      dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
+      dataGridViewCellStyle1.WrapMode = DataGridViewTriState.False;
+      dataGridView1.DefaultCellStyle = dataGridViewCellStyle1;
       dataGridView1.Location = new Point(12, 342);
       dataGridView1.Name = "dataGridView1";
       dataGridView1.RowTemplate.Height = 25;

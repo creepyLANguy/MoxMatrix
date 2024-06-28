@@ -1,6 +1,5 @@
 using Newtonsoft.Json;
 using System.Text;
-using static MoxMatrix.Form1;
 
 namespace MoxMatrix
 {
@@ -276,12 +275,53 @@ namespace MoxMatrix
 
     private void btn_save_Click(object sender, EventArgs e)
     {
-      //AL.
-      //TODO
-      //var sfd = new SaveFileDialog();
-      //sfd.Filter = "Comma-Separated Values File(*.csv)|*.csv";
-      //sfd.ShowDialog();
-      MessageBox.Show("Feature not yet implemented", "Sorry");
+      if (dataGridView1.Rows.Count == 0)
+      {
+        MessageBox.Show("No data to export.", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        return;
+      }
+
+      using var saveFileDialog = new SaveFileDialog();
+      saveFileDialog.Filter = "CSV files (*.csv)|*.csv";
+      saveFileDialog.Title = "Save as CSV file";
+      saveFileDialog.FileName = "data.csv";
+
+      if (saveFileDialog.ShowDialog() == DialogResult.OK)
+      {
+        ExportDataGridViewToCSV(saveFileDialog.FileName);
+      }
+    }
+
+    public void ExportDataGridViewToCSV(string filePath)
+    {
+      var csvContent = new StringBuilder();
+
+      // Get headers
+      foreach (DataGridViewColumn column in dataGridView1.Columns)
+      {
+        csvContent.Append(column.HeaderText + ",");
+      }
+      csvContent.Remove(csvContent.Length - 1, 1); // Remove last comma
+      csvContent.AppendLine();
+
+      // Get rows
+      foreach (DataGridViewRow row in dataGridView1.Rows)
+      {
+        if (row.IsNewRow)
+        {
+          continue; // Skip the new row placeholder
+        }
+
+        foreach (DataGridViewCell cell in row.Cells)
+        {
+          csvContent.Append(cell.Value + ",");
+        }
+        csvContent.Remove(csvContent.Length - 1, 1); // Remove last comma
+        csvContent.AppendLine();
+      }
+
+      // Write to file
+      File.WriteAllText(filePath, csvContent.ToString(), Encoding.UTF8);
     }
   }
 }

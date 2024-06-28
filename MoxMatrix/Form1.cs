@@ -210,7 +210,7 @@ namespace MoxMatrix
           var key = (cardName, retailerName);
           if (cheapestProducts.TryGetValue(key, out var product) && product.Price.HasValue)
           {
-            row.Add((product.Price.Value/100).ToString());
+            row.Add((product.Price.Value / 100).ToString());
           }
           else
           {
@@ -221,6 +221,8 @@ namespace MoxMatrix
         csvLines.Add(string.Join(",", row));
       }
 
+      csvLines.Add(string.Empty);
+
       // Final row with total prices for each column
       var totalRow = new List<string> { "Total Price" };
       foreach (var retailerName in retailerNames)
@@ -228,18 +230,47 @@ namespace MoxMatrix
         var totalPrice = cheapestProducts
             .Where(cp => cp.Key.retailerName == retailerName && cp.Value.Price.HasValue)
             .Sum(cp => cp.Value.Price.Value);
-        totalRow.Add((totalPrice/100).ToString());
+        totalRow.Add((totalPrice / 100).ToString());
       }
       csvLines.Add(string.Join(",", totalRow));
 
-      // Write to CSV file
-      File.WriteAllLines("output.csv", csvLines);
+      var fileName = DateTime.Now.ToFileTime() + ".csv";
+
+      File.WriteAllLines(fileName, csvLines);
+
+      var csvData = File.ReadAllLines(fileName);
+
+      // Parse CSV data and load into DataGridView
+      LoadCsvDataIntoDataGridView(csvData);
+    }
+
+    private void LoadCsvDataIntoDataGridView(string[] csvData)
+    {
+      // Clear existing DataGridView content
+      dataGridView1.Rows.Clear();
+      dataGridView1.Columns.Clear();
+
+      // Assuming the first row contains headers, split each row by comma to get columns
+      var rows = csvData.Select(line => line.Split(',')).ToArray();
+
+      // Set headers from the first row
+      //dataGridView1.ColumnCount = rows.Max(r => r.Length);
+      for (var i = 0; i < rows[0].Length; i++)
+      {
+        dataGridView1.Columns.Add($"Column{i}", rows[0][i]); // Use index if headers not available
+      }
+
+      // Add rows from the CSV data (skip the first row as it's headers)
+      for (var i = 1; i < rows.Length; i++)
+      {
+        dataGridView1.Rows.Add(rows[i]);
+      }
     }
 
     //AL.
-    //TODO - seems broken cos art card for dreamtide whale is still appearing.
-    //Use this to hide things like art cards
-    private bool ShouldShowProduct(Product product) 
-      => BlackListTerms.All(blackListTerm => !product.Name.ToLower().Contains(blackListTerm) && product.Price is > 0);
+      //TODO - seems broken cos art card for dreamtide whale is still appearing.
+      //Use this to hide things like art cards
+      private bool ShouldShowProduct(Product product)
+        => BlackListTerms.All(blackListTerm => !product.Name.ToLower().Contains(blackListTerm) && product.Price is > 0);
+    }
   }
-}

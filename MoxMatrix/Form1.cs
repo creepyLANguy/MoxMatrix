@@ -17,8 +17,6 @@ namespace MoxMatrix
       public List<Card> Cards { get; set; }
     }
 
-    private List<Card> _cardMatches = new();
-
     private const string CardMatchEndpoint = "https://moxmonolith.com/card/search?name=";
 
     private const string PricesEndpoint = "https://moxmonolith.com/card/{id}/products";
@@ -50,8 +48,6 @@ namespace MoxMatrix
 
     private readonly string[] BlackListTerms = { "art card" };
 
-    private List<PriceResponse> _priceList = new();
-
     public Form1()
     {
       InitializeComponent();
@@ -76,17 +72,23 @@ namespace MoxMatrix
       btn_go.Text = @"Querying prices from each store...";
       Enabled = false;
 
-      BuildCardMatchesList();
+      var cardMatches = GetCardMatchesList();
 
-      BuildPriceList();
+      var priceList = GetPriceList(cardMatches);
+
+      //AL.
+      //Do something with the price list.
+
 
       Text = Text.Replace(" - Processing...", "");
       btn_go.Text = @"Go!";
       Enabled = true;
     }
 
-    void BuildCardMatchesList()
-    {
+    List<Card> GetCardMatchesList()
+    { 
+      List<Card> cardMatches = new();
+
       var cardsInput = inputBox.Text.Split(Environment.NewLine).Where(it => it.Length > 0);
       foreach (var input in cardsInput)
       {
@@ -96,8 +98,10 @@ namespace MoxMatrix
           continue;
         }
 
-        _cardMatches.Add(match);
+        cardMatches.Add(match);
       }
+
+      return cardMatches;
     }
 
     Card? GetCardMatch(string input)
@@ -160,9 +164,11 @@ namespace MoxMatrix
       return matrix[source1Length, source2Length];
     }
 
-    void BuildPriceList()
-    {
-      foreach (var cardMatch in _cardMatches)
+    List<PriceResponse> GetPriceList(List<Card> cardMatches)
+    { 
+      List<PriceResponse> priceList = new();
+
+      foreach (var cardMatch in cardMatches)
       {
         using var httpClient = new HttpClient();
         var uri = PricesEndpoint.Replace("{id}", cardMatch.Id) + RetailersFilter;
@@ -174,15 +180,17 @@ namespace MoxMatrix
           continue;
         }
 
-        _priceList.Add(pricesResponse);
+        priceList.Add(pricesResponse);
       }
+
+      return priceList;
     }
 
     //AL.
     //Use this to hide things like art cards
     bool ShouldShowProduct(Product product)
     {
-      foreach (var blackListTerm in BlackListTerms)
+      foreach (var blackListTerm in BlackListTerms) 
       {
         if (product.Name.ToLower().Contains(blackListTerm))
         {

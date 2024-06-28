@@ -1,4 +1,7 @@
-﻿namespace MoxMatrix
+﻿using System.Resources;
+using MoxMatrix.Properties;
+
+namespace MoxMatrix
 {
   partial class Form1
   {
@@ -66,6 +69,7 @@
       Load += Form1_Load;
       ResumeLayout(false);
       PerformLayout();
+      Icon = Resources.icon;
     }
 
     #endregion

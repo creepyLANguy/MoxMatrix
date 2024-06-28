@@ -75,7 +75,7 @@ namespace MoxMatrix
       // 
       // btn_save
       // 
-      btn_save.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+      btn_save.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
       btn_save.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
       btn_save.Location = new Point(12, 804);
       btn_save.Name = "btn_save";
@@ -83,6 +83,7 @@ namespace MoxMatrix
       btn_save.TabIndex = 3;
       btn_save.Text = "Save as CSV ";
       btn_save.UseVisualStyleBackColor = true;
+      btn_save.Click += btn_save_Click;
       // 
       // Form1
       // 

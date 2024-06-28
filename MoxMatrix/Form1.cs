@@ -1,4 +1,5 @@
 using Newtonsoft.Json;
+using System.Text;
 using static MoxMatrix.Form1;
 
 namespace MoxMatrix
@@ -268,9 +269,19 @@ namespace MoxMatrix
     }
 
     //AL.
-      //TODO - seems broken cos art card for dreamtide whale is still appearing.
-      //Use this to hide things like art cards
-      private bool ShouldShowProduct(Product product)
-        => BlackListTerms.All(blackListTerm => !product.Name.ToLower().Contains(blackListTerm) && product.Price is > 0);
+    //TODO - seems broken cos art card for dreamtide whale is still appearing.
+    //Use this to hide things like art cards
+    private bool ShouldShowProduct(Product product)
+      => BlackListTerms.All(blackListTerm => !product.Name.ToLower().Contains(blackListTerm) && product.Price is > 0);
+
+    private void btn_save_Click(object sender, EventArgs e)
+    {
+      //AL.
+      //TODO
+      //var sfd = new SaveFileDialog();
+      //sfd.Filter = "Comma-Separated Values File(*.csv)|*.csv";
+      //sfd.ShowDialog();
+      MessageBox.Show("Feature not yet implemented", "Sorry");
     }
   }
+}

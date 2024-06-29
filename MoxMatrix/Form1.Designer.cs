@@ -36,19 +36,23 @@ namespace MoxMatrix
       btn_go = new Button();
       dataGridView1 = new DataGridView();
       btn_save = new Button();
+      textBox1 = new TextBox();
+      textBox2 = new TextBox();
+      label1 = new Label();
+      label2 = new Label();
+      label3 = new Label();
       ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
       SuspendLayout();
       // 
       // inputBox
       // 
-      inputBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
       inputBox.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-      inputBox.Location = new Point(12, 12);
+      inputBox.Location = new Point(12, 27);
       inputBox.Multiline = true;
       inputBox.Name = "inputBox";
       inputBox.PlaceholderText = "Input each card name on a new line...";
       inputBox.ScrollBars = ScrollBars.Both;
-      inputBox.Size = new Size(1557, 263);
+      inputBox.Size = new Size(526, 248);
       inputBox.TabIndex = 0;
       // 
       // btn_go
@@ -98,11 +102,68 @@ namespace MoxMatrix
       btn_save.UseVisualStyleBackColor = true;
       btn_save.Click += btn_save_Click;
       // 
+      // textBox1
+      // 
+      textBox1.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+      textBox1.Location = new Point(544, 27);
+      textBox1.Multiline = true;
+      textBox1.Name = "textBox1";
+      textBox1.PlaceholderText = "Out of stock or no matches found...";
+      textBox1.ReadOnly = true;
+      textBox1.ScrollBars = ScrollBars.Both;
+      textBox1.Size = new Size(523, 248);
+      textBox1.TabIndex = 4;
+      // 
+      // textBox2
+      // 
+      textBox2.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+      textBox2.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+      textBox2.Location = new Point(1073, 27);
+      textBox2.Multiline = true;
+      textBox2.Name = "textBox2";
+      textBox2.PlaceholderText = "Stores Summary...";
+      textBox2.ReadOnly = true;
+      textBox2.ScrollBars = ScrollBars.Both;
+      textBox2.Size = new Size(496, 248);
+      textBox2.TabIndex = 5;
+      // 
+      // label1
+      // 
+      label1.AutoSize = true;
+      label1.Location = new Point(12, 9);
+      label1.Name = "label1";
+      label1.Size = new Size(198, 15);
+      label1.TabIndex = 6;
+      label1.Text = "Input each card name on a new line:";
+      // 
+      // label2
+      // 
+      label2.AutoSize = true;
+      label2.Location = new Point(544, 9);
+      label2.Name = "label2";
+      label2.Size = new Size(189, 15);
+      label2.TabIndex = 7;
+      label2.Text = "Out of stock or no matches found:";
+      // 
+      // label3
+      // 
+      label3.AutoSize = true;
+      label3.Location = new Point(1073, 9);
+      label3.Name = "label3";
+      label3.Size = new Size(96, 15);
+      label3.TabIndex = 8;
+      label3.Text = "Stores Summary:";
+      // 
       // Form1
       // 
       AutoScaleDimensions = new SizeF(7F, 15F);
       AutoScaleMode = AutoScaleMode.Font;
       ClientSize = new Size(1581, 871);
+      Controls.Add(label3);
+      Controls.Add(label2);
+      Controls.Add(label1);
+      Controls.Add(textBox2);
+      Controls.Add(textBox1);
       Controls.Add(btn_save);
       Controls.Add(dataGridView1);
       Controls.Add(btn_go);
@@ -122,5 +183,10 @@ namespace MoxMatrix
     private Button btn_go;
     private DataGridView dataGridView1;
     private Button btn_save;
+    private TextBox textBox1;
+    private TextBox textBox2;
+    private Label label1;
+    private Label label2;
+    private Label label3;
   }
 }

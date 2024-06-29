@@ -81,7 +81,12 @@ namespace MoxMatrix
 
       var priceList = await GetPriceListAsync(cardMatches);
 
-      GenerateCsv(priceList);
+      var fileName = DateTime.Now.ToFileTime() + ".csv";
+
+      GenerateCsv(priceList, fileName);
+
+      var csvData = await File.ReadAllLinesAsync(fileName);
+      LoadCsvDataIntoDataGridView(csvData);
 
       Text = Text.Replace(processingText, string.Empty);
       btn_go.Text = buttonDefault;
@@ -174,7 +179,7 @@ namespace MoxMatrix
       return JsonConvert.DeserializeObject<PriceResponse>(results);
     }
 
-    private void GenerateCsv(List<PriceResponse> priceResponses)
+    private void GenerateCsv(List<PriceResponse> priceResponses, string fileName)
     {
       var cheapestProducts = new Dictionary<(string cardId, string retailerName), Product>();
 
@@ -238,14 +243,7 @@ namespace MoxMatrix
       }
       csvLines.Add(string.Join(",", totalRow));
 
-      var fileName = DateTime.Now.ToFileTime() + ".csv";
-
       File.WriteAllLines(fileName, csvLines);
-
-      var csvData = File.ReadAllLines(fileName);
-
-      // Parse CSV data and load into DataGridView
-      LoadCsvDataIntoDataGridView(csvData);
     }
 
     private void LoadCsvDataIntoDataGridView(string[] csvData)

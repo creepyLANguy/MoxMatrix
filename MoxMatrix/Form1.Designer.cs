@@ -44,6 +44,7 @@ namespace MoxMatrix
       txt_outOfStock = new TextBox();
       label4 = new Label();
       splitContainer1 = new SplitContainer();
+      btn_foils = new CheckBox();
       ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
       ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
       splitContainer1.Panel1.SuspendLayout();
@@ -59,7 +60,7 @@ namespace MoxMatrix
       inputBox.Multiline = true;
       inputBox.Name = "inputBox";
       inputBox.ScrollBars = ScrollBars.Both;
-      inputBox.Size = new Size(392, 344);
+      inputBox.Size = new Size(392, 313);
       inputBox.TabIndex = 0;
       // 
       // btn_go
@@ -70,7 +71,7 @@ namespace MoxMatrix
       btn_go.Name = "btn_go";
       btn_go.Size = new Size(1557, 55);
       btn_go.TabIndex = 1;
-      btn_go.Text = "Query Prices";
+      btn_go.Text = "[query]";
       btn_go.UseVisualStyleBackColor = true;
       btn_go.Click += btn_go_Click;
       // 
@@ -78,7 +79,10 @@ namespace MoxMatrix
       // 
       dataGridView1.AllowUserToOrderColumns = true;
       dataGridView1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+      dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
+      dataGridView1.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
       dataGridView1.BackgroundColor = SystemColors.Control;
+      dataGridView1.BorderStyle = BorderStyle.None;
       dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
       dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleCenter;
       dataGridViewCellStyle1.BackColor = SystemColors.Window;
@@ -95,7 +99,6 @@ namespace MoxMatrix
       dataGridView1.RowTemplate.Height = 25;
       dataGridView1.Size = new Size(1557, 350);
       dataGridView1.TabIndex = 2;
-      dataGridView1.RowPrePaint += dataGridView1_RowPrePaint;
       // 
       // btn_save
       // 
@@ -199,6 +202,7 @@ namespace MoxMatrix
       splitContainer1.Panel1.Controls.Add(txt_unknownCards);
       splitContainer1.Panel1.Controls.Add(txt_outOfStock);
       splitContainer1.Panel1.Controls.Add(label1);
+      splitContainer1.Panel1.Controls.Add(btn_foils);
       // 
       // splitContainer1.Panel2
       // 
@@ -209,6 +213,18 @@ namespace MoxMatrix
       splitContainer1.SplitterWidth = 10;
       splitContainer1.TabIndex = 9;
       splitContainer1.Paint += splitContainer1_Paint;
+      // 
+      // btn_foils
+      // 
+      btn_foils.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+      btn_foils.AutoSize = true;
+      btn_foils.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+      btn_foils.Location = new Point(12, 346);
+      btn_foils.Name = "btn_foils";
+      btn_foils.Size = new Size(106, 25);
+      btn_foils.TabIndex = 0;
+      btn_foils.Text = "OnlyFoils™️";
+      btn_foils.UseVisualStyleBackColor = true;
       // 
       // Form1
       // 
@@ -245,5 +261,6 @@ namespace MoxMatrix
     private TextBox txt_outOfStock;
     private Label label4;
     private SplitContainer splitContainer1;
+    private CheckBox btn_foils;
   }
 }

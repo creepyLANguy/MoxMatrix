@@ -20,6 +20,10 @@ namespace MoxMatrix
       public List<Card> Cards { get; set; }
     }
 
+    const string buttonDefault = @"Query Prices";
+    const string processingText = @" - Processing...";
+    const string queryingText = @"Querying prices from each store...";
+
     private const string CardMatchEndpoint = "https://moxmonolith.com/card/search?name=";
 
     private const string PricesEndpoint = "https://moxmonolith.com/card/{id}/products";
@@ -35,7 +39,7 @@ namespace MoxMatrix
       public string PriceRead { get; set; }
       public string Link { get; set; }
       public int Stock { get; set; }
-      public bool IsFoil { get; set; }
+      public bool Is_Foil { get; set; }
       public DateTime LastScraped { get; set; }
       public string Image { get; set; }
       public int Retailer_Id { get; set; }
@@ -58,6 +62,11 @@ namespace MoxMatrix
 
     private void Form1_Load(object sender, EventArgs e)
     {
+      btn_go.Text = buttonDefault;
+
+      dataGridView1.Columns.Add($"Blank", "");
+      //dataGridView1.Rows.Add("Results will appear here...");
+
       //AL.
       //DEBUG
       inputBox.Text += @"mox t" + Environment.NewLine;
@@ -67,20 +76,33 @@ namespace MoxMatrix
       inputBox.Text += @"somerandomstring" + Environment.NewLine;
       inputBox.Text += @"asmora" + Environment.NewLine;
       inputBox.Text += @"esper sen" + Environment.NewLine;
+      //
     }
 
     private async void btn_go_Click(object sender, EventArgs e)
     {
-      const string buttonDefault = @"Go!";
-      const string processingText = @" - Processing...";
-
       Text += processingText;
-      btn_go.Text = @"Querying prices from each store...";
+      btn_go.Text = queryingText;
       Enabled = false;
 
       var cardMatches = await GetCardMatchesListAsync();
 
       var priceList = await GetPriceListAsync(cardMatches);
+      if (btn_foils.Checked)
+      {
+        foreach (var priceGroup in priceList)
+        {
+          var foils = new List<Product>();
+          foreach (var product in priceGroup.Products)
+          {
+            if (product.Is_Foil || product.Name.ToLower().Contains("foil"))
+            {
+              foils.Add(product);
+            }
+          }
+          priceGroup.Products = foils;
+        }
+      }
 
       var fileName = DateTime.Now.ToFileTime() + ".csv";
 
@@ -366,18 +388,6 @@ namespace MoxMatrix
       }
     }
 
-    private void dataGridView1_RowPrePaint(object sender, DataGridViewRowPrePaintEventArgs e)
-    {
-      if (e.RowIndex % 2 == 0)
-      {
-        dataGridView1.Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.AliceBlue;
-      }
-      else
-      {
-        dataGridView1.Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.White;
-      }
-    }
-
     private void Form1_ResizeBegin(object sender, EventArgs e)
     {
       dataGridView1.Visible = false;
@@ -391,6 +401,15 @@ namespace MoxMatrix
 
     private void splitContainer1_Paint(object sender, PaintEventArgs e)
     {
+      if (dataGridView1.Rows.Count == 0)
+      {
+        dataGridView1.BackgroundColor = Color.White;
+      }
+      else
+      {
+        dataGridView1.BackgroundColor = SystemColors.Control;
+      }
+
       var dotSize = 4;
 
       //var control = sender as SplitContainer;

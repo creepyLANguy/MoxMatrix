@@ -183,9 +183,12 @@ namespace MoxMatrix
         foreach (var product in priceResponse.Products)
         {
           var key = (priceResponse.Card.Name, product.Retailer_Name);
-          if (!cheapestProducts.ContainsKey(key) || (product.Price.HasValue && product.Price < cheapestProducts[key].Price) && ShouldShowProduct(product))
+          if (!cheapestProducts.ContainsKey(key) || (product.Price.HasValue && product.Price < cheapestProducts[key].Price))
           {
-            cheapestProducts[key] = product;
+            if (ShouldShowProduct(product))
+            {
+              cheapestProducts[key] = product;
+            }
           }
         }
       }
@@ -268,11 +271,8 @@ namespace MoxMatrix
       }
     }
 
-    //AL.
-    //TODO - seems broken cos art card for dreamtide whale is still appearing.
-    //Use this to hide things like art cards
     private bool ShouldShowProduct(Product product)
-      => BlackListTerms.All(blackListTerm => !product.Name.ToLower().Contains(blackListTerm) && product.Price is > 0);
+      => BlackListTerms.All(blackListTerm => !product.Name.ToLower().Contains(blackListTerm.ToLower()) && product.Price is > 0);
 
     private void btn_save_Click(object sender, EventArgs e)
     {

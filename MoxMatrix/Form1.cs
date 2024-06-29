@@ -1,5 +1,6 @@
 using Newtonsoft.Json;
 using System.Diagnostics;
+using System.Drawing;
 using System.Text;
 
 namespace MoxMatrix
@@ -374,6 +375,59 @@ namespace MoxMatrix
       else
       {
         dataGridView1.Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.White;
+      }
+    }
+
+    private void Form1_ResizeBegin(object sender, EventArgs e)
+    {
+      dataGridView1.Visible = false;
+    }
+
+    private void Form1_ResizeEnd(object sender, EventArgs e)
+    {
+      dataGridView1.Visible = true;
+      splitContainer1.Invalidate();
+    }
+
+    private void splitContainer1_Paint(object sender, PaintEventArgs e)
+    {
+      var dotSize = 4;
+
+      //var control = sender as SplitContainer;
+      var control = splitContainer1;
+
+      //paint the three dots'
+      var points = new Point[3];
+      var w = control.Width;
+      var h = control.Height;
+      var d = control.SplitterDistance;
+      var sW = control.SplitterWidth;
+
+      //calculate the position of the points'
+      if (control.Orientation == Orientation.Horizontal)
+      {
+        points[0] = new Point((w / 2), d + (sW / 2));
+        points[1] = new Point(points[0].X - 10, points[0].Y);
+        points[2] = new Point(points[0].X + 10, points[0].Y);
+      }
+      else
+      {
+        points[0] = new Point(d + (sW / 2), (h / 2));
+        points[1] = new Point(points[0].X, points[0].Y - 10);
+        points[2] = new Point(points[0].X, points[0].Y + 10);
+      }
+
+      foreach (var p in points)
+      {
+        p.Offset(-2, -2);
+        e.Graphics.FillEllipse(SystemBrushes.ControlDark,
+          new(p, new Size(dotSize * 3, dotSize / 2)));
+        //new(p, new Size(dotSize, dotSize)));
+
+        p.Offset(1, 1);
+        e.Graphics.FillEllipse(SystemBrushes.ControlLight,
+          new Rectangle(p, new Size(dotSize * 3, dotSize / 2)));
+        //new Rectangle(p, new Size(dotSize, dotSize)));
       }
     }
   }

@@ -258,16 +258,42 @@ namespace MoxMatrix
       var rows = csvData.Select(line => line.Split(',')).ToArray();
 
       // Set headers from the first row
-      //dataGridView1.ColumnCount = rows.Max(r => r.Length);
       for (var i = 0; i < rows[0].Length; i++)
       {
-        dataGridView1.Columns.Add($"Column{i}", rows[0][i]); // Use index if headers not available
+        dataGridView1.Columns.Add($"Column{i}", rows[0][i]);
       }
 
       // Add rows from the CSV data (skip the first row as it's headers)
       for (var i = 1; i < rows.Length; i++)
       {
         dataGridView1.Rows.Add(rows[i]);
+      }
+
+      ReorderColumns();
+    }
+
+    private void ReorderColumns()
+    {
+      var columnPopulatedCounts = new System.Collections.Generic.List<Tuple<int, int>>();
+
+      foreach (DataGridViewColumn column in dataGridView1.Columns)
+      {
+        var nonBlankCount = 0;
+        foreach (DataGridViewRow row in dataGridView1.Rows)
+        {
+          if (row.Cells[column.Index].Value != null && !string.IsNullOrWhiteSpace(row.Cells[column.Index].Value.ToString()))
+          {
+            nonBlankCount++;
+          }
+        }
+        columnPopulatedCounts.Add(new Tuple<int, int>(column.Index, nonBlankCount));
+      }
+
+      var sortedColumns = columnPopulatedCounts.OrderByDescending(t => t.Item2).ToList();
+
+      for (var i = 0; i < sortedColumns.Count; i++)
+      {
+        dataGridView1.Columns[sortedColumns[i].Item1].DisplayIndex = i;
       }
     }
 

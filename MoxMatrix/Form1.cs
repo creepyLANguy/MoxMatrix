@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 using System.Diagnostics;
-using System.Drawing;
+using System.Reflection;
 using System.Text;
 
 namespace MoxMatrix
@@ -64,8 +64,9 @@ namespace MoxMatrix
     {
       btn_go.Text = buttonDefault;
 
-      dataGridView1.Columns.Add($"Blank", "");
-      //dataGridView1.Rows.Add("Results will appear here...");
+      dataGridView1.Columns.Add($"Blank", "Results will appear here...");
+      SetDoubleBuffer(dataGridView1, true);
+      DoubleBuffered = true;
 
       //AL.
       //DEBUG
@@ -184,7 +185,6 @@ namespace MoxMatrix
 
       return matrix[source1Length, source2Length];
     }
-
 
     public async Task<List<PriceResponse>> GetPriceListAsync(List<Card> cardMatches)
     {
@@ -390,26 +390,17 @@ namespace MoxMatrix
 
     private void Form1_ResizeBegin(object sender, EventArgs e)
     {
-      dataGridView1.Visible = false;
+      //dataGridView1.Visible = false;
     }
 
     private void Form1_ResizeEnd(object sender, EventArgs e)
     {
-      dataGridView1.Visible = true;
+      //dataGridView1.Visible = true;
       splitContainer1.Invalidate();
     }
 
     private void splitContainer1_Paint(object sender, PaintEventArgs e)
     {
-      if (dataGridView1.Rows.Count == 0)
-      {
-        dataGridView1.BackgroundColor = Color.White;
-      }
-      else
-      {
-        dataGridView1.BackgroundColor = SystemColors.Control;
-      }
-
       var dotSize = 4;
 
       //var control = sender as SplitContainer;
@@ -448,6 +439,25 @@ namespace MoxMatrix
           new Rectangle(p, new Size(dotSize * 3, dotSize / 2)));
         //new Rectangle(p, new Size(dotSize, dotSize)));
       }
+    }
+
+    private void dataGridView1_RowPrePaint(object sender, DataGridViewRowPrePaintEventArgs e)
+    {
+      if (e.RowIndex % 2 == 0)
+      {
+        dataGridView1.Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.AliceBlue;
+      }
+      else
+      {
+        dataGridView1.Rows[e.RowIndex].DefaultCellStyle.BackColor = Color.White;
+      }
+    }
+
+    static void SetDoubleBuffer(Control dgv, bool DoubleBuffered)
+    {
+      typeof(Control).InvokeMember("DoubleBuffered",
+          BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty,
+          null, dgv, new object[] { DoubleBuffered });
     }
   }
 }

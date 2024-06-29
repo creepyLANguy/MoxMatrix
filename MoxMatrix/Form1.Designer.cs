@@ -77,6 +77,8 @@ namespace MoxMatrix
       // 
       // dataGridView1
       // 
+      dataGridView1.AllowUserToAddRows = false;
+      dataGridView1.AllowUserToDeleteRows = false;
       dataGridView1.AllowUserToOrderColumns = true;
       dataGridView1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
       dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
@@ -97,14 +99,15 @@ namespace MoxMatrix
       dataGridView1.Location = new Point(12, 3);
       dataGridView1.Name = "dataGridView1";
       dataGridView1.RowTemplate.Height = 25;
-      dataGridView1.Size = new Size(1557, 350);
+      dataGridView1.Size = new Size(1557, 338);
       dataGridView1.TabIndex = 2;
+      dataGridView1.RowPrePaint += dataGridView1_RowPrePaint;
       // 
       // btn_save
       // 
       btn_save.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
       btn_save.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-      btn_save.Location = new Point(12, 359);
+      btn_save.Location = new Point(12, 347);
       btn_save.Name = "btn_save";
       btn_save.Size = new Size(1557, 55);
       btn_save.TabIndex = 3;

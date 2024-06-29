@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text;
@@ -52,7 +52,7 @@ namespace MoxMatrix
       public Card Card { get; set; }
     }
 
-
+    private readonly char csvDelim = ';';
     private readonly string[] BlackListTerms = { "art card" };
 
     public Form1()
@@ -77,6 +77,9 @@ namespace MoxMatrix
       inputBox.Text += @"somerandomstring" + Environment.NewLine;
       inputBox.Text += @"asmora" + Environment.NewLine;
       inputBox.Text += @"esper sen" + Environment.NewLine;
+      inputBox.Text += @"clara" + Environment.NewLine;
+      inputBox.Text += @"the ur" + Environment.NewLine;
+      inputBox.Text += @"teferi, master" + Environment.NewLine;
       //
     }
 
@@ -84,8 +87,30 @@ namespace MoxMatrix
     {
       Text += processingText;
       btn_go.Text = queryingText;
+      dataGridView1.Visible = false;
       Enabled = false;
 
+      txt_unknownCards.Text = string.Empty;
+      txt_outOfStock.Text = string.Empty;
+      txt_storesSummaries.Text = string.Empty;
+
+      try
+      {
+        await DoTheThings();
+      }
+      catch (Exception ex)
+      {
+        MessageBox.Show($"{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+      }
+
+      Text = Text.Replace(processingText, string.Empty);
+      btn_go.Text = buttonDefault;
+      dataGridView1.Visible = true;
+      Enabled = true;
+    }
+
+    private async Task DoTheThings()
+    {
       var cardMatches = await GetCardMatchesListAsync();
 
       var priceList = await GetPriceListAsync(cardMatches);
@@ -96,12 +121,20 @@ namespace MoxMatrix
           var foils = new List<Product>();
           foreach (var product in priceGroup.Products)
           {
-            if (product.Is_Foil || product.Name.ToLower().Contains("foil"))
+            if (IsMostLikelyFoil(product))
             {
               foils.Add(product);
             }
           }
           priceGroup.Products = foils;
+        }
+      }
+
+      foreach (var priceGroup in priceList)
+      {
+        if (priceGroup.Products.Count == 0)
+        {
+          txt_outOfStock.Text += priceGroup.Card.Name + Environment.NewLine;
         }
       }
 
@@ -112,10 +145,45 @@ namespace MoxMatrix
       var csvData = await File.ReadAllLinesAsync(fileName);
       LoadCsvDataIntoDataGridView(csvData);
 
-      Text = Text.Replace(processingText, string.Empty);
-      btn_go.Text = buttonDefault;
-      Enabled = true;
+
+      var summaries = new List<Tuple<Tuple<int, int>, string>>();
+
+      for (var col = 1; col < dataGridView1.Columns.Count; col++)
+      {
+        var stock = 0;
+        for (var row = 0; row < dataGridView1.Rows.Count - 1; row++)
+        {
+          if (dataGridView1.Rows[row].Cells[col].Value != null && !string.IsNullOrEmpty(dataGridView1.Rows[row].Cells[col].Value.ToString()))
+          {
+            ++stock;
+          }
+        }
+
+        var storeName = dataGridView1.Columns[col].HeaderText;
+        var totalCost = int.Parse(dataGridView1.Rows[dataGridView1.Rows.Count - 1].Cells[col].Value.ToString());
+
+        var summary =
+          storeName + Environment.NewLine +
+          "In Stock : " + stock + Environment.NewLine +
+          "Total : R" + totalCost + Environment.NewLine +
+          Environment.NewLine;
+
+        summaries.Add(new Tuple<Tuple<int, int>, string>(new Tuple<int, int>(stock, totalCost), summary));
+      }
+
+      var sortedSummaries = summaries.OrderByDescending(o => o.Item1.Item1).ThenBy(o => o.Item1.Item2).ToList();
+
+      foreach (var c in sortedSummaries)
+      {
+        txt_storesSummaries.Text += c.Item2;
+      }
+
+
+      ReorderColumns(sortedSummaries);
     }
+
+    private static bool IsMostLikelyFoil(Product product) =>
+      product.Is_Foil || product.Name.ToLower().Contains("foil");
 
     public async Task<List<Card>> GetCardMatchesListAsync()
     {
@@ -127,7 +195,7 @@ namespace MoxMatrix
       return results.OfType<Card>().ToList();
     }
 
-    private static async Task<Card?> GetCardMatchAsync(string input)
+    private async Task<Card?> GetCardMatchAsync(string input)
     {
       using var httpClient = new HttpClient();
       var uri = CardMatchEndpoint + input;
@@ -135,8 +203,9 @@ namespace MoxMatrix
       var results = await response.Content.ReadAsStringAsync();
       var cardsResponse = JsonConvert.DeserializeObject<CardsResponse>(results);
 
-      if (cardsResponse == null)
+      if (cardsResponse == null || cardsResponse.Cards.Count == 0)
       {
+        txt_unknownCards.Text += input + Environment.NewLine;
         return null;
       }
 
@@ -229,7 +298,7 @@ namespace MoxMatrix
       var csvLines = new List<string>();
 
       // Header row with retailer names
-      var headerRow = "," + string.Join(",", retailerNames);
+      var headerRow = csvDelim + string.Join(csvDelim, retailerNames);
       csvLines.Add(headerRow);
 
       // Rows with card names and prices
@@ -242,7 +311,7 @@ namespace MoxMatrix
           var key = (cardName, retailerName);
           if (cheapestProducts.TryGetValue(key, out var product) && product.Price.HasValue)
           {
-            row.Add((product.Price.Value / 100).ToString());
+            row.Add((product.Price.Value / 100).ToString() + (IsMostLikelyFoil(product) ? "  ✨" : ""));
           }
           else
           {
@@ -250,7 +319,7 @@ namespace MoxMatrix
           }
         }
 
-        csvLines.Add(string.Join(",", row));
+        csvLines.Add(string.Join(csvDelim, row));
       }
 
       csvLines.Add(string.Empty);
@@ -264,7 +333,7 @@ namespace MoxMatrix
             .Sum(cp => cp.Value.Price.Value);
         totalRow.Add((totalPrice / 100).ToString());
       }
-      csvLines.Add(string.Join(",", totalRow));
+      csvLines.Add(string.Join(csvDelim, totalRow));
 
       File.WriteAllLines(fileName, csvLines);
     }
@@ -275,8 +344,8 @@ namespace MoxMatrix
       dataGridView1.Rows.Clear();
       dataGridView1.Columns.Clear();
 
-      // Assuming the first row contains headers, split each row by comma to get columns
-      var rows = csvData.Select(line => line.Split(',')).ToArray();
+      // Assuming the first row contains headers, split each row by delim to get columns
+      var rows = csvData.Select(line => line.Split(csvDelim)).ToArray();
 
       // Set headers from the first row
       for (var i = 0; i < rows[0].Length; i++)
@@ -289,32 +358,18 @@ namespace MoxMatrix
       {
         dataGridView1.Rows.Add(rows[i]);
       }
-
-      ReorderColumns();
     }
 
-    private void ReorderColumns()
+    private void ReorderColumns(List<Tuple<Tuple<int, int>, string>> sortedSummaries)
     {
-      var columnPopulatedCounts = new System.Collections.Generic.List<Tuple<int, int>>();
+      dataGridView1.Columns[0].DisplayIndex = 0;
 
-      foreach (DataGridViewColumn column in dataGridView1.Columns)
+      for (var i = 1; i < dataGridView1.Columns.Count; ++i)
       {
-        var nonBlankCount = 0;
-        foreach (DataGridViewRow row in dataGridView1.Rows)
-        {
-          if (row.Cells[column.Index].Value != null && !string.IsNullOrWhiteSpace(row.Cells[column.Index].Value.ToString()))
-          {
-            nonBlankCount++;
-          }
-        }
-        columnPopulatedCounts.Add(new Tuple<int, int>(column.Index, nonBlankCount));
-      }
-
-      var sortedColumns = columnPopulatedCounts.OrderByDescending(t => t.Item2).ToList();
-
-      for (var i = 0; i < sortedColumns.Count; i++)
-      {
-        dataGridView1.Columns[sortedColumns[i].Item1].DisplayIndex = i;
+        var storeName = dataGridView1.Columns[i].HeaderText;
+        var matchingSummary = sortedSummaries.Where(s => s.Item2.Contains(storeName)).First();
+        var displayIndex = sortedSummaries.IndexOf(matchingSummary);
+        dataGridView1.Columns[i].DisplayIndex = displayIndex + 1;
       }
     }
 
@@ -351,7 +406,7 @@ namespace MoxMatrix
       // Get headers
       foreach (DataGridViewColumn column in dataGridView1.Columns)
       {
-        csvContent.Append(column.HeaderText + ",");
+        csvContent.Append(column.HeaderText + csvDelim);
       }
       csvContent.Remove(csvContent.Length - 1, 1); // Remove last comma
       csvContent.AppendLine();
@@ -366,7 +421,7 @@ namespace MoxMatrix
 
         foreach (DataGridViewCell cell in row.Cells)
         {
-          csvContent.Append(cell.Value + ",");
+          csvContent.Append(cell.Value + "" + csvDelim);
         }
         csvContent.Remove(csvContent.Length - 1, 1); // Remove last comma
         csvContent.AppendLine();

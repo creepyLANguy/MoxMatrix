@@ -60,14 +60,14 @@ namespace MoxMatrix
       inputBox.Multiline = true;
       inputBox.Name = "inputBox";
       inputBox.ScrollBars = ScrollBars.Both;
-      inputBox.Size = new Size(392, 313);
+      inputBox.Size = new Size(392, 344);
       inputBox.TabIndex = 0;
       // 
       // btn_go
       // 
       btn_go.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
       btn_go.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-      btn_go.Location = new Point(12, 377);
+      btn_go.Location = new Point(12, 419);
       btn_go.Name = "btn_go";
       btn_go.Size = new Size(1557, 55);
       btn_go.TabIndex = 1;
@@ -96,10 +96,10 @@ namespace MoxMatrix
       dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
       dataGridViewCellStyle1.WrapMode = DataGridViewTriState.False;
       dataGridView1.DefaultCellStyle = dataGridViewCellStyle1;
-      dataGridView1.Location = new Point(12, 3);
+      dataGridView1.Location = new Point(12, 14);
       dataGridView1.Name = "dataGridView1";
       dataGridView1.RowTemplate.Height = 25;
-      dataGridView1.Size = new Size(1557, 338);
+      dataGridView1.Size = new Size(1557, 276);
       dataGridView1.TabIndex = 2;
       dataGridView1.RowPrePaint += dataGridView1_RowPrePaint;
       // 
@@ -107,7 +107,7 @@ namespace MoxMatrix
       // 
       btn_save.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
       btn_save.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-      btn_save.Location = new Point(12, 347);
+      btn_save.Location = new Point(12, 296);
       btn_save.Name = "btn_save";
       btn_save.Size = new Size(1557, 55);
       btn_save.TabIndex = 3;
@@ -124,7 +124,7 @@ namespace MoxMatrix
       txt_unknownCards.Name = "txt_unknownCards";
       txt_unknownCards.ReadOnly = true;
       txt_unknownCards.ScrollBars = ScrollBars.Both;
-      txt_unknownCards.Size = new Size(376, 344);
+      txt_unknownCards.Size = new Size(376, 375);
       txt_unknownCards.TabIndex = 4;
       // 
       // txt_storesSummaries
@@ -136,7 +136,7 @@ namespace MoxMatrix
       txt_storesSummaries.Name = "txt_storesSummaries";
       txt_storesSummaries.ReadOnly = true;
       txt_storesSummaries.ScrollBars = ScrollBars.Both;
-      txt_storesSummaries.Size = new Size(402, 344);
+      txt_storesSummaries.Size = new Size(402, 375);
       txt_storesSummaries.TabIndex = 6;
       // 
       // label1
@@ -175,7 +175,7 @@ namespace MoxMatrix
       txt_outOfStock.Name = "txt_outOfStock";
       txt_outOfStock.ReadOnly = true;
       txt_outOfStock.ScrollBars = ScrollBars.Both;
-      txt_outOfStock.Size = new Size(369, 344);
+      txt_outOfStock.Size = new Size(369, 375);
       txt_outOfStock.TabIndex = 5;
       // 
       // label4
@@ -212,7 +212,7 @@ namespace MoxMatrix
       splitContainer1.Panel2.Controls.Add(btn_save);
       splitContainer1.Panel2.Controls.Add(dataGridView1);
       splitContainer1.Size = new Size(1581, 871);
-      splitContainer1.SplitterDistance = 435;
+      splitContainer1.SplitterDistance = 492;
       splitContainer1.SplitterWidth = 10;
       splitContainer1.TabIndex = 9;
       splitContainer1.Paint += splitContainer1_Paint;
@@ -222,11 +222,11 @@ namespace MoxMatrix
       btn_foils.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
       btn_foils.AutoSize = true;
       btn_foils.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-      btn_foils.Location = new Point(12, 346);
+      btn_foils.Location = new Point(12, 377);
       btn_foils.Name = "btn_foils";
-      btn_foils.Size = new Size(106, 25);
+      btn_foils.Size = new Size(120, 25);
       btn_foils.TabIndex = 0;
-      btn_foils.Text = "OnlyFoils™️";
+      btn_foils.Text = "OnlyFoils ✨";
       btn_foils.UseVisualStyleBackColor = true;
       // 
       // Form1

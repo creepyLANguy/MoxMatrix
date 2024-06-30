@@ -451,7 +451,7 @@ namespace MoxMatrix
       for (var i = 1; i < dataGridView1.Columns.Count; ++i)
       {
         var storeName = dataGridView1.Columns[i].HeaderText;
-        var matchingSummary = sortedSummaries.Where(s => s.Item2.Contains(storeName)).First();
+        var matchingSummary = sortedSummaries.First(s => s.Item2.Contains(storeName));
         var displayIndex = sortedSummaries.IndexOf(matchingSummary);
         dataGridView1.Columns[i].DisplayIndex = displayIndex + 1;
       }

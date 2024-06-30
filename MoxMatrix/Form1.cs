@@ -57,8 +57,8 @@ namespace MoxMatrix
     private readonly char csvDelim = ';';
     private readonly string[] BlackListTerms = { "art card" };
 
-    private readonly string urlHeadingTag_Open = "[";
-    private readonly string urlHeadingTag_Close = "]";
+    private readonly string urlHeadingTag_Open = "-- ";
+    private readonly string urlHeadingTag_Close = "  --";
 
     public Form1()
     {
@@ -413,7 +413,7 @@ namespace MoxMatrix
       for (var i = 0; i < Math.Min(openingTagLocations.Count, closingTagLocations.Count); ++i)
       {
         var startIndex = openingTagLocations[i];
-        var length = closingTagLocations[i] - startIndex;
+        var length = closingTagLocations[i] + urlHeadingTag_Close.Length - startIndex;
 
         txt_urls.SelectionStart = startIndex;
         txt_urls.SelectionLength = length;

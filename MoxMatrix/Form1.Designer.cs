@@ -102,7 +102,7 @@ namespace MoxMatrix
       dataGridView1.Location = new Point(12, 14);
       dataGridView1.Name = "dataGridView1";
       dataGridView1.RowTemplate.Height = 25;
-      dataGridView1.Size = new Size(1557, 270);
+      dataGridView1.Size = new Size(1557, 282);
       dataGridView1.TabIndex = 2;
       dataGridView1.RowPrePaint += dataGridView1_RowPrePaint;
       // 
@@ -110,9 +110,9 @@ namespace MoxMatrix
       // 
       btn_exportCSV.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
       btn_exportCSV.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-      btn_exportCSV.Location = new Point(12, 290);
+      btn_exportCSV.Location = new Point(21, 302);
       btn_exportCSV.Name = "btn_exportCSV";
-      btn_exportCSV.Size = new Size(1557, 55);
+      btn_exportCSV.Size = new Size(1548, 55);
       btn_exportCSV.TabIndex = 3;
       btn_exportCSV.Text = "Export CSV ";
       btn_exportCSV.UseVisualStyleBackColor = true;
@@ -236,6 +236,7 @@ namespace MoxMatrix
       // 
       // label5
       // 
+      label5.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
       label5.AutoSize = true;
       label5.Location = new Point(1536, 9);
       label5.Name = "label5";

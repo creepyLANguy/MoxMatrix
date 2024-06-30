@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Reflection;
 using System.Text;
+using System.Windows.Forms;
 
 namespace MoxMatrix
 {
@@ -93,6 +94,7 @@ namespace MoxMatrix
       txt_unknownCards.Text = string.Empty;
       txt_outOfStock.Text = string.Empty;
       txt_storesSummaries.Text = string.Empty;
+      txt_urls.Text = string.Empty;
 
       try
       {
@@ -145,7 +147,6 @@ namespace MoxMatrix
       var csvData = await File.ReadAllLinesAsync(fileName);
       LoadCsvDataIntoDataGridView(csvData);
 
-
       var summaries = new List<Tuple<Tuple<int, int>, string>>();
 
       for (var col = 1; col < dataGridView1.Columns.Count; col++)
@@ -160,6 +161,10 @@ namespace MoxMatrix
         }
 
         var storeName = dataGridView1.Columns[col].HeaderText;
+        if (dataGridView1.Rows[dataGridView1.Rows.Count - 1].Cells[col].Value == null)
+        {
+          return;
+        }
         var totalCost = int.Parse(dataGridView1.Rows[dataGridView1.Rows.Count - 1].Cells[col].Value.ToString());
 
         var summary =
@@ -294,6 +299,49 @@ namespace MoxMatrix
       var retailerNames = cheapestProducts.Values.Select(p => p.Retailer_Name).Distinct().ToList();
       var cardNames = priceResponses.Select(pr => pr.Card.Name).Distinct().ToList();
 
+      foreach (var cardName in cardNames)
+      {
+        var heading = "<b>" + cardName + "<\\b>" + Environment.NewLine + Environment.NewLine;
+
+        var buffer = heading;
+
+        foreach (var priceResponse in priceResponses)
+        {
+          if (priceResponse.Card.Name == cardName)
+          {
+            if (priceResponse.Products.Count == 0)
+            {
+              continue;
+            }
+
+            foreach (var product in priceResponse.Products.OrderBy(p => p.Price))
+            {
+              if (product.Price.HasValue == false)
+              {
+                continue;
+              }
+
+              buffer += "R" + product.Price / 100 + Environment.NewLine;
+              buffer += product.Name + Environment.NewLine;
+              buffer += product.Retailer_Name + Environment.NewLine;
+              buffer += product.Link + Environment.NewLine;
+              buffer += Environment.NewLine;
+            }
+          }
+        }
+
+        if (buffer == heading)
+        {
+          continue;
+        }
+
+        buffer += "___";
+        buffer += Environment.NewLine + Environment.NewLine;
+        txt_urls.Text += buffer;
+      }
+
+      FormatUrlsTextBox();
+
       // Create the CSV content
       var csvLines = new List<string>();
 
@@ -338,6 +386,30 @@ namespace MoxMatrix
       File.WriteAllLines(fileName, csvLines);
     }
 
+    private void FormatUrlsTextBox()
+    {
+      var tagPairLocations = new List<Tuple<int, int>>();
+      foreach (var word in txt_urls.Text.Split())
+      {
+        var x = word.IndexOf("<b>");
+        var y = word.IndexOf("<\\b>");
+        if (x != -1 && y != -1)
+        {
+          tagPairLocations.Add(new Tuple<int, int>(x, y));
+        }
+      }
+
+      foreach (var tagPairLocation in tagPairLocations)
+      {
+        var startIndex = tagPairLocation.Item1;
+        var length = tagPairLocation.Item2;
+
+        txt_urls.SelectionStart = startIndex;
+        txt_urls.SelectionLength = length;
+        txt_urls.SelectionFont = new Font(txt_urls.Font, FontStyle.Bold);
+      }
+    }
+
     private void LoadCsvDataIntoDataGridView(string[] csvData)
     {
       // Clear existing DataGridView content
@@ -376,7 +448,7 @@ namespace MoxMatrix
     private bool ShouldShowProduct(Product product)
       => BlackListTerms.All(blackListTerm => !product.Name.ToLower().Contains(blackListTerm.ToLower()) && product.Price is > 0);
 
-    private void btn_save_Click(object sender, EventArgs e)
+    private void btn_exportCSV_Click(object sender, EventArgs e)
     {
       if (dataGridView1.Rows.Count == 0)
       {
@@ -513,6 +585,29 @@ namespace MoxMatrix
       typeof(Control).InvokeMember("DoubleBuffered",
           BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty,
           null, dgv, new object[] { DoubleBuffered });
+    }
+
+    private void btn_saveUrls_Click(object sender, EventArgs e)
+    {
+      if (txt_urls.Text.Length == 0)
+      {
+        MessageBox.Show("No data to export.", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        return;
+      }
+
+      using var saveFileDialog = new SaveFileDialog();
+      saveFileDialog.Filter = "Plain Text files (*.txt)|*.txt";
+      saveFileDialog.Title = "Save as Plain Text file";
+      saveFileDialog.FileName = "MoxMatrix_URLs.txt";
+
+      if (saveFileDialog.ShowDialog() == DialogResult.OK)
+      {
+        var fileName = saveFileDialog.FileName;
+
+        File.WriteAllText(fileName, txt_urls.Text, Encoding.UTF8);
+
+        OpenFile(fileName);
+      }
     }
   }
 }

@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text;
@@ -55,6 +56,9 @@ namespace MoxMatrix
 
     private readonly char csvDelim = ';';
     private readonly string[] BlackListTerms = { "art card" };
+
+    private readonly string urlHeadingTag_Open = "[";
+    private readonly string urlHeadingTag_Close = "]";
 
     public Form1()
     {
@@ -301,7 +305,7 @@ namespace MoxMatrix
 
       foreach (var cardName in cardNames)
       {
-        var heading = "<b>" + cardName + "<\\b>" + Environment.NewLine + Environment.NewLine;
+        var heading = urlHeadingTag_Open + cardName + urlHeadingTag_Close + Environment.NewLine + Environment.NewLine;
 
         var buffer = heading;
 
@@ -388,26 +392,36 @@ namespace MoxMatrix
 
     private void FormatUrlsTextBox()
     {
-      var tagPairLocations = new List<Tuple<int, int>>();
-      foreach (var word in txt_urls.Text.Split())
+      var openingTagLocations = new List<int>();
+      var input1 = txt_urls.Text;
+      var index1 = input1.IndexOf(urlHeadingTag_Open);
+      while (index1 != -1)
       {
-        var x = word.IndexOf("<b>");
-        var y = word.IndexOf("<\\b>");
-        if (x != -1 && y != -1)
-        {
-          tagPairLocations.Add(new Tuple<int, int>(x, y));
-        }
+        openingTagLocations.Add(index1);
+        index1 = input1.IndexOf(urlHeadingTag_Open, index1 + urlHeadingTag_Open.Length);
       }
 
-      foreach (var tagPairLocation in tagPairLocations)
+      var closingTagLocations = new List<int>();
+      var input2 = txt_urls.Text;
+      var index2 = input2.IndexOf(urlHeadingTag_Close);
+      while (index2 != -1)
       {
-        var startIndex = tagPairLocation.Item1;
-        var length = tagPairLocation.Item2;
+        closingTagLocations.Add(index2);
+        index2 = input2.IndexOf(urlHeadingTag_Close, index2 + urlHeadingTag_Close.Length);
+      }
+
+      for (var i = 0; i < Math.Min(openingTagLocations.Count, closingTagLocations.Count); ++i)
+      {
+        var startIndex = openingTagLocations[i];
+        var length = closingTagLocations[i] - startIndex;
 
         txt_urls.SelectionStart = startIndex;
         txt_urls.SelectionLength = length;
-        txt_urls.SelectionFont = new Font(txt_urls.Font, FontStyle.Bold);
+        txt_urls.SelectionFont = new Font(txt_urls.Font, FontStyle.Bold | FontStyle.Underline);
       }
+
+      txt_urls.Text = txt_urls.Text.Replace(urlHeadingTag_Open, string.Empty);
+      txt_urls.Text = txt_urls.Text.Replace(urlHeadingTag_Close, string.Empty);
     }
 
     private void LoadCsvDataIntoDataGridView(string[] csvData)

@@ -94,6 +94,7 @@ namespace MoxMatrix
       btn_go.Text = queryingText;
       dataGridView1.Visible = false;
       Enabled = false;
+      Cursor.Current = Cursors.WaitCursor;
 
       txt_unknownCards.Text = string.Empty;
       txt_outOfStock.Text = string.Empty;
@@ -113,6 +114,7 @@ namespace MoxMatrix
       btn_go.Text = buttonDefault;
       dataGridView1.Visible = true;
       Enabled = true;
+      Cursor.Current = Cursors.Default;
     }
 
     private async Task DoTheThings()

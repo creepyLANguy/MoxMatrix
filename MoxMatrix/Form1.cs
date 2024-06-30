@@ -419,9 +419,6 @@ namespace MoxMatrix
         txt_urls.SelectionLength = length;
         txt_urls.SelectionFont = new Font(txt_urls.Font, FontStyle.Bold | FontStyle.Underline);
       }
-
-      txt_urls.Text = txt_urls.Text.Replace(urlHeadingTag_Open, string.Empty);
-      txt_urls.Text = txt_urls.Text.Replace(urlHeadingTag_Close, string.Empty);
     }
 
     private void LoadCsvDataIntoDataGridView(string[] csvData)

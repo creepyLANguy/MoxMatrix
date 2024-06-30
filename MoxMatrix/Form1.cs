@@ -187,7 +187,8 @@ namespace MoxMatrix
         txt_storesSummaries.Text += c.Item2;
       }
 
-
+      //Doing this twice cos... datagridviews are wierd about how they reorder columns. 
+      ReorderColumns(sortedSummaries);
       ReorderColumns(sortedSummaries);
     }
 

@@ -626,5 +626,19 @@ namespace MoxMatrix
 
     private void txt_urls_LinkClicked(object sender, LinkClickedEventArgs e)
       => Process.Start("cmd", "/C start" + " " + e.LinkText);
+
+    private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
+    {
+      if (e.RowIndex != 0) 
+      {
+        var target = urlHeadingTag_Open + dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString() + urlHeadingTag_Close;
+        var index = txt_urls.Text.IndexOf(target);
+        if (index != -1)
+        {
+          txt_urls.SelectionStart = index;
+          txt_urls.ScrollToCaret();
+        }
+      }
+    }
   }
 }

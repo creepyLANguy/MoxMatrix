@@ -1,4 +1,4 @@
-﻿using System.Resources;
+using System.Resources;
 using MoxMatrix.Properties;
 
 namespace MoxMatrix
@@ -265,6 +265,7 @@ namespace MoxMatrix
       txt_urls.Size = new Size(292, 386);
       txt_urls.TabIndex = 12;
       txt_urls.Text = "";
+      txt_urls.LinkClicked += txt_urls_LinkClicked;
       // 
       // Form1
       // 

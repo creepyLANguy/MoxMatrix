@@ -623,5 +623,8 @@ namespace MoxMatrix
         OpenFile(fileName);
       }
     }
+
+    private void txt_urls_LinkClicked(object sender, LinkClickedEventArgs e)
+      => Process.Start("cmd", "/C start" + " " + e.LinkText);
   }
 }

@@ -1,9 +1,7 @@
 ﻿using Newtonsoft.Json;
-using System;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text;
-using System.Windows.Forms;
 
 namespace MoxMatrix
 {
@@ -30,8 +28,25 @@ namespace MoxMatrix
 
     private const string PricesEndpoint = "https://moxmonolith.com/card/{id}/products";
 
-    private const string RetailersFilter =
-      "?retailers[]=2&retailers[]=3&retailers[]=4&retailers[]=6&retailers[]=11&retailers[]=13&retailers[]=15&retailers[]=16&retailers[]=18&retailers[]=19&retailers[]=20&retailers[]=21&retailers[]=26&retailers[]=34&retailers[]=41&retailers[]=44";
+    private readonly Dictionary<int, string> retailerDictionary = new()
+    {
+      {2, ""},
+      {3, ""},
+      {4, ""},
+      {6, ""},
+      {11, ""},
+      {13, ""},
+      {15, ""},
+      {16, ""},
+      {18, ""},
+      {19, ""},
+      {20, ""},
+      {21, ""},
+      {26, ""},
+      {34, ""},
+      {41, ""},
+      {44, ""}
+    };
 
     public class Product
     {
@@ -69,7 +84,7 @@ namespace MoxMatrix
     {
       btn_go.Text = buttonDefault;
 
-      dataGridView1.Columns.Add($"Blank", "Results will appear here...");
+      dataGridView1.Columns.Add("Blank", "Results will appear here...");
       SetDoubleBuffer(dataGridView1, true);
       DoubleBuffered = true;
 
@@ -279,13 +294,24 @@ namespace MoxMatrix
       return results.Where(result => result != null).ToList();
     }
 
-    private static async Task<PriceResponse?> GetPriceAsync(Card cardMatch)
+    private async Task<PriceResponse?> GetPriceAsync(Card cardMatch)
     {
       using var httpClient = new HttpClient();
-      var uri = PricesEndpoint.Replace("{id}", cardMatch.Id) + RetailersFilter;
+      var uri = PricesEndpoint.Replace("{id}", cardMatch.Id) + GetRetailersFilter();
       var response = await httpClient.GetAsync(uri);
       var results = await response.Content.ReadAsStringAsync();
       return JsonConvert.DeserializeObject<PriceResponse>(results);
+    }
+
+    private string GetRetailersFilter()
+    {
+      var buff = 
+        retailerDictionary.Aggregate("?retailers[]=", (current, pair) => current + pair.Key + "&retailers[]=");
+
+      buff = buff[..buff.LastIndexOf('&')];
+
+      return buff;
+      //return "?retailers[]=2&retailers[]=3&retailers[]=4&retailers[]=6&retailers[]=11&retailers[]=13&retailers[]=15&retailers[]=16&retailers[]=18&retailers[]=19&retailers[]=20&retailers[]=21&retailers[]=26&retailers[]=34&retailers[]=41&retailers[]=44";
     }
 
     private void GenerateCsv(List<PriceResponse> priceResponses, string fileName)

@@ -211,7 +211,7 @@ namespace MoxMatrix
       ReorderColumns(sortedSummaries);
     }
 
-    private void RemoveDuplicates(Control control) 
+    private void RemoveDuplicates(Control control)
       => control.Text = string.Join(Environment.NewLine, control.Text.Split(Environment.NewLine).Distinct());
 
     private static bool IsMostLikelyFoil(Product product) =>
@@ -305,7 +305,7 @@ namespace MoxMatrix
 
     private string GetRetailersFilter()
     {
-      var buff = 
+      var buff =
         retailerDictionary.Aggregate("?retailers[]=", (current, pair) => current + pair.Key + "&retailers[]=");
 
       buff = buff[..buff.LastIndexOf('&')];
@@ -670,7 +670,7 @@ namespace MoxMatrix
 
     private void FocusOnCorrespondingURL(DataGridViewCellEventArgs e)
     {
-      if (e.RowIndex == 0)
+      if (e.RowIndex < 0)
       {
         return;
       }
@@ -707,7 +707,7 @@ namespace MoxMatrix
           return;
         }
       }
-      
+
       if (e.Data.GetDataPresent(DataFormats.FileDrop, true))
       {
         var files = (string[])e.Data.GetData(DataFormats.FileDrop);
@@ -747,7 +747,7 @@ namespace MoxMatrix
       }
       else
       {
-        e.Effect = DragDropEffects.None; 
+        e.Effect = DragDropEffects.None;
 
       }
     }

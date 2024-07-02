@@ -119,6 +119,8 @@ namespace MoxMatrix
 
     private async Task DoTheThings()
     {
+      RemoveDuplicates(inputBox);
+
       var cardMatches = await GetCardMatchesListAsync();
 
       var priceList = await GetPriceListAsync(cardMatches);
@@ -193,6 +195,9 @@ namespace MoxMatrix
       ReorderColumns(sortedSummaries);
       ReorderColumns(sortedSummaries);
     }
+
+    private void RemoveDuplicates(Control control) 
+      => control.Text = string.Join(Environment.NewLine, control.Text.Split(Environment.NewLine).Distinct());
 
     private static bool IsMostLikelyFoil(Product product) =>
       product.Is_Foil || product.Name.ToLower().Contains("foil");
@@ -658,6 +663,67 @@ namespace MoxMatrix
 
       txt_urls.SelectionStart = index;
       txt_urls.ScrollToCaret();
+    }
+
+    private void inputBox_DragDrop(object sender, DragEventArgs e)
+    {
+      var buffer = "";
+
+      if (inputBox.Text.Trim().Length > 0)
+      {
+        var choice = MessageBox.Show("Would you like to replace the card list entries?\n('No' will append to the existing list)", "", MessageBoxButtons.YesNoCancel);
+        if (choice == DialogResult.No)
+        {
+          buffer = inputBox.Text;
+        }
+        else if (choice == DialogResult.Cancel)
+        {
+          return;
+        }
+      }
+      
+      if (e.Data.GetDataPresent(DataFormats.FileDrop, true))
+      {
+        var files = (string[])e.Data.GetData(DataFormats.FileDrop);
+        if (files == null || files.Length == 0)
+        {
+          return;
+        }
+
+        foreach (var file in files)
+        {
+          //Note : StreamReader.ReadToEnd()is faster. 
+          var fileContents = File.ReadAllText(file);
+          buffer += fileContents;
+          buffer += Environment.NewLine + Environment.NewLine;
+        }
+      }
+
+      else if (e.Data.GetDataPresent(DataFormats.Text, true))
+      {
+        buffer += e.Data.GetData(DataFormats.Text, true);
+      }
+
+      if (buffer.Length > 0)
+      {
+        inputBox.Text = buffer;
+      }
+    }
+
+    private void inputBox_DragOver(object sender, DragEventArgs e)
+    {
+      if (
+        (e.Data.GetDataPresent(DataFormats.FileDrop, true)) ||
+        (e.Data.GetDataPresent(DataFormats.Text, true))
+      )
+      {
+        e.Effect = DragDropEffects.All;
+      }
+      else
+      {
+        e.Effect = DragDropEffects.None; 
+
+      }
     }
   }
 }

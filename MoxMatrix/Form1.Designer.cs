@@ -57,6 +57,7 @@ namespace MoxMatrix
       // 
       // inputBox
       // 
+      inputBox.AllowDrop = true;
       inputBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
       inputBox.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
       inputBox.Location = new Point(12, 27);
@@ -65,6 +66,8 @@ namespace MoxMatrix
       inputBox.ScrollBars = ScrollBars.Both;
       inputBox.Size = new Size(392, 386);
       inputBox.TabIndex = 0;
+      inputBox.DragDrop += inputBox_DragDrop;
+      inputBox.DragOver += inputBox_DragOver;
       // 
       // btn_go
       // 
@@ -277,6 +280,7 @@ namespace MoxMatrix
       Controls.Add(splitContainer1);
       Icon = Resources.icon;
       Name = "Form1";
+      StartPosition = FormStartPosition.CenterScreen;
       Text = "Mox Matrix (beta)";
       Load += Form1_Load;
       ResizeBegin += Form1_ResizeBegin;

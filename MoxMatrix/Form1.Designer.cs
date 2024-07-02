@@ -48,6 +48,7 @@ namespace MoxMatrix
       label3 = new Label();
       btn_go = new Button();
       splitContainer1 = new SplitContainer();
+      panel1 = new Panel();
       ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
       ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
       splitContainer1.Panel1.SuspendLayout();
@@ -104,7 +105,7 @@ namespace MoxMatrix
       txt_urls.Location = new Point(1289, 27);
       txt_urls.Name = "txt_urls";
       txt_urls.ReadOnly = true;
-      txt_urls.Size = new Size(311, 880);
+      txt_urls.Size = new Size(345, 880);
       txt_urls.TabIndex = 12;
       txt_urls.Text = "";
       txt_urls.LinkClicked += txt_urls_LinkClicked;
@@ -115,7 +116,7 @@ namespace MoxMatrix
       btn_saveUrls.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
       btn_saveUrls.Location = new Point(1289, 913);
       btn_saveUrls.Name = "btn_saveUrls";
-      btn_saveUrls.Size = new Size(311, 55);
+      btn_saveUrls.Size = new Size(345, 55);
       btn_saveUrls.TabIndex = 11;
       btn_saveUrls.Text = "Save URLs";
       btn_saveUrls.UseVisualStyleBackColor = true;
@@ -136,7 +137,7 @@ namespace MoxMatrix
       btn_foils.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
       btn_foils.AutoSize = true;
       btn_foils.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-      btn_foils.Location = new Point(284, 490);
+      btn_foils.Location = new Point(284, 496);
       btn_foils.Name = "btn_foils";
       btn_foils.Size = new Size(120, 25);
       btn_foils.TabIndex = 0;
@@ -161,7 +162,7 @@ namespace MoxMatrix
       txt_outOfStock.Name = "txt_outOfStock";
       txt_outOfStock.ReadOnly = true;
       txt_outOfStock.ScrollBars = ScrollBars.Both;
-      txt_outOfStock.Size = new Size(283, 502);
+      txt_outOfStock.Size = new Size(283, 508);
       txt_outOfStock.TabIndex = 5;
       // 
       // txt_unknownCards
@@ -173,7 +174,7 @@ namespace MoxMatrix
       txt_unknownCards.Name = "txt_unknownCards";
       txt_unknownCards.ReadOnly = true;
       txt_unknownCards.ScrollBars = ScrollBars.Both;
-      txt_unknownCards.Size = new Size(283, 502);
+      txt_unknownCards.Size = new Size(283, 508);
       txt_unknownCards.TabIndex = 4;
       // 
       // txt_storesSummaries
@@ -184,7 +185,7 @@ namespace MoxMatrix
       txt_storesSummaries.Name = "txt_storesSummaries";
       txt_storesSummaries.ReadOnly = true;
       txt_storesSummaries.ScrollBars = ScrollBars.Both;
-      txt_storesSummaries.Size = new Size(283, 502);
+      txt_storesSummaries.Size = new Size(283, 508);
       txt_storesSummaries.TabIndex = 6;
       // 
       // inputBox
@@ -196,7 +197,7 @@ namespace MoxMatrix
       inputBox.Multiline = true;
       inputBox.Name = "inputBox";
       inputBox.ScrollBars = ScrollBars.Both;
-      inputBox.Size = new Size(392, 441);
+      inputBox.Size = new Size(392, 447);
       inputBox.TabIndex = 0;
       inputBox.DragDrop += inputBox_DragDrop;
       inputBox.DragOver += inputBox_DragOver;
@@ -232,7 +233,7 @@ namespace MoxMatrix
       // 
       btn_go.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
       btn_go.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-      btn_go.Location = new Point(12, 474);
+      btn_go.Location = new Point(12, 480);
       btn_go.Name = "btn_go";
       btn_go.Size = new Size(266, 55);
       btn_go.TabIndex = 1;
@@ -249,6 +250,7 @@ namespace MoxMatrix
       // 
       // splitContainer1.Panel1
       // 
+      splitContainer1.Panel1.Controls.Add(panel1);
       splitContainer1.Panel1.Controls.Add(btn_go);
       splitContainer1.Panel1.Controls.Add(label3);
       splitContainer1.Panel1.Controls.Add(label4);
@@ -264,17 +266,26 @@ namespace MoxMatrix
       // 
       splitContainer1.Panel2.Controls.Add(btn_exportCSV);
       splitContainer1.Panel2.Controls.Add(dataGridView1);
-      splitContainer1.Size = new Size(1283, 971);
-      splitContainer1.SplitterDistance = 547;
+      splitContainer1.Size = new Size(1283, 983);
+      splitContainer1.SplitterDistance = 553;
       splitContainer1.SplitterWidth = 10;
       splitContainer1.TabIndex = 9;
       splitContainer1.Paint += splitContainer1_Paint;
+      // 
+      // panel1
+      // 
+      panel1.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+      panel1.BackColor = SystemColors.ControlLight;
+      panel1.Location = new Point(12, 541);
+      panel1.Name = "panel1";
+      panel1.Size = new Size(1259, 2);
+      panel1.TabIndex = 9;
       // 
       // Form1
       // 
       AutoScaleDimensions = new SizeF(7F, 15F);
       AutoScaleMode = AutoScaleMode.Font;
-      ClientSize = new Size(1612, 983);
+      ClientSize = new Size(1646, 983);
       Controls.Add(splitContainer1);
       Controls.Add(txt_urls);
       Controls.Add(btn_saveUrls);
@@ -314,5 +325,6 @@ namespace MoxMatrix
     private Label label3;
     private Button btn_go;
     private SplitContainer splitContainer1;
+    private Panel panel1;
   }
 }

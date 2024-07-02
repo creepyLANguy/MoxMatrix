@@ -105,6 +105,7 @@ namespace MoxMatrix
       dataGridView1.Size = new Size(1557, 276);
       dataGridView1.TabIndex = 2;
       dataGridView1.CellClick += dataGridView1_CellClick;
+      dataGridView1.CellEnter += dataGridView1_CellEnter;
       dataGridView1.RowPrePaint += dataGridView1_RowPrePaint;
       // 
       // btn_exportCSV

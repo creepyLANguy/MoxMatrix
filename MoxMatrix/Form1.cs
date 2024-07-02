@@ -629,16 +629,35 @@ namespace MoxMatrix
 
     private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
     {
-      if (e.RowIndex != 0) 
+      FocusOnCorrespondingURL(e);
+    }
+
+    private void dataGridView1_CellEnter(object sender, DataGridViewCellEventArgs e)
+    {
+      FocusOnCorrespondingURL(e);
+    }
+
+    private void FocusOnCorrespondingURL(DataGridViewCellEventArgs e)
+    {
+      if (e.RowIndex == 0)
       {
-        var target = urlHeadingTag_Open + dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString() + urlHeadingTag_Close;
-        var index = txt_urls.Text.IndexOf(target);
-        if (index != -1)
-        {
-          txt_urls.SelectionStart = index;
-          txt_urls.ScrollToCaret();
-        }
+        return;
       }
+
+      var target = urlHeadingTag_Open + dataGridView1.Rows[e.RowIndex].Cells[0].Value.ToString() + urlHeadingTag_Close;
+      var index = txt_urls.Text.IndexOf(target);
+      if (index == -1)
+      {
+        return;
+      }
+
+      if (txt_urls.SelectionStart == index)
+      {
+        return;
+      }
+
+      txt_urls.SelectionStart = index;
+      txt_urls.ScrollToCaret();
     }
   }
 }

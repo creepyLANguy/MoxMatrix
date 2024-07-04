@@ -28,7 +28,7 @@ namespace MoxMatrix
 
     private const string PricesEndpoint = "https://moxmonolith.com/card/{id}/products";
 
-    private readonly Dictionary<int, string> retailerDictionary = new()
+    private readonly Dictionary<int, string> _retailerDictionary = new()
     {
       {2, ""},
       {3, ""},
@@ -47,6 +47,8 @@ namespace MoxMatrix
       {41, ""},
       {44, ""}
     };
+
+    private readonly string _outputFolder = "queries";
 
     public class Product
     {
@@ -163,9 +165,11 @@ namespace MoxMatrix
         }
       }
 
-      var fileName = DateTime.Now.ToFileTime() + ".csv";
-
-      GenerateCsv(priceList, fileName);
+      var csvLines = GenerateCsv(priceList);
+      
+      Directory.CreateDirectory(_outputFolder);
+      var fileName = _outputFolder + "//" + DateTime.Now.ToFileTime() + ".csv";
+      File.WriteAllLines(fileName, csvLines);
 
       var csvData = await File.ReadAllLinesAsync(fileName);
       LoadCsvDataIntoDataGridView(csvData);
@@ -306,15 +310,14 @@ namespace MoxMatrix
     private string GetRetailersFilter()
     {
       var buff =
-        retailerDictionary.Aggregate("?retailers[]=", (current, pair) => current + pair.Key + "&retailers[]=");
+        _retailerDictionary.Aggregate("?retailers[]=", (current, pair) => current + pair.Key + "&retailers[]=");
 
       buff = buff[..buff.LastIndexOf('&')];
 
       return buff;
-      //return "?retailers[]=2&retailers[]=3&retailers[]=4&retailers[]=6&retailers[]=11&retailers[]=13&retailers[]=15&retailers[]=16&retailers[]=18&retailers[]=19&retailers[]=20&retailers[]=21&retailers[]=26&retailers[]=34&retailers[]=41&retailers[]=44";
     }
 
-    private void GenerateCsv(List<PriceResponse> priceResponses, string fileName)
+    private List<string> GenerateCsv(List<PriceResponse> priceResponses)
     {
       var cheapestProducts = new Dictionary<(string cardId, string retailerName), Product>();
 
@@ -421,7 +424,7 @@ namespace MoxMatrix
       }
       csvLines.Add(string.Join(csvDelim, totalRow));
 
-      File.WriteAllLines(fileName, csvLines);
+      return csvLines;
     }
 
     private void FormatUrlsTextBox()

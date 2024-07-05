@@ -1,5 +1,6 @@
 using Newtonsoft.Json;
 using System.Diagnostics;
+using System.Net;
 using System.Reflection;
 using System.Text;
 using MoxMatrix.Properties;
@@ -73,7 +74,7 @@ namespace MoxMatrix
     }
 
     private readonly char csvDelim = ';';
-    private readonly string[] BlackListTerms = {"art card"};
+    private readonly string[] BlackListTerms = { "art card" };
 
     private readonly string urlHeadingTag_Open = "-- ";
     private readonly string urlHeadingTag_Close = "  --";
@@ -141,6 +142,7 @@ namespace MoxMatrix
       txt_outOfStock.Text = string.Empty;
       txt_storesSummaries.Text = string.Empty;
       txt_urls.Text = string.Empty;
+      txt_errorFetching.Text = string.Empty;
 
       try
       {
@@ -276,6 +278,13 @@ namespace MoxMatrix
       using var httpClient = new HttpClient();
       var uri = CardMatchEndpoint + input;
       var response = await httpClient.GetAsync(uri);
+
+      if (response.StatusCode != HttpStatusCode.OK)
+      {
+        txt_errorFetching.Text += input + Environment.NewLine;
+        return null;
+      }
+
       var results = await response.Content.ReadAsStringAsync();
       var cardsResponse = JsonConvert.DeserializeObject<CardsResponse>(results);
 
@@ -340,12 +349,14 @@ namespace MoxMatrix
 
     private async Task<PriceResponse?> GetPriceAsync(Card cardMatch)
     {
-      //AL. 
-      //TODO - handle only 200s, and populate view of cards that failed to get a response. Also do this for card name search, just in case. 
-
       using var httpClient = new HttpClient();
       var uri = PricesEndpoint.Replace("{id}", cardMatch.Id) + GetRetailersFilter();
       var response = await httpClient.GetAsync(uri);
+      if (response.StatusCode != HttpStatusCode.OK)
+      {
+        txt_errorFetching.Text += cardMatch.Name + Environment.NewLine;
+        return null;
+      }
       var results = await response.Content.ReadAsStringAsync();
       return JsonConvert.DeserializeObject<PriceResponse>(results);
     }
@@ -437,7 +448,7 @@ namespace MoxMatrix
       // Rows with card names and prices
       foreach (var cardName in cardNames)
       {
-        var row = new List<string> {cardName};
+        var row = new List<string> { cardName };
 
         foreach (var retailerName in retailerNames)
         {
@@ -458,7 +469,7 @@ namespace MoxMatrix
       csvLines.Add(string.Empty);
 
       // Final row with total prices for each column
-      var totalRow = new List<string> {"Total Price"};
+      var totalRow = new List<string> { "Total Price" };
       foreach (var retailerName in retailerNames)
       {
         var totalPrice = cheapestProducts
@@ -603,7 +614,7 @@ namespace MoxMatrix
     {
       try
       {
-        Process.Start(new ProcessStartInfo(fileName) {UseShellExecute = true});
+        Process.Start(new ProcessStartInfo(fileName) { UseShellExecute = true });
       }
       catch (Exception ex)
       {
@@ -680,7 +691,7 @@ namespace MoxMatrix
     {
       typeof(Control).InvokeMember("DoubleBuffered",
         BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty,
-        null, dgv, new object[] {DoubleBuffered});
+        null, dgv, new object[] { DoubleBuffered });
     }
 
     private void btn_saveUrls_Click(object sender, EventArgs e)
@@ -738,7 +749,7 @@ namespace MoxMatrix
       }
 
       //Do this cos the grid selects the first cell as soon as it's populated and so shows the image window automatically.
-      if ((string) imageForm.Tag == null)
+      if ((string)imageForm.Tag == null)
       {
         imageForm.Visible = true;
         imageForm.Visible = false;
@@ -756,7 +767,7 @@ namespace MoxMatrix
       imageForm.Tag = url;
       imageForm.SetPicture(url);
       imageForm.Visible = true;
-      
+
       Focus();
     }
 
@@ -804,7 +815,7 @@ namespace MoxMatrix
 
       if (e.Data.GetDataPresent(DataFormats.FileDrop, true))
       {
-        var files = (string[]) e.Data.GetData(DataFormats.FileDrop);
+        var files = (string[])e.Data.GetData(DataFormats.FileDrop);
         if (files == null || files.Length == 0)
         {
           return;

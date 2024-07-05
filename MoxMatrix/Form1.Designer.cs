@@ -48,6 +48,8 @@ namespace MoxMatrix
       label3 = new Label();
       btn_go = new Button();
       splitContainer1 = new SplitContainer();
+      label6 = new Label();
+      txt_errorFetching = new TextBox();
       panel1 = new Panel();
       ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
       ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
@@ -168,14 +170,13 @@ namespace MoxMatrix
       // 
       // txt_unknownCards
       // 
-      txt_unknownCards.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
       txt_unknownCards.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
       txt_unknownCards.Location = new Point(410, 27);
       txt_unknownCards.Multiline = true;
       txt_unknownCards.Name = "txt_unknownCards";
       txt_unknownCards.ReadOnly = true;
       txt_unknownCards.ScrollBars = ScrollBars.Both;
-      txt_unknownCards.Size = new Size(283, 508);
+      txt_unknownCards.Size = new Size(283, 221);
       txt_unknownCards.TabIndex = 4;
       // 
       // txt_storesSummaries
@@ -251,6 +252,8 @@ namespace MoxMatrix
       // 
       // splitContainer1.Panel1
       // 
+      splitContainer1.Panel1.Controls.Add(label6);
+      splitContainer1.Panel1.Controls.Add(txt_errorFetching);
       splitContainer1.Panel1.Controls.Add(panel1);
       splitContainer1.Panel1.Controls.Add(btn_go);
       splitContainer1.Panel1.Controls.Add(label3);
@@ -272,6 +275,27 @@ namespace MoxMatrix
       splitContainer1.SplitterWidth = 10;
       splitContainer1.TabIndex = 9;
       splitContainer1.Paint += splitContainer1_Paint;
+      // 
+      // label6
+      // 
+      label6.AutoSize = true;
+      label6.Location = new Point(410, 262);
+      label6.Name = "label6";
+      label6.Size = new Size(278, 15);
+      label6.TabIndex = 11;
+      label6.Text = "NETWORK ERROR fetching these cards- please retry";
+      // 
+      // txt_errorFetching
+      // 
+      txt_errorFetching.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
+      txt_errorFetching.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+      txt_errorFetching.Location = new Point(410, 280);
+      txt_errorFetching.Multiline = true;
+      txt_errorFetching.Name = "txt_errorFetching";
+      txt_errorFetching.ReadOnly = true;
+      txt_errorFetching.ScrollBars = ScrollBars.Both;
+      txt_errorFetching.Size = new Size(283, 255);
+      txt_errorFetching.TabIndex = 10;
       // 
       // panel1
       // 
@@ -330,5 +354,7 @@ namespace MoxMatrix
     private Button btn_go;
     private SplitContainer splitContainer1;
     private Panel panel1;
+    private Label label6;
+    private TextBox txt_errorFetching;
   }
 }

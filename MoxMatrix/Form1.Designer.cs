@@ -85,6 +85,7 @@ namespace MoxMatrix
       dataGridView1.CellClick += dataGridView1_CellClick;
       dataGridView1.CellEnter += dataGridView1_CellEnter;
       dataGridView1.RowPrePaint += dataGridView1_RowPrePaint;
+      dataGridView1.Leave += dataGridView1_Leave;
       // 
       // btn_exportCSV
       // 
@@ -297,6 +298,9 @@ namespace MoxMatrix
       Load += Form1_Load;
       ResizeBegin += Form1_ResizeBegin;
       ResizeEnd += Form1_ResizeEnd;
+      ClientSizeChanged += Form1_ClientSizeChanged;
+      LocationChanged += Form1_LocationChanged;
+      RegionChanged += Form1_RegionChanged;
       ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
       splitContainer1.Panel1.ResumeLayout(false);
       splitContainer1.Panel1.PerformLayout();

@@ -1,7 +1,8 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Reflection;
 using System.Text;
+using MoxMatrix.Properties;
 
 namespace MoxMatrix
 {
@@ -72,10 +73,14 @@ namespace MoxMatrix
     }
 
     private readonly char csvDelim = ';';
-    private readonly string[] BlackListTerms = { "art card" };
+    private readonly string[] BlackListTerms = {"art card"};
 
     private readonly string urlHeadingTag_Open = "-- ";
     private readonly string urlHeadingTag_Close = "  --";
+
+    private Dictionary<string, string> imageUrls;
+
+    private ImageForm imageForm;
 
     public Form1()
     {
@@ -84,14 +89,34 @@ namespace MoxMatrix
 
     private void Form1_Load(object sender, EventArgs e)
     {
+      SetupImageForm();
+
       btn_go.Text = buttonDefault;
 
       dataGridView1.Columns.Add("Blank", "Results will appear here...");
       SetDoubleBuffer(dataGridView1, true);
       DoubleBuffered = true;
 
-      //AL.
-      //DEBUG
+      PopulateDebugData();
+    }
+
+    private void SetupImageForm()
+    {
+      imageForm = new();
+      imageForm.Icon = Resources.icon;
+      imageForm.Text = "";
+      imageForm.BackColor = Color.LimeGreen;
+      imageForm.TransparencyKey = Color.LimeGreen;
+      imageForm.FormBorderStyle = FormBorderStyle.None;
+      imageForm.Size = new Size(250, 350);
+      imageForm.TopLevel = true;
+      imageForm.TopMost = true;
+      imageForm.ShowInTaskbar = false;
+      imageForm.Visible = false;
+    }
+
+    private void PopulateDebugData()
+    {
       inputBox.Text += @"mox t" + Environment.NewLine;
       inputBox.Text += @"opportunis" + Environment.NewLine;
       inputBox.Text += @"countersp" + Environment.NewLine;
@@ -102,7 +127,6 @@ namespace MoxMatrix
       inputBox.Text += @"clara" + Environment.NewLine;
       inputBox.Text += @"the ur" + Environment.NewLine;
       inputBox.Text += @"teferi, master" + Environment.NewLine;
-      //
     }
 
     private async void btn_go_Click(object sender, EventArgs e)
@@ -153,8 +177,22 @@ namespace MoxMatrix
               foils.Add(product);
             }
           }
+
           priceGroup.Products = foils;
         }
+      }
+
+      imageUrls = new();
+      foreach (var priceResponse in priceList)
+      {
+        if (priceResponse.Products.Count == 0)
+        {
+          continue;
+        }
+
+        var url = priceResponse.Products.OrderByDescending(it => it.Price)
+          .First(it => it.Image != null && it.Image != string.Empty).Image;
+        imageUrls.Add(priceResponse.Card.Name, url);
       }
 
       foreach (var priceGroup in priceList)
@@ -166,7 +204,7 @@ namespace MoxMatrix
       }
 
       var csvLines = GenerateCsv(priceList);
-      
+
       Directory.CreateDirectory(_outputFolder);
       var fileName = _outputFolder + "//" + DateTime.Now.ToFileTime() + ".csv";
       File.WriteAllLines(fileName, csvLines);
@@ -181,7 +219,8 @@ namespace MoxMatrix
         var stock = 0;
         for (var row = 0; row < dataGridView1.Rows.Count - 1; row++)
         {
-          if (dataGridView1.Rows[row].Cells[col].Value != null && !string.IsNullOrEmpty(dataGridView1.Rows[row].Cells[col].Value.ToString()))
+          if (dataGridView1.Rows[row].Cells[col].Value != null &&
+              !string.IsNullOrEmpty(dataGridView1.Rows[row].Cells[col].Value.ToString()))
           {
             ++stock;
           }
@@ -192,6 +231,7 @@ namespace MoxMatrix
         {
           return;
         }
+
         var totalCost = int.Parse(dataGridView1.Rows[dataGridView1.Rows.Count - 1].Cells[col].Value.ToString());
 
         var summary =
@@ -300,6 +340,9 @@ namespace MoxMatrix
 
     private async Task<PriceResponse?> GetPriceAsync(Card cardMatch)
     {
+      //AL. 
+      //TODO - handle only 200s, and populate view of cards that failed to get a response. Also do this for card name search, just in case. 
+
       using var httpClient = new HttpClient();
       var uri = PricesEndpoint.Replace("{id}", cardMatch.Id) + GetRetailersFilter();
       var response = await httpClient.GetAsync(uri);
@@ -326,7 +369,8 @@ namespace MoxMatrix
         foreach (var product in priceResponse.Products)
         {
           var key = (priceResponse.Card.Name, product.Retailer_Name);
-          if (!cheapestProducts.ContainsKey(key) || (product.Price.HasValue && product.Price < cheapestProducts[key].Price))
+          if (!cheapestProducts.ContainsKey(key) ||
+              (product.Price.HasValue && product.Price < cheapestProducts[key].Price))
           {
             if (ShouldShowProduct(product))
             {
@@ -393,7 +437,7 @@ namespace MoxMatrix
       // Rows with card names and prices
       foreach (var cardName in cardNames)
       {
-        var row = new List<string> { cardName };
+        var row = new List<string> {cardName};
 
         foreach (var retailerName in retailerNames)
         {
@@ -414,14 +458,15 @@ namespace MoxMatrix
       csvLines.Add(string.Empty);
 
       // Final row with total prices for each column
-      var totalRow = new List<string> { "Total Price" };
+      var totalRow = new List<string> {"Total Price"};
       foreach (var retailerName in retailerNames)
       {
         var totalPrice = cheapestProducts
-            .Where(cp => cp.Key.retailerName == retailerName && cp.Value.Price.HasValue)
-            .Sum(cp => cp.Value.Price.Value);
+          .Where(cp => cp.Key.retailerName == retailerName && cp.Value.Price.HasValue)
+          .Sum(cp => cp.Value.Price.Value);
         totalRow.Add((totalPrice / 100).ToString());
       }
+
       csvLines.Add(string.Join(csvDelim, totalRow));
 
       return csvLines;
@@ -494,7 +539,8 @@ namespace MoxMatrix
     }
 
     private bool ShouldShowProduct(Product product)
-      => BlackListTerms.All(blackListTerm => !product.Name.ToLower().Contains(blackListTerm.ToLower()) && product.Price is > 0);
+      => BlackListTerms.All(blackListTerm =>
+        !product.Name.ToLower().Contains(blackListTerm.ToLower()) && product.Price is > 0);
 
     private void btn_exportCSV_Click(object sender, EventArgs e)
     {
@@ -528,6 +574,7 @@ namespace MoxMatrix
       {
         csvContent.Append(column.HeaderText + csvDelim);
       }
+
       csvContent.Remove(csvContent.Length - 1, 1); // Remove last comma
       csvContent.AppendLine();
 
@@ -543,6 +590,7 @@ namespace MoxMatrix
         {
           csvContent.Append(cell.Value + "" + csvDelim);
         }
+
         csvContent.Remove(csvContent.Length - 1, 1); // Remove last comma
         csvContent.AppendLine();
       }
@@ -555,7 +603,7 @@ namespace MoxMatrix
     {
       try
       {
-        Process.Start(new ProcessStartInfo(fileName) { UseShellExecute = true });
+        Process.Start(new ProcessStartInfo(fileName) {UseShellExecute = true});
       }
       catch (Exception ex)
       {
@@ -631,8 +679,8 @@ namespace MoxMatrix
     static void SetDoubleBuffer(Control dgv, bool DoubleBuffered)
     {
       typeof(Control).InvokeMember("DoubleBuffered",
-          BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty,
-          null, dgv, new object[] { DoubleBuffered });
+        BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.SetProperty,
+        null, dgv, new object[] {DoubleBuffered});
     }
 
     private void btn_saveUrls_Click(object sender, EventArgs e)
@@ -669,6 +717,47 @@ namespace MoxMatrix
     private void dataGridView1_CellEnter(object sender, DataGridViewCellEventArgs e)
     {
       FocusOnCorrespondingURL(e);
+
+      if (dataGridView1.Focused == false)
+      {
+        imageForm.Visible = false;
+        return;
+      }
+
+      var cellValue = dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value;
+      if (cellValue == null)
+      {
+        imageForm.Visible = false;
+        return;
+      }
+
+      if (imageUrls == null || !imageUrls.TryGetValue(cellValue.ToString(), out var url))
+      {
+        imageForm.Visible = false;
+        return;
+      }
+
+      //Do this cos the grid selects the first cell as soon as it's populated and so shows the image window automatically.
+      if ((string) imageForm.Tag == null)
+      {
+        imageForm.Visible = true;
+        imageForm.Visible = false;
+        imageForm.Tag = url;
+        return;
+      }
+
+      imageForm.Visible = false;
+
+      var rect = dataGridView1.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, false);
+      var point = dataGridView1.PointToScreen(rect.Location);
+      var pos = new Point(point.X, point.Y + rect.Height);
+      imageForm.Location = pos;
+
+      imageForm.Tag = url;
+      imageForm.SetPicture(url);
+      imageForm.Visible = true;
+      
+      Focus();
     }
 
     private void FocusOnCorrespondingURL(DataGridViewCellEventArgs e)
@@ -700,7 +789,9 @@ namespace MoxMatrix
 
       if (inputBox.Text.Trim().Length > 0)
       {
-        var choice = MessageBox.Show("Would you like to replace the card list entries?\n('No' will append to the existing list)", "", MessageBoxButtons.YesNoCancel);
+        var choice =
+          MessageBox.Show("Would you like to replace the card list entries?\n('No' will append to the existing list)",
+            "", MessageBoxButtons.YesNoCancel);
         if (choice == DialogResult.No)
         {
           buffer = inputBox.Text;
@@ -713,7 +804,7 @@ namespace MoxMatrix
 
       if (e.Data.GetDataPresent(DataFormats.FileDrop, true))
       {
-        var files = (string[])e.Data.GetData(DataFormats.FileDrop);
+        var files = (string[]) e.Data.GetData(DataFormats.FileDrop);
         if (files == null || files.Length == 0)
         {
           return;
@@ -751,7 +842,35 @@ namespace MoxMatrix
       else
       {
         e.Effect = DragDropEffects.None;
+      }
+    }
 
+    private void dataGridView1_Leave(object sender, EventArgs e)
+    {
+      imageForm.Visible = false;
+    }
+
+    private void Form1_LocationChanged(object sender, EventArgs e)
+    {
+      if (imageForm != null)
+      {
+        imageForm.Visible = false;
+      }
+    }
+
+    private void Form1_ClientSizeChanged(object sender, EventArgs e)
+    {
+      if (imageForm != null)
+      {
+        imageForm.Visible = false;
+      }
+    }
+
+    private void Form1_RegionChanged(object sender, EventArgs e)
+    {
+      if (imageForm != null)
+      {
+        imageForm.Visible = false;
       }
     }
   }

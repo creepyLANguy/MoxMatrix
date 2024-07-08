@@ -4,6 +4,7 @@ using System.Net;
 using System.Reflection;
 using System.Text;
 using MoxMatrix.Properties;
+using Newtonsoft.Json.Linq;
 
 namespace MoxMatrix
 {
@@ -29,6 +30,8 @@ namespace MoxMatrix
     private const string CardMatchEndpoint = "https://moxmonolith.com/card/search?name=";
 
     private const string PricesEndpoint = "https://moxmonolith.com/card/{id}/products";
+
+    private const string ImageEndpoint = "https://api.scryfall.com/cards/named?exact=";
 
     private readonly Dictionary<int, string> _retailerDictionary = new()
     {
@@ -187,14 +190,21 @@ namespace MoxMatrix
       imageUrls = new();
       foreach (var priceResponse in priceList)
       {
-        if (priceResponse.Products.Count == 0)
+        var cardName = priceResponse.Card.Name;
+
+        using var httpClient = new HttpClient();
+        var uri = ImageEndpoint + Uri.EscapeDataString(cardName);
+        var response = await httpClient.GetAsync(uri);
+
+        if (!response.IsSuccessStatusCode)
         {
           continue;
         }
 
-        var url = priceResponse.Products.OrderByDescending(it => it.Price)
-          .First(it => it.Image != null && it.Image != string.Empty).Image;
-        imageUrls.Add(priceResponse.Card.Name, url);
+        var jsonResponse = await response.Content.ReadAsStringAsync();
+        var data = JObject.Parse(jsonResponse);
+        var url = data["image_uris"]?["border_crop"]?.ToString();
+        imageUrls.Add(cardName, url);
       }
 
       foreach (var priceGroup in priceList)

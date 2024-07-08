@@ -255,6 +255,8 @@ namespace MoxMatrix
       //Doing this twice cos... datagridviews are wierd about how they reorder columns. 
       ReorderColumns(sortedSummaries);
       ReorderColumns(sortedSummaries);
+
+      ReorderRows();
     }
 
     private void RemoveDuplicates(Control control)
@@ -547,6 +549,48 @@ namespace MoxMatrix
         var displayIndex = sortedSummaries.IndexOf(matchingSummary);
         dataGridView1.Columns[i].DisplayIndex = displayIndex + 1;
       }
+    }
+
+    private int CountNonBlankStrings(DataGridViewRow row)
+    {
+      var count = 0;
+      for (var index = 0; index < row.Cells.Count; index++)
+      {
+        var cell = row.Cells[index];
+        if (cell.Value != null && !string.IsNullOrWhiteSpace(cell.Value.ToString()))
+        {
+          count++;
+        }
+      }
+
+      return count;
+    }
+
+    private void ReorderRows()
+    {
+      // Check if there are rows to sort
+      if (dataGridView1.Rows.Count <= 1) return;
+
+      // Separate the last row
+      var lastRow = dataGridView1.Rows[dataGridView1.Rows.Count - 1];
+
+      // Create a list of rows excluding the last one (if it's not the new row)
+      var rows = dataGridView1.Rows.Cast<DataGridViewRow>()
+        .Take(dataGridView1.Rows.Count - 2)
+        .ToList();
+
+      // Sort the rows
+      rows.Sort((row1, row2) => CountNonBlankStrings(row2).CompareTo(CountNonBlankStrings(row1)));
+
+      // Clear the DataGridView and add sorted rows back
+      dataGridView1.Rows.Clear();
+      foreach (var row in rows)
+      {
+        dataGridView1.Rows.Add(row);
+      }
+
+      dataGridView1.Rows.Add();
+      dataGridView1.Rows.Add(lastRow);
     }
 
     private bool ShouldShowProduct(Product product)

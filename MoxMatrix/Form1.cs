@@ -101,7 +101,9 @@ namespace MoxMatrix
       SetDoubleBuffer(dataGridView1, true);
       DoubleBuffered = true;
 
+#if DEBUG
       PopulateDebugData();
+#endif
     }
 
     private void SetupImageForm()
@@ -604,7 +606,7 @@ namespace MoxMatrix
     }
 
     private bool ShouldShowProduct(Product product)
-      => BlackListTerms.All(blackListTerm =>
+      => BlackListTerms.All(blackListTerm => 
         !product.Name.ToLower().Contains(blackListTerm.ToLower()) && product.Price is > 0);
 
     private void btn_exportCSV_Click(object sender, EventArgs e)
@@ -828,6 +830,11 @@ namespace MoxMatrix
     private void FocusOnCorrespondingURL(DataGridViewCellEventArgs e)
     {
       if (e.RowIndex < 0)
+      {
+        return;
+      }
+
+      if (dataGridView1.Rows[e.RowIndex].Cells[0].Value == null)
       {
         return;
       }

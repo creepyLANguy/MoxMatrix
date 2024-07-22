@@ -33,6 +33,7 @@ namespace MoxMatrix
 
     private const string ImageEndpoint = "https://api.scryfall.com/cards/named?exact=";
 
+    //TODO - make more robust as changes to moxmonolith retailers list breaks this program. eg: removal of 16 broke us. 
     private readonly Dictionary<int, string> _retailerDictionary = new()
     {
       {2, ""},
@@ -42,7 +43,6 @@ namespace MoxMatrix
       {11, ""},
       {13, ""},
       {15, ""},
-      {16, ""},
       {18, ""},
       {19, ""},
       {20, ""},

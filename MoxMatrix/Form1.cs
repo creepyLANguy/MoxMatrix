@@ -39,7 +39,6 @@ namespace MoxMatrix
       {2, ""},
       {3, ""},
       {4, ""},
-      {6, ""},
       {11, ""},
       {13, ""},
       {15, ""},
@@ -51,6 +50,8 @@ namespace MoxMatrix
       {34, ""},
       {41, ""},
       {44, ""}
+
+https://moxmonolith.com/card/7597/products?retailers[]=2&retailers[]=3&retailers[]=4&retailers[]=11&retailers[]=13&retailers[]=15&retailers[]=18&retailers[]=19&retailers[]=20&retailers[]=21&retailers[]=26&retailers[]=34&retailers[]=41&retailers[]=44&poll=0
     };
 
     private readonly string _outputFolder = "queries";

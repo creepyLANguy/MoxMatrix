@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using MoxMatrix.Properties;
 using Newtonsoft.Json.Linq;
+using System.Net.Mime;
 
 namespace MoxMatrix
 {
@@ -38,7 +39,7 @@ namespace MoxMatrix
     {
       {2, ""},
       {3, ""},
-      {4, ""},
+      {4, ""},      
       {11, ""},
       {13, ""},
       {15, ""},
@@ -154,7 +155,7 @@ namespace MoxMatrix
       }
       catch (Exception ex)
       {
-        MessageBox.Show($"{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
       }
 
       Text = Text.Replace(processingText, string.Empty);
@@ -170,7 +171,17 @@ namespace MoxMatrix
 
       var cardMatches = await GetCardMatchesListAsync();
 
-      var priceList = await GetPriceListAsync(cardMatches);
+      var priceList = new List<PriceResponse>();
+      try
+      {
+        priceList = await GetPriceListAsync(cardMatches);
+      }
+      catch (Exception ex)
+      {
+        MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        return;
+      }
+      
       if (btn_foils.Checked)
       {
         foreach (var priceGroup in priceList)
@@ -371,6 +382,13 @@ namespace MoxMatrix
         return null;
       }
       var results = await response.Content.ReadAsStringAsync();
+
+      var contentType = response.Content.Headers.ContentType;
+      if (contentType == null || contentType.MediaType != MediaTypeNames.Application.Json) 
+      {
+        throw new Exception("Something is wrong with the response.\nA retailer ID might be invalid in the request params.");
+      }
+
       return JsonConvert.DeserializeObject<PriceResponse>(results);
     }
 

@@ -24,33 +24,36 @@ namespace MoxMatrix
       public List<Card> Cards { get; set; }
     }
 
+    public struct Vendor
+    {
+      public int id;
+      public string name;
+
+      public Vendor(int id, string name)
+      {
+        this.id = id;
+        this.name = name;
+      }
+    }
+
     const string buttonDefault = @"Query Prices";
     const string processingText = @" - Processing...";
     const string queryingText = @"Querying prices from each store...";
 
-    private const string CardMatchEndpoint = "https://moxmonolith.com/card/search?name=";
+    private const string BaseUrl = "https://moxmonolith.com";
 
-    private const string PricesEndpoint = "https://moxmonolith.com/card/{id}/products";
+    private const string CardMatchEndpoint = "/card/search?name=";
 
-    private const string ImageEndpoint = "https://api.scryfall.com/cards/named?exact=";
+    private const string PricesEndpoint = "/card/{id}/products";
 
-    //TODO - make more robust as changes to moxmonolith retailers list breaks this program. eg: removal of 16 broke us. 
-    private readonly Dictionary<int, string> _retailerDictionary = new()
+    private const string ImageEndpoint = "/named?exact=";
+
+    private const string VendorsEndpoint = "/vendors";
+
+    //TODO - make more robust by scraping VendorsEndpoint 
+    private readonly List<Vendor> _retailersList = new()//; //AL.
     {
-      {2, ""},
-      {3, ""},
-      {4, ""},      
-      {11, ""},
-      {13, ""},
-      {15, ""},
-      {18, ""},
-      {19, ""},
-      {20, ""},
-      {21, ""},
-      {26, ""},
-      {34, ""},
-      {41, ""},
-      {44, ""}
+      new Vendor(18, "")
     };
 
     private readonly string _outputFolder = "queries";
@@ -205,7 +208,7 @@ namespace MoxMatrix
         var cardName = priceResponse.Card.Name;
 
         using var httpClient = new HttpClient();
-        var uri = ImageEndpoint + Uri.EscapeDataString(cardName);
+        var uri = BaseUrl + ImageEndpoint + Uri.EscapeDataString(cardName);
         var response = await httpClient.GetAsync(uri);
 
         if (!response.IsSuccessStatusCode)
@@ -300,7 +303,7 @@ namespace MoxMatrix
     private async Task<Card?> GetCardMatchAsync(string input)
     {
       using var httpClient = new HttpClient();
-      var uri = CardMatchEndpoint + input;
+      var uri = BaseUrl + CardMatchEndpoint + input;
       var response = await httpClient.GetAsync(uri);
 
       if (response.StatusCode != HttpStatusCode.OK)
@@ -374,7 +377,7 @@ namespace MoxMatrix
     private async Task<PriceResponse?> GetPriceAsync(Card cardMatch)
     {
       using var httpClient = new HttpClient();
-      var uri = PricesEndpoint.Replace("{id}", cardMatch.Id) + GetRetailersFilter();
+      var uri = BaseUrl + PricesEndpoint.Replace("{id}", cardMatch.Id) + GetRetailersFilter();
       var response = await httpClient.GetAsync(uri);
       if (response.StatusCode != HttpStatusCode.OK)
       {
@@ -395,7 +398,7 @@ namespace MoxMatrix
     private string GetRetailersFilter()
     {
       var buff =
-        _retailerDictionary.Aggregate("?retailers[]=", (current, pair) => current + pair.Key + "&retailers[]=");
+        _retailersList.Aggregate("?retailers[]=", (current, vendor) => current + vendor.id + "&retailers[]=");
 
       buff = buff[..buff.LastIndexOf('&')];
 

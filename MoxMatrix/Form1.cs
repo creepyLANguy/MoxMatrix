@@ -6,6 +6,7 @@ using System.Text;
 using MoxMatrix.Properties;
 using Newtonsoft.Json.Linq;
 using System.Net.Mime;
+using HtmlDocument = HtmlAgilityPack.HtmlDocument;
 
 namespace MoxMatrix
 {
@@ -24,18 +25,15 @@ namespace MoxMatrix
       public List<Card> Cards { get; set; }
     }
 
-    public struct Vendor
+    class Vendor
     {
-      public int id;
-      public string name;
-
-      public Vendor(int id, string name)
-      {
-        this.id = id;
-        this.name = name;
-      }
+      public int Id { get; set; }
+      public string Name { get; set; }
+      public string Type { get; set; }
     }
 
+    const string loadingVendorsText= @"Loading Vendors...";
+    
     const string buttonDefault = @"Query Prices";
     const string processingText = @" - Processing...";
     const string queryingText = @"Querying prices from each store...";
@@ -50,11 +48,7 @@ namespace MoxMatrix
 
     private const string VendorsEndpoint = "/vendors";
 
-    //TODO - make more robust by scraping VendorsEndpoint 
-    private readonly List<Vendor> _retailersList = new()//; //AL.
-    {
-      new Vendor(18, "")
-    };
+    private List<Vendor> _vendorsList;
 
     private readonly string _outputFolder = "queries";
 
@@ -107,6 +101,12 @@ namespace MoxMatrix
 #if DEBUG
       PopulateDebugData();
 #endif
+
+      SuspendForm(loadingVendorsText);
+
+      GetVendors();
+
+      UnsuspendForm(loadingVendorsText);
     }
 
     private void SetupImageForm()
@@ -138,13 +138,92 @@ namespace MoxMatrix
       inputBox.Text += @"teferi, master" + Environment.NewLine;
     }
 
-    private async void btn_go_Click(object sender, EventArgs e)
+    private void SuspendForm(string text)
     {
-      Text += processingText;
+      Text += text;
       btn_go.Text = queryingText;
       dataGridView1.Visible = false;
       Enabled = false;
       Cursor.Current = Cursors.WaitCursor;
+    }
+
+    private void UnsuspendForm(string text)
+    {
+      Text = Text.Replace(loadingVendorsText, string.Empty);
+      btn_go.Text = buttonDefault;
+      dataGridView1.Visible = true;
+      Enabled = true;
+      Cursor.Current = Cursors.Default;
+    }
+
+    private void GetVendors()
+    {
+      using var httpClient = new HttpClient();
+      var uri = BaseUrl + VendorsEndpoint;
+      var request = new HttpRequestMessage(HttpMethod.Get, uri);
+
+      var response = httpClient.Send(request);
+
+      if (response.StatusCode != HttpStatusCode.OK)
+      {
+        MessageBox.Show(
+          "Failed to retrieve a list of vendors.\n\nThe application will now close.", 
+          "Mox Matrix (beta) - ERROR", 
+          MessageBoxButtons.OK, 
+          MessageBoxIcon.Error);
+
+        Close();
+        return;
+      }
+
+      var html = response.Content.ReadAsStringAsync().Result;
+      var doc = new HtmlDocument();
+      doc.LoadHtml(html);
+
+      var dataPage = doc.DocumentNode
+        .SelectSingleNode("//div[@id='app']")?
+        .GetAttributeValue("data-page", "");
+
+      dataPage = dataPage.Replace("&quot", "");
+      dataPage = dataPage.Replace(";", "");
+
+      var lines = dataPage.Split("},");
+
+      _vendorsList = new List<Vendor>();
+
+      foreach (var line in lines)
+      {
+        if (line.Contains("id") == false)
+        {
+          continue;
+        }
+
+        var props = line.Split(",");
+
+        var id = props.First(i => i.Contains("id:"));
+        id = id.Substring(id.LastIndexOf(":") + 1);
+
+        var name = props.First(i => i.Contains("name:"));
+        name = name.Substring(name.LastIndexOf(":") + 1);
+
+        var type = props.First(i => i.Contains("type:"));
+        type = type.Substring(type.LastIndexOf(":") + 1);
+
+        var v = new Vendor
+        {
+          Id = int.Parse(id),
+          Name = name,
+          Type = type
+        };
+        _vendorsList.Add(v);
+      }
+
+      _vendorsList = _vendorsList.Where(v => v.Type == "business").ToList();
+    }
+
+    private async void btn_go_Click(object sender, EventArgs e)
+    {
+      SuspendForm(processingText);
 
       txt_unknownCards.Text = string.Empty;
       txt_outOfStock.Text = string.Empty;
@@ -161,11 +240,7 @@ namespace MoxMatrix
         MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
       }
 
-      Text = Text.Replace(processingText, string.Empty);
-      btn_go.Text = buttonDefault;
-      dataGridView1.Visible = true;
-      Enabled = true;
-      Cursor.Current = Cursors.Default;
+      UnsuspendForm(processingText);
     }
 
     private async Task DoTheThings()
@@ -377,7 +452,7 @@ namespace MoxMatrix
     private async Task<PriceResponse?> GetPriceAsync(Card cardMatch)
     {
       using var httpClient = new HttpClient();
-      var uri = BaseUrl + PricesEndpoint.Replace("{id}", cardMatch.Id) + GetRetailersFilter();
+      var uri = BaseUrl + PricesEndpoint.Replace("{id}", cardMatch.Id) + GetVendorsQueryString();
       var response = await httpClient.GetAsync(uri);
       if (response.StatusCode != HttpStatusCode.OK)
       {
@@ -395,10 +470,10 @@ namespace MoxMatrix
       return JsonConvert.DeserializeObject<PriceResponse>(results);
     }
 
-    private string GetRetailersFilter()
+    private string GetVendorsQueryString()
     {
       var buff =
-        _retailersList.Aggregate("?retailers[]=", (current, vendor) => current + vendor.id + "&retailers[]=");
+        _vendorsList.Aggregate("?retailers[]=", (current, vendor) => current + vendor.Id + "&retailers[]=");
 
       buff = buff[..buff.LastIndexOf('&')];
 
@@ -407,7 +482,7 @@ namespace MoxMatrix
 
     private List<string> GenerateCsv(List<PriceResponse> priceResponses)
     {
-      var cheapestProducts = new Dictionary<(string cardId, string retailerName), Product>();
+      var cheapestProducts = new Dictionary<(string cardId, string vendorName), Product>();
 
       foreach (var priceResponse in priceResponses)
       {
@@ -425,8 +500,8 @@ namespace MoxMatrix
         }
       }
 
-      // Extract unique retailer names and card names
-      var retailerNames = cheapestProducts.Values.Select(p => p.Retailer_Name).Distinct().ToList();
+      // Extract unique vendor names and card names
+      var vendorNames = cheapestProducts.Values.Select(p => p.Retailer_Name).Distinct().ToList();
       var cardNames = priceResponses.Select(pr => pr.Card.Name).Distinct().ToList();
 
       foreach (var cardName in cardNames)
@@ -475,8 +550,8 @@ namespace MoxMatrix
       // Create the CSV content
       var csvLines = new List<string>();
 
-      // Header row with retailer names
-      var headerRow = csvDelim + string.Join(csvDelim, retailerNames);
+      // Header row with vendor names
+      var headerRow = csvDelim + string.Join(csvDelim, vendorNames);
       csvLines.Add(headerRow);
 
       // Rows with card names and prices
@@ -484,12 +559,12 @@ namespace MoxMatrix
       {
         var row = new List<string> { cardName };
 
-        foreach (var retailerName in retailerNames)
+        foreach (var vendorName in vendorNames)
         {
-          var key = (cardName, retailerName);
+          var key = (cardName, vendorName);
           if (cheapestProducts.TryGetValue(key, out var product) && product.Price.HasValue)
           {
-            row.Add((product.Price.Value / 100).ToString() + (IsMostLikelyFoil(product) ? "  ✨" : ""));
+            row.Add((product.Price.Value / 100) + (IsMostLikelyFoil(product) ? "  ✨" : ""));
           }
           else
           {
@@ -504,10 +579,10 @@ namespace MoxMatrix
 
       // Final row with total prices for each column
       var totalRow = new List<string> { "Total Price" };
-      foreach (var retailerName in retailerNames)
+      foreach (var vendorName in vendorNames)
       {
         var totalPrice = cheapestProducts
-          .Where(cp => cp.Key.retailerName == retailerName && cp.Value.Price.HasValue)
+          .Where(cp => cp.Key.vendorName == vendorName && cp.Value.Price.HasValue)
           .Sum(cp => cp.Value.Price.Value);
         totalRow.Add((totalPrice / 100).ToString());
       }

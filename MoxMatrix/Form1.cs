@@ -32,8 +32,8 @@ namespace MoxMatrix
       public string Type { get; set; }
     }
 
-    const string loadingVendorsText= @"Loading Vendors...";
-    
+    const string loadingVendorsText = @"Loading Vendors...";
+
     const string buttonDefault = @"Query Prices";
     const string processingText = @" - Processing...";
     const string queryingText = @"Querying prices from each store...";
@@ -149,7 +149,7 @@ namespace MoxMatrix
 
     private void UnsuspendForm(string text)
     {
-      Text = Text.Replace(loadingVendorsText, string.Empty);
+      Text = Text.Replace(text, string.Empty);
       btn_go.Text = buttonDefault;
       dataGridView1.Visible = true;
       Enabled = true;
@@ -167,9 +167,9 @@ namespace MoxMatrix
       if (response.StatusCode != HttpStatusCode.OK)
       {
         MessageBox.Show(
-          "Failed to retrieve a list of vendors.\n\nThe application will now close.", 
-          "Mox Matrix (beta) - ERROR", 
-          MessageBoxButtons.OK, 
+          "Failed to retrieve a list of vendors.\n\nThe application will now close.",
+          "Mox Matrix (beta) - ERROR",
+          MessageBoxButtons.OK,
           MessageBoxIcon.Error);
 
         Close();
@@ -259,7 +259,7 @@ namespace MoxMatrix
         MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         return;
       }
-      
+
       if (btn_foils.Checked)
       {
         foreach (var priceGroup in priceList)
@@ -462,7 +462,7 @@ namespace MoxMatrix
       var results = await response.Content.ReadAsStringAsync();
 
       var contentType = response.Content.Headers.ContentType;
-      if (contentType == null || contentType.MediaType != MediaTypeNames.Application.Json) 
+      if (contentType == null || contentType.MediaType != MediaTypeNames.Application.Json)
       {
         throw new Exception("Something is wrong with the response.\nA retailer ID might be invalid in the request params.");
       }
@@ -701,7 +701,7 @@ namespace MoxMatrix
     }
 
     private bool ShouldShowProduct(Product product)
-      => BlackListTerms.All(blackListTerm => 
+      => BlackListTerms.All(blackListTerm =>
         !product.Name.ToLower().Contains(blackListTerm.ToLower()) && product.Price is > 0);
 
     private void btn_exportCSV_Click(object sender, EventArgs e)

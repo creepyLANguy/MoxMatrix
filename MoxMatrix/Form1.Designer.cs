@@ -82,7 +82,7 @@ namespace MoxMatrix
       dataGridView1.Location = new Point(12, 14);
       dataGridView1.Name = "dataGridView1";
       dataGridView1.RowTemplate.Height = 25;
-      dataGridView1.Size = new Size(1259, 336);
+      dataGridView1.Size = new Size(1259, 330);
       dataGridView1.TabIndex = 2;
       dataGridView1.CellClick += dataGridView1_CellClick;
       dataGridView1.CellEnter += dataGridView1_CellEnter;
@@ -93,7 +93,7 @@ namespace MoxMatrix
       // 
       btn_exportCSV.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
       btn_exportCSV.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-      btn_exportCSV.Location = new Point(12, 356);
+      btn_exportCSV.Location = new Point(12, 350);
       btn_exportCSV.Name = "btn_exportCSV";
       btn_exportCSV.Size = new Size(1259, 55);
       btn_exportCSV.TabIndex = 3;
@@ -143,7 +143,7 @@ namespace MoxMatrix
       btn_foils.Location = new Point(284, 496);
       btn_foils.Name = "btn_foils";
       btn_foils.Size = new Size(120, 25);
-      btn_foils.TabIndex = 0;
+      btn_foils.TabIndex = 1;
       btn_foils.Text = "OnlyFoils ✨";
       btn_foils.UseVisualStyleBackColor = true;
       // 
@@ -238,7 +238,7 @@ namespace MoxMatrix
       btn_go.Location = new Point(12, 480);
       btn_go.Name = "btn_go";
       btn_go.Size = new Size(266, 55);
-      btn_go.TabIndex = 1;
+      btn_go.TabIndex = 0;
       btn_go.Text = "[query]";
       btn_go.UseVisualStyleBackColor = true;
       btn_go.Click += btn_go_Click;

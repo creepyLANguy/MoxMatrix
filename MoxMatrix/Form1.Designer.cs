@@ -143,7 +143,7 @@ namespace MoxMatrix
       btn_foils.Location = new Point(284, 496);
       btn_foils.Name = "btn_foils";
       btn_foils.Size = new Size(120, 25);
-      btn_foils.TabIndex = 1;
+      btn_foils.TabIndex = 2;
       btn_foils.Text = "OnlyFoils ✨";
       btn_foils.UseVisualStyleBackColor = true;
       // 
@@ -171,6 +171,7 @@ namespace MoxMatrix
       // txt_unknownCards
       // 
       txt_unknownCards.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+      txt_unknownCards.ForeColor = SystemColors.WindowText;
       txt_unknownCards.Location = new Point(410, 27);
       txt_unknownCards.Multiline = true;
       txt_unknownCards.Name = "txt_unknownCards";
@@ -238,7 +239,7 @@ namespace MoxMatrix
       btn_go.Location = new Point(12, 480);
       btn_go.Name = "btn_go";
       btn_go.Size = new Size(266, 55);
-      btn_go.TabIndex = 0;
+      btn_go.TabIndex = 1;
       btn_go.Text = "[query]";
       btn_go.UseVisualStyleBackColor = true;
       btn_go.Click += btn_go_Click;
@@ -289,6 +290,7 @@ namespace MoxMatrix
       // 
       txt_errorFetching.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
       txt_errorFetching.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+      txt_errorFetching.ForeColor = SystemColors.WindowText;
       txt_errorFetching.Location = new Point(410, 280);
       txt_errorFetching.Multiline = true;
       txt_errorFetching.Name = "txt_errorFetching";

@@ -9,9 +9,28 @@ namespace MoxMatrix
       InitializeComponent();
     }
 
-    public void SetPicture(string imageUrl)
+    public bool SetPicture(string imageUrl)
     {
-      pictureBox1.Load(imageUrl);
+      //AL.
+      //TODO - Fix break on "https://c1.scryfall.com/file/scryfall-cards/large/front/5/e/5e6fac09-34e1-495a-ba70-8110845fbefb.jpg" 
+
+      //var qindex = imageUrl.IndexOf('?');
+      //if (qindex != -1)
+      //{
+      //  imageUrl = imageUrl.Substring(0, qindex);
+      //}
+
+      try
+      {
+        pictureBox1.Load(imageUrl);
+      }
+      catch (Exception e)
+      {
+        Console.WriteLine(e);
+        return false;
+      }
+
+      return true;
     }
 
     private void ImageForm_Leave(object sender, EventArgs e)

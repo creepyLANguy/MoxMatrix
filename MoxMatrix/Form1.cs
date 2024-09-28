@@ -282,18 +282,33 @@ namespace MoxMatrix
       {
         var cardName = priceResponse.Card.Name;
 
-        using var httpClient = new HttpClient();
-        var uri = BaseUrl + ImageEndpoint + Uri.EscapeDataString(cardName);
-        var response = await httpClient.GetAsync(uri);
+        //using var httpClient = new HttpClient();
+        //var uri = BaseUrl + ImageEndpoint + Uri.EscapeDataString(cardName);
+        //var response = await httpClient.GetAsync(uri);
 
-        if (!response.IsSuccessStatusCode)
+        //if (!response.IsSuccessStatusCode)
+        //{
+        //  continue;
+        //}
+
+        //var jsonResponse = await response.Content.ReadAsStringAsync();
+        //var data = JObject.Parse(jsonResponse);
+        //var url = data["image_uris"]?["border_crop"]?.ToString();
+
+        //AL.
+        //TODO - FIX!
+        if (priceResponse.Products.Count == 0)
         {
           continue;
         }
 
-        var jsonResponse = await response.Content.ReadAsStringAsync();
-        var data = JObject.Parse(jsonResponse);
-        var url = data["image_uris"]?["border_crop"]?.ToString();
+        var url = priceResponse.Products.First().Image;
+        if (priceResponse.Products.Count > 2)
+        {
+          url = priceResponse.Products[2].Image;
+        }
+        //
+
         imageUrls.Add(cardName, url);
       }
 
@@ -916,8 +931,8 @@ namespace MoxMatrix
       imageForm.Location = pos;
 
       imageForm.Tag = url;
-      imageForm.SetPicture(url);
-      imageForm.Visible = true;
+      var result = imageForm.SetPicture(url);
+      imageForm.Visible = result;
 
       Focus();
     }

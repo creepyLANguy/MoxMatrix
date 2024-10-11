@@ -4,7 +4,6 @@ using System.Net;
 using System.Reflection;
 using System.Text;
 using MoxMatrix.Properties;
-using Newtonsoft.Json.Linq;
 using System.Net.Mime;
 using HtmlDocument = HtmlAgilityPack.HtmlDocument;
 
@@ -884,12 +883,24 @@ namespace MoxMatrix
     }
 
     private void txt_urls_LinkClicked(object sender, LinkClickedEventArgs e)
-      => Process.Start("cmd", "/C start" + " " + e.LinkText);
-
-    private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
     {
-      FocusOnCorrespondingURL(e);
+      var args = "/C start " + e.LinkText.Replace("&", "^&");
+
+      var psi = new ProcessStartInfo
+      {
+        FileName = "cmd",
+        WindowStyle = ProcessWindowStyle.Hidden,
+        UseShellExecute = false,
+        CreateNoWindow = true,
+        Arguments = args
+      };
+      Process.Start(psi);
     }
+
+
+    private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e) 
+      => FocusOnCorrespondingURL(e);
+   
 
     private void dataGridView1_CellEnter(object sender, DataGridViewCellEventArgs e)
     {

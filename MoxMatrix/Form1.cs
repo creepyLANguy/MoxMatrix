@@ -217,6 +217,9 @@ namespace MoxMatrix
         _vendorsList.Add(v);
       }
 
+
+      //AL.
+      //TODO - filter the results based on selected vendors
       _vendorsList = _vendorsList.Where(v => v.Type == "business").ToList();
     }
 

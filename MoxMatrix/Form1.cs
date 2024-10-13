@@ -49,7 +49,7 @@ namespace MoxMatrix
 
     private List<Vendor> _vendorsList;
 
-    private readonly string _outputFolder = "queries";
+    private readonly string _queryOutputFolderName = "queries";
 
     public class Product
     {
@@ -324,12 +324,15 @@ namespace MoxMatrix
 
       var csvLines = GenerateCsv(priceList);
 
-      Directory.CreateDirectory(_outputFolder);
-      var fileName = _outputFolder + "//" + DateTime.Now.ToFileTime() + ".csv";
-      File.WriteAllLines(fileName, csvLines);
+      var queryOutputFolderFullPath =
+        Path.Join(Path.GetDirectoryName(AppContext.BaseDirectory), _queryOutputFolderName);
 
-      var csvData = await File.ReadAllLinesAsync(fileName);
-      LoadCsvDataIntoDataGridView(csvData);
+      Directory.CreateDirectory(queryOutputFolderFullPath);
+
+      var fullFilePath = Path.Join(queryOutputFolderFullPath, DateTime.Now.ToFileTime() + ".csv");
+      File.WriteAllLines(fullFilePath, csvLines);
+
+      LoadCsvDataIntoDataGridView(ref csvLines);
 
       var summaries = new List<Tuple<Tuple<int, int>, string>>();
 
@@ -640,7 +643,7 @@ namespace MoxMatrix
       }
     }
 
-    private void LoadCsvDataIntoDataGridView(string[] csvData)
+    private void LoadCsvDataIntoDataGridView(ref List<string> csvData)
     {
       // Clear existing DataGridView content
       dataGridView1.Rows.Clear();

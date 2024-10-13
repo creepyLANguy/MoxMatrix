@@ -51,6 +51,10 @@ namespace MoxMatrix
       label6 = new Label();
       txt_errorFetching = new TextBox();
       panel1 = new Panel();
+      cl_individuals = new CheckedListBox();
+      cl_businesses = new CheckedListBox();
+      label8 = new Label();
+      label7 = new Label();
       ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
       ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
       splitContainer1.Panel1.SuspendLayout();
@@ -140,7 +144,7 @@ namespace MoxMatrix
       btn_foils.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
       btn_foils.AutoSize = true;
       btn_foils.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-      btn_foils.Location = new Point(284, 496);
+      btn_foils.Location = new Point(493, 496);
       btn_foils.Name = "btn_foils";
       btn_foils.Size = new Size(120, 25);
       btn_foils.TabIndex = 2;
@@ -158,26 +162,25 @@ namespace MoxMatrix
       // 
       // txt_outOfStock
       // 
-      txt_outOfStock.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
       txt_outOfStock.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
       txt_outOfStock.Location = new Point(699, 27);
       txt_outOfStock.Multiline = true;
       txt_outOfStock.Name = "txt_outOfStock";
       txt_outOfStock.ReadOnly = true;
       txt_outOfStock.ScrollBars = ScrollBars.Both;
-      txt_outOfStock.Size = new Size(283, 508);
+      txt_outOfStock.Size = new Size(283, 172);
       txt_outOfStock.TabIndex = 5;
       // 
       // txt_unknownCards
       // 
       txt_unknownCards.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
       txt_unknownCards.ForeColor = SystemColors.WindowText;
-      txt_unknownCards.Location = new Point(410, 27);
+      txt_unknownCards.Location = new Point(699, 220);
       txt_unknownCards.Multiline = true;
       txt_unknownCards.Name = "txt_unknownCards";
       txt_unknownCards.ReadOnly = true;
       txt_unknownCards.ScrollBars = ScrollBars.Both;
-      txt_unknownCards.Size = new Size(283, 221);
+      txt_unknownCards.Size = new Size(283, 189);
       txt_unknownCards.TabIndex = 4;
       // 
       // txt_storesSummaries
@@ -208,7 +211,7 @@ namespace MoxMatrix
       // label2
       // 
       label2.AutoSize = true;
-      label2.Location = new Point(410, 9);
+      label2.Location = new Point(699, 202);
       label2.Name = "label2";
       label2.Size = new Size(202, 15);
       label2.TabIndex = 7;
@@ -238,7 +241,7 @@ namespace MoxMatrix
       btn_go.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
       btn_go.Location = new Point(12, 480);
       btn_go.Name = "btn_go";
-      btn_go.Size = new Size(266, 55);
+      btn_go.Size = new Size(392, 55);
       btn_go.TabIndex = 1;
       btn_go.Text = "[query]";
       btn_go.UseVisualStyleBackColor = true;
@@ -253,6 +256,7 @@ namespace MoxMatrix
       // 
       // splitContainer1.Panel1
       // 
+      splitContainer1.Panel1.Controls.Add(btn_foils);
       splitContainer1.Panel1.Controls.Add(label6);
       splitContainer1.Panel1.Controls.Add(txt_errorFetching);
       splitContainer1.Panel1.Controls.Add(panel1);
@@ -265,7 +269,10 @@ namespace MoxMatrix
       splitContainer1.Panel1.Controls.Add(txt_unknownCards);
       splitContainer1.Panel1.Controls.Add(txt_outOfStock);
       splitContainer1.Panel1.Controls.Add(label1);
-      splitContainer1.Panel1.Controls.Add(btn_foils);
+      splitContainer1.Panel1.Controls.Add(cl_individuals);
+      splitContainer1.Panel1.Controls.Add(cl_businesses);
+      splitContainer1.Panel1.Controls.Add(label8);
+      splitContainer1.Panel1.Controls.Add(label7);
       // 
       // splitContainer1.Panel2
       // 
@@ -280,7 +287,7 @@ namespace MoxMatrix
       // label6
       // 
       label6.AutoSize = true;
-      label6.Location = new Point(410, 262);
+      label6.Location = new Point(699, 412);
       label6.Name = "label6";
       label6.Size = new Size(278, 15);
       label6.TabIndex = 11;
@@ -291,12 +298,12 @@ namespace MoxMatrix
       txt_errorFetching.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
       txt_errorFetching.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
       txt_errorFetching.ForeColor = SystemColors.WindowText;
-      txt_errorFetching.Location = new Point(410, 280);
+      txt_errorFetching.Location = new Point(699, 430);
       txt_errorFetching.Multiline = true;
       txt_errorFetching.Name = "txt_errorFetching";
       txt_errorFetching.ReadOnly = true;
       txt_errorFetching.ScrollBars = ScrollBars.Both;
-      txt_errorFetching.Size = new Size(283, 255);
+      txt_errorFetching.Size = new Size(283, 105);
       txt_errorFetching.TabIndex = 10;
       // 
       // panel1
@@ -307,6 +314,48 @@ namespace MoxMatrix
       panel1.Name = "panel1";
       panel1.Size = new Size(1259, 2);
       panel1.TabIndex = 9;
+      // 
+      // cl_individuals
+      // 
+      cl_individuals.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
+      cl_individuals.CheckOnClick = true;
+      cl_individuals.FormattingEnabled = true;
+      cl_individuals.HorizontalScrollbar = true;
+      cl_individuals.Location = new Point(410, 362);
+      cl_individuals.Name = "cl_individuals";
+      cl_individuals.Size = new Size(283, 112);
+      cl_individuals.TabIndex = 17;
+      cl_individuals.UseTabStops = false;
+      // 
+      // cl_businesses
+      // 
+      cl_businesses.CheckOnClick = true;
+      cl_businesses.FormattingEnabled = true;
+      cl_businesses.HorizontalScrollbar = true;
+      cl_businesses.Location = new Point(410, 27);
+      cl_businesses.Name = "cl_businesses";
+      cl_businesses.Size = new Size(283, 310);
+      cl_businesses.TabIndex = 16;
+      cl_businesses.UseTabStops = false;
+      cl_businesses.ItemCheck += cl_businesses_ItemCheck;
+      // 
+      // label8
+      // 
+      label8.AutoSize = true;
+      label8.Location = new Point(410, 344);
+      label8.Name = "label8";
+      label8.Size = new Size(67, 15);
+      label8.TabIndex = 13;
+      label8.Text = "Individuals:";
+      // 
+      // label7
+      // 
+      label7.AutoSize = true;
+      label7.Location = new Point(410, 9);
+      label7.Name = "label7";
+      label7.Size = new Size(66, 15);
+      label7.TabIndex = 12;
+      label7.Text = "Businesses:";
       // 
       // Form1
       // 
@@ -358,5 +407,9 @@ namespace MoxMatrix
     private Panel panel1;
     private Label label6;
     private TextBox txt_errorFetching;
+    private Label label7;
+    private Label label8;
+    private CheckedListBox cl_businesses;
+    private CheckedListBox cl_individuals;
   }
 }

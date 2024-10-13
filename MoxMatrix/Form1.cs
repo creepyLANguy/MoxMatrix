@@ -6,6 +6,9 @@ using System.Text;
 using MoxMatrix.Properties;
 using System.Net.Mime;
 using HtmlDocument = HtmlAgilityPack.HtmlDocument;
+using System.Numerics;
+using System.Windows.Forms;
+using Newtonsoft.Json.Linq;
 
 namespace MoxMatrix
 {
@@ -220,7 +223,22 @@ namespace MoxMatrix
 
       //AL.
       //TODO - filter the results based on selected vendors
-      _vendorsList = _vendorsList.Where(v => v.Type == "business").ToList();
+      //_vendorsList = _vendorsList.Where(v => v.Type == "business").ToList();
+
+      //cl_businesses.Items.Add("ALL", true);
+      //cl_individuals.Items.Add("ALL", true);
+
+      foreach (var vendor in _vendorsList)
+      {
+        if (vendor.Type == "business")
+        {
+          cl_businesses.Items.Add(vendor.Name, true);
+        }
+        else if (vendor.Type == "individual")
+        {
+          cl_individuals.Items.Add(vendor.Name, true);
+        }
+      }
     }
 
     private async void btn_go_Click(object sender, EventArgs e)
@@ -904,9 +922,9 @@ namespace MoxMatrix
     }
 
 
-    private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e) 
+    private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
       => FocusOnCorrespondingURL(e);
-   
+
 
     private void dataGridView1_CellEnter(object sender, DataGridViewCellEventArgs e)
     {
@@ -1071,6 +1089,25 @@ namespace MoxMatrix
       {
         imageForm.Visible = false;
       }
+    }
+
+    private void cl_businesses_ItemCheck(object sender, ItemCheckEventArgs e)
+    {
+      //if (cl_businesses.Enabled == false)
+      //{
+      //  return;
+      //}
+      ////var index = cl_businesses.Items.IndexOf("ALL");
+      //var allChecked = cl_businesses.CheckedItems.Count == cl_businesses.Items.Count;
+
+      //for (var i = 0; i < cl_businesses.Items.Count; i++)
+      //{
+      //  if ((string) cl_businesses.Items[i] == "ALL")
+      //  {
+      //    cl_businesses.SetItemChecked(i, allChecked);
+      //    break;
+      //  }
+      //}
     }
   }
 }

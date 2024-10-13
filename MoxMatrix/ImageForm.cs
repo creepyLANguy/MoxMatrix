@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace MoxMatrix
+﻿namespace MoxMatrix
 {
   public partial class ImageForm : Form
   {

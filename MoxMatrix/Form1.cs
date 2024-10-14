@@ -218,14 +218,6 @@ namespace MoxMatrix
         _vendorsList.Add(v);
       }
 
-
-      //AL.
-      //TODO - filter the results based on selected vendors
-      //_vendorsList = _vendorsList.Where(v => v.Type == "business").ToList();
-
-      //cl_businesses.Items.Add("ALL", true);
-      //cl_individuals.Items.Add("ALL", true);
-
       foreach (var vendor in _vendorsList)
       {
         if (vendor.Type == "business")
@@ -508,6 +500,8 @@ namespace MoxMatrix
 
     private string GetVendorsQueryString()
     {
+      //AL.
+      //TODO - only use retailers that are selected in checkboxes. Can optimise a little by seeing state of the "All" checkboxes.
       var buff =
         _vendorsList.Aggregate("?retailers[]=", (current, vendor) => current + vendor.Id + "&retailers[]=");
 

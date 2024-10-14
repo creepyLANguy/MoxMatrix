@@ -48,6 +48,8 @@ namespace MoxMatrix
       label3 = new Label();
       btn_go = new Button();
       splitContainer1 = new SplitContainer();
+      cb_individualsAll = new CheckBox();
+      cb_businessesAll = new CheckBox();
       label6 = new Label();
       txt_errorFetching = new TextBox();
       panel1 = new Panel();
@@ -86,7 +88,7 @@ namespace MoxMatrix
       dataGridView1.Location = new Point(12, 14);
       dataGridView1.Name = "dataGridView1";
       dataGridView1.RowTemplate.Height = 25;
-      dataGridView1.Size = new Size(1259, 330);
+      dataGridView1.Size = new Size(1259, 282);
       dataGridView1.TabIndex = 2;
       dataGridView1.CellClick += dataGridView1_CellClick;
       dataGridView1.CellEnter += dataGridView1_CellEnter;
@@ -97,7 +99,7 @@ namespace MoxMatrix
       // 
       btn_exportCSV.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
       btn_exportCSV.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-      btn_exportCSV.Location = new Point(12, 350);
+      btn_exportCSV.Location = new Point(12, 302);
       btn_exportCSV.Name = "btn_exportCSV";
       btn_exportCSV.Size = new Size(1259, 55);
       btn_exportCSV.TabIndex = 3;
@@ -256,6 +258,8 @@ namespace MoxMatrix
       // 
       // splitContainer1.Panel1
       // 
+      splitContainer1.Panel1.Controls.Add(cb_individualsAll);
+      splitContainer1.Panel1.Controls.Add(cb_businessesAll);
       splitContainer1.Panel1.Controls.Add(btn_foils);
       splitContainer1.Panel1.Controls.Add(label6);
       splitContainer1.Panel1.Controls.Add(txt_errorFetching);
@@ -283,6 +287,32 @@ namespace MoxMatrix
       splitContainer1.SplitterWidth = 10;
       splitContainer1.TabIndex = 9;
       splitContainer1.Paint += splitContainer1_Paint;
+      // 
+      // cb_individualsAll
+      // 
+      cb_individualsAll.AutoSize = true;
+      cb_individualsAll.Checked = true;
+      cb_individualsAll.CheckState = CheckState.Checked;
+      cb_individualsAll.Location = new Point(482, 343);
+      cb_individualsAll.Name = "cb_individualsAll";
+      cb_individualsAll.Size = new Size(40, 19);
+      cb_individualsAll.TabIndex = 19;
+      cb_individualsAll.Text = "All";
+      cb_individualsAll.UseVisualStyleBackColor = true;
+      cb_individualsAll.CheckedChanged += cb_individualsAll_CheckedChanged;
+      // 
+      // cb_businessesAll
+      // 
+      cb_businessesAll.AutoSize = true;
+      cb_businessesAll.Checked = true;
+      cb_businessesAll.CheckState = CheckState.Checked;
+      cb_businessesAll.Location = new Point(482, 8);
+      cb_businessesAll.Name = "cb_businessesAll";
+      cb_businessesAll.Size = new Size(40, 19);
+      cb_businessesAll.TabIndex = 18;
+      cb_businessesAll.Text = "All";
+      cb_businessesAll.UseVisualStyleBackColor = true;
+      cb_businessesAll.CheckedChanged += cb_businessesAll_CheckedChanged;
       // 
       // label6
       // 
@@ -326,6 +356,7 @@ namespace MoxMatrix
       cl_individuals.Size = new Size(283, 112);
       cl_individuals.TabIndex = 17;
       cl_individuals.UseTabStops = false;
+      cl_individuals.MouseUp += cl_individuals_MouseUp;
       // 
       // cl_businesses
       // 
@@ -337,7 +368,7 @@ namespace MoxMatrix
       cl_businesses.Size = new Size(283, 310);
       cl_businesses.TabIndex = 16;
       cl_businesses.UseTabStops = false;
-      cl_businesses.ItemCheck += cl_businesses_ItemCheck;
+      cl_businesses.MouseUp += cl_businesses_MouseUp;
       // 
       // label8
       // 
@@ -411,5 +442,7 @@ namespace MoxMatrix
     private Label label8;
     private CheckedListBox cl_businesses;
     private CheckedListBox cl_individuals;
+    private CheckBox cb_individualsAll;
+    private CheckBox cb_businessesAll;
   }
 }

@@ -6,9 +6,6 @@ using System.Text;
 using MoxMatrix.Properties;
 using System.Net.Mime;
 using HtmlDocument = HtmlAgilityPack.HtmlDocument;
-using System.Numerics;
-using System.Windows.Forms;
-using Newtonsoft.Json.Linq;
 
 namespace MoxMatrix
 {
@@ -1091,23 +1088,26 @@ namespace MoxMatrix
       }
     }
 
-    private void cl_businesses_ItemCheck(object sender, ItemCheckEventArgs e)
+    private void cl_businesses_MouseUp(object sender, MouseEventArgs e)
     {
-      //if (cl_businesses.Enabled == false)
-      //{
-      //  return;
-      //}
-      ////var index = cl_businesses.Items.IndexOf("ALL");
-      //var allChecked = cl_businesses.CheckedItems.Count == cl_businesses.Items.Count;
+      cb_businessesAll.Checked = cl_businesses.CheckedItems.Count == cl_businesses.Items.Count;
+    }
 
-      //for (var i = 0; i < cl_businesses.Items.Count; i++)
-      //{
-      //  if ((string) cl_businesses.Items[i] == "ALL")
-      //  {
-      //    cl_businesses.SetItemChecked(i, allChecked);
-      //    break;
-      //  }
-      //}
+    private void cl_individuals_MouseUp(object sender, MouseEventArgs e)
+    {
+      cb_individualsAll.Checked = cl_individuals.CheckedItems.Count == cl_individuals.Items.Count;
+    }
+
+    private void cb_businessesAll_CheckedChanged(object sender, EventArgs e)
+    {
+      //AL.
+      
+
+    }
+
+    private void cb_individualsAll_CheckedChanged(object sender, EventArgs e)
+    {
+      //AL.
     }
   }
 }

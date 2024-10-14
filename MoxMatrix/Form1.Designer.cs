@@ -48,12 +48,12 @@ namespace MoxMatrix
       label3 = new Label();
       btn_go = new Button();
       splitContainer1 = new SplitContainer();
+      panel1 = new Panel();
       panel2 = new Panel();
       cb_individualsAll = new CheckBox();
       cb_businessesAll = new CheckBox();
       label6 = new Label();
       txt_errorFetching = new TextBox();
-      panel1 = new Panel();
       cl_individuals = new CheckedListBox();
       cl_businesses = new CheckedListBox();
       label8 = new Label();
@@ -71,6 +71,7 @@ namespace MoxMatrix
       dataGridView1.AllowUserToAddRows = false;
       dataGridView1.AllowUserToDeleteRows = false;
       dataGridView1.AllowUserToOrderColumns = true;
+      dataGridView1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
       dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
       dataGridView1.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
       dataGridView1.BackgroundColor = SystemColors.Control;
@@ -89,7 +90,7 @@ namespace MoxMatrix
       dataGridView1.Location = new Point(12, 14);
       dataGridView1.Name = "dataGridView1";
       dataGridView1.RowTemplate.Height = 25;
-      dataGridView1.Size = new Size(1259, 330);
+      dataGridView1.Size = new Size(1259, 339);
       dataGridView1.TabIndex = 2;
       dataGridView1.CellClick += dataGridView1_CellClick;
       dataGridView1.CellEnter += dataGridView1_CellEnter;
@@ -100,7 +101,7 @@ namespace MoxMatrix
       // 
       btn_exportCSV.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
       btn_exportCSV.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-      btn_exportCSV.Location = new Point(12, 332);
+      btn_exportCSV.Location = new Point(12, 365);
       btn_exportCSV.Name = "btn_exportCSV";
       btn_exportCSV.Size = new Size(1259, 55);
       btn_exportCSV.TabIndex = 3;
@@ -281,6 +282,7 @@ namespace MoxMatrix
       // 
       // splitContainer1.Panel2
       // 
+      splitContainer1.Panel2.AutoScroll = true;
       splitContainer1.Panel2.Controls.Add(btn_exportCSV);
       splitContainer1.Panel2.Controls.Add(dataGridView1);
       splitContainer1.Size = new Size(1283, 983);
@@ -288,6 +290,15 @@ namespace MoxMatrix
       splitContainer1.SplitterWidth = 10;
       splitContainer1.TabIndex = 9;
       splitContainer1.Paint += splitContainer1_Paint;
+      // 
+      // panel1
+      // 
+      panel1.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+      panel1.BackColor = SystemColors.ControlLight;
+      panel1.Location = new Point(12, 541);
+      panel1.Name = "panel1";
+      panel1.Size = new Size(1259, 2);
+      panel1.TabIndex = 9;
       // 
       // panel2
       // 
@@ -345,15 +356,6 @@ namespace MoxMatrix
       txt_errorFetching.ScrollBars = ScrollBars.Both;
       txt_errorFetching.Size = new Size(283, 105);
       txt_errorFetching.TabIndex = 10;
-      // 
-      // panel1
-      // 
-      panel1.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-      panel1.BackColor = SystemColors.ControlLight;
-      panel1.Location = new Point(12, 541);
-      panel1.Name = "panel1";
-      panel1.Size = new Size(1259, 2);
-      panel1.TabIndex = 9;
       // 
       // cl_individuals
       // 

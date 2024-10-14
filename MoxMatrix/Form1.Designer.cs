@@ -48,6 +48,7 @@ namespace MoxMatrix
       label3 = new Label();
       btn_go = new Button();
       splitContainer1 = new SplitContainer();
+      panel2 = new Panel();
       cb_individualsAll = new CheckBox();
       cb_businessesAll = new CheckBox();
       label6 = new Label();
@@ -62,6 +63,7 @@ namespace MoxMatrix
       splitContainer1.Panel1.SuspendLayout();
       splitContainer1.Panel2.SuspendLayout();
       splitContainer1.SuspendLayout();
+      panel2.SuspendLayout();
       SuspendLayout();
       // 
       // dataGridView1
@@ -69,7 +71,6 @@ namespace MoxMatrix
       dataGridView1.AllowUserToAddRows = false;
       dataGridView1.AllowUserToDeleteRows = false;
       dataGridView1.AllowUserToOrderColumns = true;
-      dataGridView1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
       dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
       dataGridView1.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
       dataGridView1.BackgroundColor = SystemColors.Control;
@@ -88,7 +89,7 @@ namespace MoxMatrix
       dataGridView1.Location = new Point(12, 14);
       dataGridView1.Name = "dataGridView1";
       dataGridView1.RowTemplate.Height = 25;
-      dataGridView1.Size = new Size(1259, 282);
+      dataGridView1.Size = new Size(1259, 330);
       dataGridView1.TabIndex = 2;
       dataGridView1.CellClick += dataGridView1_CellClick;
       dataGridView1.CellEnter += dataGridView1_CellEnter;
@@ -99,7 +100,7 @@ namespace MoxMatrix
       // 
       btn_exportCSV.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
       btn_exportCSV.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-      btn_exportCSV.Location = new Point(12, 302);
+      btn_exportCSV.Location = new Point(12, 332);
       btn_exportCSV.Name = "btn_exportCSV";
       btn_exportCSV.Size = new Size(1259, 55);
       btn_exportCSV.TabIndex = 3;
@@ -146,7 +147,7 @@ namespace MoxMatrix
       btn_foils.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
       btn_foils.AutoSize = true;
       btn_foils.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-      btn_foils.Location = new Point(493, 496);
+      btn_foils.Location = new Point(84, 21);
       btn_foils.Name = "btn_foils";
       btn_foils.Size = new Size(120, 25);
       btn_foils.TabIndex = 2;
@@ -258,12 +259,12 @@ namespace MoxMatrix
       // 
       // splitContainer1.Panel1
       // 
+      splitContainer1.Panel1.Controls.Add(panel1);
+      splitContainer1.Panel1.Controls.Add(panel2);
       splitContainer1.Panel1.Controls.Add(cb_individualsAll);
       splitContainer1.Panel1.Controls.Add(cb_businessesAll);
-      splitContainer1.Panel1.Controls.Add(btn_foils);
       splitContainer1.Panel1.Controls.Add(label6);
       splitContainer1.Panel1.Controls.Add(txt_errorFetching);
-      splitContainer1.Panel1.Controls.Add(panel1);
       splitContainer1.Panel1.Controls.Add(btn_go);
       splitContainer1.Panel1.Controls.Add(label3);
       splitContainer1.Panel1.Controls.Add(label4);
@@ -287,6 +288,15 @@ namespace MoxMatrix
       splitContainer1.SplitterWidth = 10;
       splitContainer1.TabIndex = 9;
       splitContainer1.Paint += splitContainer1_Paint;
+      // 
+      // panel2
+      // 
+      panel2.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+      panel2.Controls.Add(btn_foils);
+      panel2.Location = new Point(403, 480);
+      panel2.Name = "panel2";
+      panel2.Size = new Size(295, 60);
+      panel2.TabIndex = 20;
       // 
       // cb_individualsAll
       // 
@@ -356,6 +366,7 @@ namespace MoxMatrix
       cl_individuals.Size = new Size(283, 112);
       cl_individuals.TabIndex = 17;
       cl_individuals.UseTabStops = false;
+      cl_individuals.KeyUp += cl_individuals_KeyUp;
       cl_individuals.MouseUp += cl_individuals_MouseUp;
       // 
       // cl_businesses
@@ -368,6 +379,7 @@ namespace MoxMatrix
       cl_businesses.Size = new Size(283, 310);
       cl_businesses.TabIndex = 16;
       cl_businesses.UseTabStops = false;
+      cl_businesses.KeyUp += cl_businesses_KeyUp;
       cl_businesses.MouseUp += cl_businesses_MouseUp;
       // 
       // label8
@@ -413,6 +425,8 @@ namespace MoxMatrix
       splitContainer1.Panel2.ResumeLayout(false);
       ((System.ComponentModel.ISupportInitialize)splitContainer1).EndInit();
       splitContainer1.ResumeLayout(false);
+      panel2.ResumeLayout(false);
+      panel2.PerformLayout();
       ResumeLayout(false);
       PerformLayout();
     }
@@ -444,5 +458,6 @@ namespace MoxMatrix
     private CheckedListBox cl_individuals;
     private CheckBox cb_individualsAll;
     private CheckBox cb_businessesAll;
+    private Panel panel2;
   }
 }

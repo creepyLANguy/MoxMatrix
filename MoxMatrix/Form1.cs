@@ -6,6 +6,7 @@ using System.Text;
 using MoxMatrix.Properties;
 using System.Net.Mime;
 using HtmlDocument = HtmlAgilityPack.HtmlDocument;
+using System.Windows.Forms;
 
 namespace MoxMatrix
 {
@@ -1090,24 +1091,58 @@ namespace MoxMatrix
 
     private void cl_businesses_MouseUp(object sender, MouseEventArgs e)
     {
-      cb_businessesAll.Checked = cl_businesses.CheckedItems.Count == cl_businesses.Items.Count;
+      cb_businessesAll.CheckState =
+        cl_businesses.CheckedItems.Count == cl_businesses.Items.Count ?
+          CheckState.Checked : CheckState.Indeterminate;
+
+      if (cb_businessesAll.CheckState == CheckState.Indeterminate && cl_businesses.CheckedItems.Count == 0)
+      {
+        cb_businessesAll.CheckState = CheckState.Unchecked;
+      }
     }
+
+    private void cl_businesses_KeyUp(object sender, KeyEventArgs e)
+      => cl_businesses_MouseUp(sender, null);
 
     private void cl_individuals_MouseUp(object sender, MouseEventArgs e)
     {
-      cb_individualsAll.Checked = cl_individuals.CheckedItems.Count == cl_individuals.Items.Count;
+      cb_individualsAll.CheckState =
+        cl_individuals.CheckedItems.Count == cl_individuals.Items.Count ?
+          CheckState.Checked : CheckState.Indeterminate;
+
+      if (cb_individualsAll.CheckState == CheckState.Indeterminate && cl_individuals.CheckedItems.Count == 0)
+      {
+        cb_individualsAll.CheckState = CheckState.Unchecked;
+      }
     }
+
+    private void cl_individuals_KeyUp(object sender, KeyEventArgs e)
+      => cl_individuals_MouseUp(sender, null);
 
     private void cb_businessesAll_CheckedChanged(object sender, EventArgs e)
     {
-      //AL.
-      
+      if (cb_businessesAll.CheckState == CheckState.Indeterminate)
+      {
+        return;
+      }
 
+      for (var i = 0; i < cl_businesses.Items.Count; i++)
+      {
+        cl_businesses.SetItemChecked(i, cb_businessesAll.CheckState == CheckState.Checked);
+      }
     }
 
     private void cb_individualsAll_CheckedChanged(object sender, EventArgs e)
     {
-      //AL.
+      if (cb_individualsAll.CheckState == CheckState.Indeterminate)
+      {
+        return;
+      }
+
+      for (var i = 0; i < cl_individuals.Items.Count; i++)
+      {
+        cl_individuals.SetItemChecked(i, cb_individualsAll.CheckState == CheckState.Checked);
+      }
     }
   }
 }

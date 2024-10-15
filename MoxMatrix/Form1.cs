@@ -272,8 +272,6 @@ namespace MoxMatrix
       }
       catch (Exception ex)
       {
-        //AL.
-        //TODO - FIX - Breaking on only selecting "individuals".
         MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         return;
       }

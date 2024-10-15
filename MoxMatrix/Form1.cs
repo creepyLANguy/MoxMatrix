@@ -272,8 +272,8 @@ namespace MoxMatrix
       }
       catch (Exception ex)
       {
-//AL.
-//TODO - FIX - Breaking on only selecting "individuals".
+        //AL.
+        //TODO - FIX - Breaking on only selecting "individuals".
         MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         return;
       }
@@ -510,23 +510,28 @@ namespace MoxMatrix
     {
       var buffRevised = "?retailers[]=";
 
+      //AL.
+      //TODO - extract to common function. Or don't. All of the code is rubbish anyway.
       foreach (var checkedItem in cl_businesses.CheckedItems)
       {
         var vendorId = _vendorsList.First(v => v.Name == checkedItem).Id;
         buffRevised += vendorId + "&retailers[]=";
       }
-      buffRevised = buffRevised[..buffRevised.LastIndexOf('&')];
+
 
       foreach (var checkedItem in cl_individuals.CheckedItems)
       {
         var vendorId = _vendorsList.First(v => v.Name == checkedItem).Id;
         buffRevised += vendorId + "&retailers[]=";
       }
-      buffRevised = buffRevised[..buffRevised.LastIndexOf('&')];
+      
+      if (buffRevised.EndsWith("=")) 
+      {
+        buffRevised = buffRevised[..buffRevised.LastIndexOf('&')];
+      }
 
       return buffRevised;
     }
-
     private List<string> GenerateCsv(List<PriceResponse> priceResponses)
     {
       var cheapestProducts = new Dictionary<(string cardId, string vendorName), Product>();

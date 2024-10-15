@@ -233,6 +233,12 @@ namespace MoxMatrix
 
     private async void btn_go_Click(object sender, EventArgs e)
     {
+      if (cl_individuals.CheckedItems.Count == 0 && cl_businesses.CheckedItems.Count == 0)
+      {
+        MessageBox.Show("No vendors selected!", "Mox Matrix (beta) - ERROR");
+        return;
+      }
+
       SuspendForm(processingText);
 
       txt_unknownCards.Text = string.Empty;
@@ -266,6 +272,8 @@ namespace MoxMatrix
       }
       catch (Exception ex)
       {
+//AL.
+//TODO - FIX - Breaking on only selecting "individuals".
         MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
         return;
       }
@@ -500,14 +508,23 @@ namespace MoxMatrix
 
     private string GetVendorsQueryString()
     {
-      //AL.
-      //TODO - only use retailers that are selected in checkboxes. Can optimise a little by seeing state of the "All" checkboxes.
-      var buff =
-        _vendorsList.Aggregate("?retailers[]=", (current, vendor) => current + vendor.Id + "&retailers[]=");
+      var buffRevised = "?retailers[]=";
 
-      buff = buff[..buff.LastIndexOf('&')];
+      foreach (var checkedItem in cl_businesses.CheckedItems)
+      {
+        var vendorId = _vendorsList.First(v => v.Name == checkedItem).Id;
+        buffRevised += vendorId + "&retailers[]=";
+      }
+      buffRevised = buffRevised[..buffRevised.LastIndexOf('&')];
 
-      return buff;
+      foreach (var checkedItem in cl_individuals.CheckedItems)
+      {
+        var vendorId = _vendorsList.First(v => v.Name == checkedItem).Id;
+        buffRevised += vendorId + "&retailers[]=";
+      }
+      buffRevised = buffRevised[..buffRevised.LastIndexOf('&')];
+
+      return buffRevised;
     }
 
     private List<string> GenerateCsv(List<PriceResponse> priceResponses)

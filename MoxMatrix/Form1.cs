@@ -38,13 +38,14 @@ namespace MoxMatrix
     const string processingText = @" - Processing...";
     const string queryingText = @"Querying prices from each store...";
 
+    private const string ImageEndpoint = "https://api.scryfall.com/cards/named?exact=";
+    private const string ImageParams = "&format=image";
+
     private const string BaseUrl = "https://moxmonolith.com";
 
     private const string CardMatchEndpoint = "/card/search?name=";
 
     private const string PricesEndpoint = "/card/{id}/products";
-
-    private const string ImageEndpoint = "/named?exact=";
 
     private const string VendorsEndpoint = "/vendors";
 
@@ -105,6 +106,9 @@ namespace MoxMatrix
       SuspendForm(loadingVendorsText);
 
       GetVendors();
+
+      //TODO - revise this? 
+      cb_individualsAll.Checked = false;
 
       UnsuspendForm(loadingVendorsText);
     }
@@ -298,21 +302,10 @@ namespace MoxMatrix
       {
         var cardName = priceResponse.Card.Name;
 
-        //using var httpClient = new HttpClient();
-        //var uri = BaseUrl + ImageEndpoint + Uri.EscapeDataString(cardName);
-        //var response = await httpClient.GetAsync(uri);
-
-        //if (!response.IsSuccessStatusCode)
-        //{
-        //  continue;
-        //}
-
-        //var jsonResponse = await response.Content.ReadAsStringAsync();
-        //var data = JObject.Parse(jsonResponse);
-        //var url = data["image_uris"]?["border_crop"]?.ToString();
-
         //AL.
         //TODO - FIX!
+        //var url = ImageEndpoint + encodedName + ImageParams;
+
         if (priceResponse.Products.Count == 0)
         {
           continue;
@@ -323,6 +316,8 @@ namespace MoxMatrix
         {
           url = priceResponse.Products[2].Image;
         }
+
+        var encodedName = Uri.EscapeDataString(cardName);
         //
 
         imageUrls.Add(cardName, url);
@@ -530,6 +525,7 @@ namespace MoxMatrix
 
       return buffRevised;
     }
+
     private List<string> GenerateCsv(List<PriceResponse> priceResponses)
     {
       var cheapestProducts = new Dictionary<(string cardId, string vendorName), Product>();
@@ -976,7 +972,6 @@ namespace MoxMatrix
       var point = dataGridView1.PointToScreen(rect.Location);
       var pos = new Point(point.X, point.Y + rect.Height);
       imageForm.Location = pos;
-
       imageForm.Tag = url;
       var result = imageForm.SetPicture(url);
       imageForm.Visible = result;

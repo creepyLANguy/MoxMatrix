@@ -38,9 +38,6 @@ namespace MoxMatrix
     const string processingText = @" - Processing...";
     const string queryingText = @"Querying prices from each store...";
 
-    private const string ImageEndpoint = "https://api.scryfall.com/cards/named?exact=";
-    private const string ImageParams = "&format=image";
-
     private const string BaseUrl = "https://moxmonolith.com";
 
     private const string CardMatchEndpoint = "/card/search?name=";
@@ -80,8 +77,6 @@ namespace MoxMatrix
     private readonly string urlHeadingTag_Open = "-- ";
     private readonly string urlHeadingTag_Close = "  --";
 
-    private Dictionary<string, string> imageUrls;
-
     private ImageForm imageForm;
 
     public Form1()
@@ -107,7 +102,6 @@ namespace MoxMatrix
 
       GetVendors();
 
-      //TODO - revise this? 
       cb_individualsAll.Checked = false;
 
       UnsuspendForm(loadingVendorsText);
@@ -297,32 +291,6 @@ namespace MoxMatrix
         }
       }
 
-      imageUrls = new();
-      foreach (var priceResponse in priceList)
-      {
-        var cardName = priceResponse.Card.Name;
-
-        //AL.
-        //TODO - FIX!
-        //var url = ImageEndpoint + encodedName + ImageParams;
-
-        if (priceResponse.Products.Count == 0)
-        {
-          continue;
-        }
-
-        var url = priceResponse.Products.First().Image;
-        if (priceResponse.Products.Count > 2)
-        {
-          url = priceResponse.Products[2].Image;
-        }
-
-        var encodedName = Uri.EscapeDataString(cardName);
-        //
-
-        imageUrls.Add(cardName, url);
-      }
-
       foreach (var priceGroup in priceList)
       {
         if (priceGroup.Products.Count == 0)
@@ -503,14 +471,11 @@ namespace MoxMatrix
     {
       var buffRevised = "?retailers[]=";
 
-      //AL.
-      //TODO - extract to common function. Or don't. All of the code is rubbish anyway.
       foreach (var checkedItem in cl_businesses.CheckedItems)
       {
         var vendorId = _vendorsList.First(v => v.Name == checkedItem).Id;
         buffRevised += vendorId + "&retailers[]=";
       }
-
 
       foreach (var checkedItem in cl_individuals.CheckedItems)
       {
@@ -951,29 +916,20 @@ namespace MoxMatrix
         return;
       }
 
-      if (imageUrls == null || !imageUrls.TryGetValue(cellValue.ToString(), out var url))
-      {
-        imageForm.Visible = false;
-        return;
-      }
 
-      //Do this cos the grid selects the first cell as soon as it's populated and so shows the image window automatically.
+      //Avoid showing image in wrong position on first viewing.
       if ((string)imageForm.Tag == null)
       {
         imageForm.Visible = true;
         imageForm.Visible = false;
-        imageForm.Tag = url;
-        return;
       }
 
       imageForm.Visible = false;
-
       var rect = dataGridView1.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, false);
       var point = dataGridView1.PointToScreen(rect.Location);
       var pos = new Point(point.X, point.Y + rect.Height);
       imageForm.Location = pos;
-      imageForm.Tag = url;
-      var result = imageForm.SetPicture(url);
+      var result = imageForm.SetPicture(cellValue.ToString());
       imageForm.Visible = result;
 
       Focus();

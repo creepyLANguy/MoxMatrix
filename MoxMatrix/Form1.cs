@@ -7,6 +7,7 @@ using MoxMatrix.Properties;
 using System.Net.Mime;
 using HtmlDocument = HtmlAgilityPack.HtmlDocument;
 using System.Windows.Forms;
+using Newtonsoft.Json.Linq;
 
 namespace MoxMatrix
 {
@@ -32,6 +33,8 @@ namespace MoxMatrix
       public string Type { get; set; }
     }
 
+    string NL = Environment.NewLine;
+
     const string loadingVendorsText = @"Loading Vendors...";
 
     const string buttonDefault = @"Query Prices";
@@ -50,7 +53,43 @@ namespace MoxMatrix
 
     private readonly string _queryOutputFolderName = "queries";
 
-    public class Product
+    private readonly string exchangeRateUrl = "https://v6.exchangerate-api.com/v6/9f7ed2855a8ce2b44d0f9338/pair/USD/ZAR";
+    private double exchangeRateDollar = -1; //gets set during form load.
+
+    private double GetExchangeRateDollar(double defaultExchangeRate)
+    {
+      try
+      {
+        using var client = new HttpClient();
+        var response = client.GetAsync(exchangeRateUrl).Result;
+        response.EnsureSuccessStatusCode();
+        var responseBody = response.Content.ReadAsStringAsync().Result;
+        var json = JObject.Parse(responseBody);
+
+        var rate = json["conversion_rate"].ToObject<decimal>();
+        return decimal.ToDouble(rate);
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine($"Request error: {ex.Message}");
+
+        var title = "Mox Matrix (beta) - WARNING";
+
+        var message = "Cannot determine Rand/Dollar exchange rate";
+        message += "\n\nDefaulting to following rate : R" + defaultExchangeRate + " ~ $1";
+        message += "\n\nContinue?";
+        
+        var res = MessageBox.Show(message, title, MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+        if (res == DialogResult.No)
+        {
+          Close();
+        }
+      }
+
+      return defaultExchangeRate;
+    }
+
+    public record class Product
     {
       public int Id { get; set; }
       public string Name { get; set; }
@@ -63,6 +102,7 @@ namespace MoxMatrix
       public string Image { get; set; }
       public int Retailer_Id { get; set; }
       public string Retailer_Name { get; set; }
+      public string Currency { get; set; }
     }
 
     public class PriceResponse
@@ -100,6 +140,8 @@ namespace MoxMatrix
 
       SuspendForm(loadingVendorsText);
 
+      exchangeRateDollar = GetExchangeRateDollar(18.0);
+
       GetVendors();
 
       cb_individualsAll.Checked = false;
@@ -124,16 +166,16 @@ namespace MoxMatrix
 
     private void PopulateDebugData()
     {
-      inputBox.Text += @"mox t" + Environment.NewLine;
-      inputBox.Text += @"opportunis" + Environment.NewLine;
-      inputBox.Text += @"countersp" + Environment.NewLine;
-      inputBox.Text += @"dreamtide" + Environment.NewLine;
-      inputBox.Text += @"somerandomstring" + Environment.NewLine;
-      inputBox.Text += @"asmora" + Environment.NewLine;
-      inputBox.Text += @"esper sen" + Environment.NewLine;
-      inputBox.Text += @"clara" + Environment.NewLine;
-      inputBox.Text += @"the ur" + Environment.NewLine;
-      inputBox.Text += @"teferi, master" + Environment.NewLine;
+      inputBox.Text += @"mox t" + NL;
+      inputBox.Text += @"opportunis" + NL;
+      inputBox.Text += @"countersp" + NL;
+      inputBox.Text += @"dreamtide" + NL;
+      inputBox.Text += @"somerandomstring" + NL;
+      inputBox.Text += @"asmora" + NL;
+      inputBox.Text += @"esper sen" + NL;
+      inputBox.Text += @"clara" + NL;
+      inputBox.Text += @"the ur" + NL;
+      inputBox.Text += @"teferi, master" + NL;
     }
 
     private void SuspendForm(string text)
@@ -295,7 +337,7 @@ namespace MoxMatrix
       {
         if (priceGroup.Products.Count == 0)
         {
-          txt_outOfStock.Text += priceGroup.Card.Name + Environment.NewLine;
+          txt_outOfStock.Text += priceGroup.Card.Name + NL;
         }
       }
 
@@ -334,10 +376,10 @@ namespace MoxMatrix
         var totalCost = int.Parse(dataGridView1.Rows[dataGridView1.Rows.Count - 1].Cells[col].Value.ToString());
 
         var summary =
-          storeName + Environment.NewLine +
-          "In Stock : " + stock + Environment.NewLine +
-          "Total : R" + totalCost + Environment.NewLine +
-          Environment.NewLine;
+          storeName + NL +
+          "In Stock : " + stock + NL +
+          "Total : R" + totalCost + NL +
+          NL;
 
         summaries.Add(new Tuple<Tuple<int, int>, string>(new Tuple<int, int>(stock, totalCost), summary));
       }
@@ -357,14 +399,14 @@ namespace MoxMatrix
     }
 
     private void RemoveDuplicates(Control control)
-      => control.Text = string.Join(Environment.NewLine, control.Text.Split(Environment.NewLine).Distinct());
+      => control.Text = string.Join(NL, control.Text.Split(NL).Distinct());
 
     private static bool IsMostLikelyFoil(Product product) =>
       product.Is_Foil || product.Name.ToLower().Contains("foil");
 
     public async Task<List<Card>> GetCardMatchesListAsync()
     {
-      var cardsInput = inputBox.Text.Split(Environment.NewLine).Where(it => it.Length > 0);
+      var cardsInput = inputBox.Text.Split(NL).Where(it => it.Length > 0);
       var tasks = cardsInput.Select(GetCardMatchAsync).ToList();
 
       var results = await Task.WhenAll(tasks);
@@ -380,7 +422,7 @@ namespace MoxMatrix
 
       if (response.StatusCode != HttpStatusCode.OK)
       {
-        txt_errorFetching.Text += input + Environment.NewLine;
+        txt_errorFetching.Text += input + NL;
         return null;
       }
 
@@ -389,7 +431,7 @@ namespace MoxMatrix
 
       if (cardsResponse == null || cardsResponse.Cards.Count == 0)
       {
-        txt_unknownCards.Text += input + Environment.NewLine;
+        txt_unknownCards.Text += input + NL;
         return null;
       }
 
@@ -453,7 +495,7 @@ namespace MoxMatrix
       var response = await httpClient.GetAsync(uri);
       if (response.StatusCode != HttpStatusCode.OK)
       {
-        txt_errorFetching.Text += cardMatch.Name + Environment.NewLine;
+        txt_errorFetching.Text += cardMatch.Name + NL;
         return null;
       }
       var results = await response.Content.ReadAsStringAsync();
@@ -500,12 +542,17 @@ namespace MoxMatrix
         foreach (var product in priceResponse.Products)
         {
           var key = (priceResponse.Card.Name, product.Retailer_Name);
-          if (!cheapestProducts.ContainsKey(key) ||
-              (product.Price.HasValue && product.Price < cheapestProducts[key].Price))
+          
+          var price = product.Currency.ToLower() == "ZAR".ToLower()
+            ? product.Price
+            : product.Price * exchangeRateDollar;
+
+          if (!cheapestProducts.ContainsKey(key) || product.Price.HasValue && price < cheapestProducts[key].Price)
           {
             if (ShouldShowProduct(product))
             {
-              cheapestProducts[key] = product;
+              var p = product with {Price = (int)price};
+              cheapestProducts[key] = p;
             }
           }
         }
@@ -517,7 +564,7 @@ namespace MoxMatrix
 
       foreach (var cardName in cardNames)
       {
-        var heading = urlHeadingTag_Open + cardName + urlHeadingTag_Close + Environment.NewLine + Environment.NewLine;
+        var heading = urlHeadingTag_Open + cardName + urlHeadingTag_Close + NL + NL;
 
         var buffer = heading;
 
@@ -537,11 +584,11 @@ namespace MoxMatrix
                 continue;
               }
 
-              buffer += "R" + product.Price / 100 + Environment.NewLine;
-              buffer += product.Name + Environment.NewLine;
-              buffer += product.Retailer_Name + Environment.NewLine;
-              buffer += product.Link + Environment.NewLine;
-              buffer += Environment.NewLine;
+              buffer += product.PriceRead + NL;
+              buffer += product.Name + NL;
+              buffer += product.Retailer_Name + NL;
+              buffer += product.Link + NL;
+              buffer += NL;
             }
           }
         }
@@ -552,7 +599,7 @@ namespace MoxMatrix
         }
 
         buffer += "___";
-        buffer += Environment.NewLine + Environment.NewLine;
+        buffer += NL + NL;
         txt_urls.Text += buffer;
       }
 
@@ -589,7 +636,7 @@ namespace MoxMatrix
       csvLines.Add(string.Empty);
 
       // Final row with total prices for each column
-      var totalRow = new List<string> { "Total Price" };
+      var totalRow = new List<string> { "Total Price (ZAR)" };
       foreach (var vendorName in vendorNames)
       {
         var totalPrice = cheapestProducts
@@ -995,7 +1042,7 @@ namespace MoxMatrix
           //Note : StreamReader.ReadToEnd()is faster. 
           var fileContents = File.ReadAllText(file);
           buffer += fileContents;
-          buffer += Environment.NewLine + Environment.NewLine;
+          buffer += NL + NL;
         }
       }
 

@@ -94,6 +94,7 @@ namespace MoxMatrix
       dataGridView1.TabIndex = 2;
       dataGridView1.CellClick += dataGridView1_CellClick;
       dataGridView1.CellEnter += dataGridView1_CellEnter;
+      dataGridView1.ColumnHeaderMouseClick += dataGridView1_ColumnHeaderMouseClick;
       dataGridView1.RowPrePaint += dataGridView1_RowPrePaint;
       dataGridView1.Leave += dataGridView1_Leave;
       // 
@@ -421,6 +422,7 @@ namespace MoxMatrix
       ClientSizeChanged += Form1_ClientSizeChanged;
       LocationChanged += Form1_LocationChanged;
       RegionChanged += Form1_RegionChanged;
+      Resize += Form1_Resize;
       ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
       splitContainer1.Panel1.ResumeLayout(false);
       splitContainer1.Panel1.PerformLayout();

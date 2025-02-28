@@ -6,8 +6,9 @@ using System.Text;
 using MoxMatrix.Properties;
 using System.Net.Mime;
 using HtmlDocument = HtmlAgilityPack.HtmlDocument;
-using System.Windows.Forms;
 using Newtonsoft.Json.Linq;
+using System.Runtime.InteropServices;
+using Timer = System.Windows.Forms.Timer;
 
 namespace MoxMatrix
 {
@@ -78,7 +79,7 @@ namespace MoxMatrix
         var message = "Cannot determine Rand/Dollar exchange rate";
         message += "\n\nDefaulting to following rate : R" + defaultExchangeRate + " ~ $1";
         message += "\n\nContinue?";
-        
+
         var res = MessageBox.Show(message, title, MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
         if (res == DialogResult.No)
         {
@@ -119,6 +120,12 @@ namespace MoxMatrix
 
     private ImageForm imageForm;
 
+    private Timer checkFocusTimer;
+
+
+    [DllImport("user32.dll")]
+    private static extern IntPtr GetForegroundWindow();
+
     public Form1()
     {
       InitializeComponent();
@@ -127,6 +134,8 @@ namespace MoxMatrix
     private void Form1_Load(object sender, EventArgs e)
     {
       SetupImageForm();
+
+      SetupCheckFocusTimer();
 
       btn_go.Text = buttonDefault;
 
@@ -147,6 +156,26 @@ namespace MoxMatrix
       cb_individualsAll.Checked = false;
 
       UnsuspendForm(loadingVendorsText);
+    }
+
+    private void SetupCheckFocusTimer()
+    {
+      checkFocusTimer = new Timer();
+      checkFocusTimer.Interval = 500;
+      checkFocusTimer.Tick += CheckIfMainIsOnlyObscuredByImageForm;
+      
+      void CheckIfMainIsOnlyObscuredByImageForm(object sender, EventArgs e)
+      {
+        if (imageForm.Visible == false)
+        {
+          return;
+        }
+
+        if (GetForegroundWindow() != Handle)
+        {
+          imageForm.Visible = false;
+        }
+      }
     }
 
     private void SetupImageForm()
@@ -524,8 +553,8 @@ namespace MoxMatrix
         var vendorId = _vendorsList.First(v => v.Name == checkedItem).Id;
         buffRevised += vendorId + "&retailers[]=";
       }
-      
-      if (buffRevised.EndsWith("=")) 
+
+      if (buffRevised.EndsWith("="))
       {
         buffRevised = buffRevised[..buffRevised.LastIndexOf('&')];
       }
@@ -542,7 +571,7 @@ namespace MoxMatrix
         foreach (var product in priceResponse.Products)
         {
           var key = (priceResponse.Card.Name, product.Retailer_Name);
-          
+
           var price = product.Currency.ToLower() == "ZAR".ToLower()
             ? product.Price
             : product.Price * exchangeRateDollar;
@@ -551,7 +580,7 @@ namespace MoxMatrix
           {
             if (ShouldShowProduct(product))
             {
-              var p = product with {Price = (int)price};
+              var p = product with { Price = (int)price };
               cheapestProducts[key] = p;
             }
           }
@@ -609,7 +638,7 @@ namespace MoxMatrix
       var csvLines = new List<string>();
 
       // Header row with vendor names
-      var headerRow = csvDelim + string.Join(csvDelim, vendorNames);
+      var headerRow = "" + cardNames.Count + " Items" + csvDelim + string.Join(csvDelim, vendorNames);
       csvLines.Add(headerRow);
 
       // Rows with card names and prices
@@ -700,6 +729,11 @@ namespace MoxMatrix
       for (var i = 1; i < rows.Length; i++)
       {
         dataGridView1.Rows.Add(rows[i]);
+      }
+
+      foreach (DataGridViewColumn column in dataGridView1.Columns)
+      {
+        column.SortMode = DataGridViewColumnSortMode.Programmatic;
       }
     }
 
@@ -948,6 +982,11 @@ namespace MoxMatrix
 
     private void dataGridView1_CellEnter(object sender, DataGridViewCellEventArgs e)
     {
+      if (e.RowIndex == 0)
+      {
+        return;
+      }
+
       FocusOnCorrespondingURL(e);
 
       if (dataGridView1.Focused == false)
@@ -963,6 +1002,7 @@ namespace MoxMatrix
         return;
       }
 
+      checkFocusTimer.Stop();
 
       //Avoid showing image in wrong position on first viewing.
       if ((string)imageForm.Tag == null)
@@ -980,6 +1020,8 @@ namespace MoxMatrix
       imageForm.Visible = result;
 
       Focus();
+
+      checkFocusTimer.Start();
     }
 
     private void FocusOnCorrespondingURL(DataGridViewCellEventArgs e)
@@ -1154,6 +1196,60 @@ namespace MoxMatrix
       for (var i = 0; i < cl_individuals.Items.Count; i++)
       {
         cl_individuals.SetItemChecked(i, cb_individualsAll.CheckState == CheckState.Checked);
+      }
+    }
+
+    private void dataGridView1_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
+    {
+      var column = dataGridView1.Columns[e.ColumnIndex];
+      if (column.SortMode == DataGridViewColumnSortMode.Programmatic)
+      {
+        SortDataGridView(e.ColumnIndex);
+      }
+    }
+
+    private void SortDataGridView(int columnIndex)
+    {
+      var rows = dataGridView1.Rows.Cast<DataGridViewRow>()
+        .Where(row => !row.IsNewRow && row.Index < dataGridView1.Rows.Count - 2)
+        .ToList();
+
+      var lastRow = dataGridView1.Rows[^1];
+
+      var ascending = dataGridView1.Tag as bool? ?? true;
+      dataGridView1.Tag = !ascending;
+
+      if (rows.Count > 0)
+      {
+        var isNumeric = rows[0].Cells[columnIndex].Value is IComparable;
+
+        if (isNumeric)
+        {
+          rows.Sort((row1, row2) =>
+          {
+            var val1 = row1.Cells[columnIndex].Value ?? "";
+            var val2 = row2.Cells[columnIndex].Value ?? "";
+            return ascending ? Comparer<object>.Default.Compare(val1, val2)
+              : Comparer<object>.Default.Compare(val2, val1);
+          });
+        }
+      }
+
+      dataGridView1.Rows.Clear();
+      foreach (var row in rows)
+      {
+        dataGridView1.Rows.Add(row.Cells.Cast<DataGridViewCell>().Select(c => c.Value).ToArray());
+      }
+
+      dataGridView1.Rows.Add();
+      dataGridView1.Rows.Add(lastRow.Cells.Cast<DataGridViewCell>().Select(c => c.Value).ToArray());
+    }
+
+    private void Form1_Resize(object sender, EventArgs e)
+    {
+      if (WindowState == FormWindowState.Minimized)
+      {
+        imageForm.Visible = false;
       }
     }
   }

@@ -122,9 +122,10 @@ namespace MoxMatrix
 
     private Timer checkFocusTimer;
 
-
     [DllImport("user32.dll")]
     private static extern IntPtr GetForegroundWindow();
+
+    private bool performedReorderByStore;
 
     public Form1()
     {
@@ -163,7 +164,8 @@ namespace MoxMatrix
       checkFocusTimer = new Timer();
       checkFocusTimer.Interval = 500;
       checkFocusTimer.Tick += CheckIfMainIsOnlyObscuredByImageForm;
-      
+      checkFocusTimer.Start();
+
       void CheckIfMainIsOnlyObscuredByImageForm(object sender, EventArgs e)
       {
         if (imageForm.Visible == false)
@@ -982,11 +984,6 @@ namespace MoxMatrix
 
     private void dataGridView1_CellEnter(object sender, DataGridViewCellEventArgs e)
     {
-      if (e.RowIndex == 0)
-      {
-        return;
-      }
-
       FocusOnCorrespondingURL(e);
 
       if (dataGridView1.Focused == false)
@@ -1009,6 +1006,13 @@ namespace MoxMatrix
       {
         imageForm.Visible = true;
         imageForm.Visible = false;
+      }
+
+      if (e.ColumnIndex != 0 || performedReorderByStore) //performedReorderByStore helps avoid issue where old image wants to show. 
+      {
+        imageForm.Visible = false;
+        performedReorderByStore = false;
+        return;
       }
 
       imageForm.Visible = false;
@@ -1201,11 +1205,20 @@ namespace MoxMatrix
 
     private void dataGridView1_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
     {
-      var column = dataGridView1.Columns[e.ColumnIndex];
-      if (column.SortMode == DataGridViewColumnSortMode.Programmatic)
+      if (dataGridView1.Columns[e.ColumnIndex].SortMode != DataGridViewColumnSortMode.Programmatic)
       {
-        SortDataGridView(e.ColumnIndex);
+        return;
       }
+
+      imageForm.Visible = false;
+      dataGridView1.Visible = false;
+      Cursor.Current = Cursors.WaitCursor;
+
+      SortDataGridView(e.ColumnIndex);
+      
+      dataGridView1.Visible = true;
+      performedReorderByStore = true;
+      Cursor.Current = Cursors.Default;
     }
 
     private void SortDataGridView(int columnIndex)

@@ -5,12 +5,12 @@ namespace MoxMatrix
 {
   public class CardResponse
   {
-    [JsonProperty("image_uris")] public ImageUris ImageUris { get; set; }
+    [JsonProperty("image_uris")] public required ImageUris ImageUris { get; set; }
   }
 
   public class ImageUris
   {
-    [JsonProperty("normal")] public string Normal { get; set; }
+    [JsonProperty("normal")] public required string Normal { get; set; }
   }
 
   public partial class ImageForm : Form
@@ -52,7 +52,7 @@ namespace MoxMatrix
     {
       if (e.Button is MouseButtons.Right or MouseButtons.Middle)
       {
-        var url = ImageCache.GetImageUrl((string)Tag);
+        var url = ImageCache.GetImageUrl((string)Tag!);
 
         var args = "/C start " + url.Replace("&", "^&");
 

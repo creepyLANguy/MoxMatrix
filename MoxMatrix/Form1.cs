@@ -9,7 +9,6 @@ using HtmlDocument = HtmlAgilityPack.HtmlDocument;
 using Newtonsoft.Json.Linq;
 using System.Runtime.InteropServices;
 using Timer = System.Windows.Forms.Timer;
-using System.Net.Http;
 
 namespace MoxMatrix
 {
@@ -385,7 +384,7 @@ namespace MoxMatrix
       Directory.CreateDirectory(queryOutputFolderFullPath);
 
       var fullFilePath = Path.Join(queryOutputFolderFullPath, DateTime.Now.ToFileTime() + ".csv");
-      File.WriteAllLines(fullFilePath, csvLines); //AL. //TODO - async?
+      File.WriteAllLines(fullFilePath, csvLines);
 
       LoadCsvDataIntoDataGridView(ref csvLines);
 
@@ -1013,7 +1012,7 @@ namespace MoxMatrix
         imageForm.Visible = false;
       }
 
-      if (e.ColumnIndex != 0 || performedReorderByStore) //performedReorderByStore helps avoid issue where old image wants to show. 
+      if (e.ColumnIndex != 0 || e.RowIndex == dataGridView1.RowCount - 1 || performedReorderByStore) //performedReorderByStore helps avoid issue where old image wants to show. 
       {
         imageForm.Visible = false;
         performedReorderByStore = false;

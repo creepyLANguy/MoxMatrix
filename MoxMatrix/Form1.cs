@@ -331,8 +331,6 @@ namespace MoxMatrix
       }
 
       UnsuspendForm(processingText);
-
-      await Task.Run(() => StartCachingImages(cardMatches));
     }
 
     private async Task DoTheThings()
@@ -340,6 +338,8 @@ namespace MoxMatrix
       RemoveDuplicates(inputBox);
 
       cardMatches = await GetCardMatchesListAsync();
+
+      imageForm.UpdateImageCache(cardMatches.Select(c => c.Name).ToList());
 
       var priceList = new List<PriceResponse>();
       try
@@ -385,7 +385,7 @@ namespace MoxMatrix
       Directory.CreateDirectory(queryOutputFolderFullPath);
 
       var fullFilePath = Path.Join(queryOutputFolderFullPath, DateTime.Now.ToFileTime() + ".csv");
-      File.WriteAllLines(fullFilePath, csvLines);
+      File.WriteAllLines(fullFilePath, csvLines); //AL. //TODO - async?
 
       LoadCsvDataIntoDataGridView(ref csvLines);
 
@@ -432,19 +432,6 @@ namespace MoxMatrix
       ReorderColumns(sortedSummaries);
 
       ReorderRows();
-    }
-
-    private void StartCachingImages(List<Card> cardMatches)
-    {
-      foreach (var cardMatch in cardMatches)
-      {
-        if (imageForm.DoesImageCacheContain(cardMatch.Name))
-        {
-          continue;
-        }
-        var image = imageForm.DownloadImage(cardMatch.Name);
-        imageForm.AddImageToCache(cardMatch.Name, image);
-      }
     }
 
     private void RemoveDuplicates(Control control)
@@ -1037,9 +1024,9 @@ namespace MoxMatrix
       var rect = dataGridView1.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, false);
       var point = dataGridView1.PointToScreen(rect.Location);
       var pos = new Point(point.X, point.Y + rect.Height);
-      imageForm.Location = pos;
-      var result = imageForm.SetPicture(cellValue.ToString());
-      imageForm.Visible = result;
+      imageForm.Location = pos; 
+      imageForm.SetPicture(cellValue.ToString());
+      imageForm.Visible = true;
 
       Focus();
 

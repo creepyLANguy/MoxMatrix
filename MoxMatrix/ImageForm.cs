@@ -5,14 +5,12 @@ namespace MoxMatrix
 {
   public class CardResponse
   {
-    [JsonProperty("image_uris")]
-    public ImageUris ImageUris { get; set; }
+    [JsonProperty("image_uris")] public ImageUris ImageUris { get; set; }
   }
 
   public class ImageUris
   {
-    [JsonProperty("normal")]
-    public string Normal { get; set; }
+    [JsonProperty("normal")] public string Normal { get; set; }
   }
 
   public partial class ImageForm : Form
@@ -48,18 +46,13 @@ namespace MoxMatrix
 
       try
       {
-        var imageUrl = ImageEndpoint + Uri.EscapeDataString(cardName) + ImageParams; 
-        var request = new HttpRequestMessage(HttpMethod.Get, imageUrl);
-        request.Headers.Add("User-Agent", "YourAppName/1.0 (your-email@example.com)");
-        request.Headers.Add("Accept", "application/json;q=0.9,*/*;q=0.8");
-        var response = httpClient.SendAsync(request).GetAwaiter().GetResult();
-        using var imageStream = response.Content.ReadAsStream();
-        var image = Image.FromStream(imageStream);
-        imageDictionary[cardName] = image;
+        var image = DownloadImage(cardName);
+
         if (imageDictionary.Count >= maxCachedImages)
         {
           imageDictionary.Clear();
         }
+
         pictureBox1.Image = image;
         Tag = cardName;
         return true;
@@ -71,7 +64,6 @@ namespace MoxMatrix
 
       return false;
     }
-
 
     private void ImageForm_Leave(object sender, EventArgs e)
     {
@@ -95,7 +87,7 @@ namespace MoxMatrix
     {
       if (e.Button is MouseButtons.Right or MouseButtons.Middle)
       {
-        var url = ImageEndpoint + Uri.EscapeDataString((string)Tag) + ImageParams;
+        var url = ImageEndpoint + Uri.EscapeDataString((string) Tag) + ImageParams;
 
         var args = "/C start " + url.Replace("&", "^&");
 
@@ -111,6 +103,32 @@ namespace MoxMatrix
       }
 
       Visible = false;
+    }
+
+    public bool DoesImageCacheContain(string cardName)
+      => imageDictionary.ContainsKey(cardName);
+
+    public bool AddImageToCache(string cardName, Image image)
+    {
+      if (imageDictionary.Count >= maxCachedImages)
+      {
+        return false;
+      }
+
+      imageDictionary[cardName] = image;
+      return true;
+    }
+
+    public Image DownloadImage(string cardName)
+    {
+      var imageUrl = ImageEndpoint + Uri.EscapeDataString(cardName) + ImageParams;
+      var request = new HttpRequestMessage(HttpMethod.Get, imageUrl);
+      request.Headers.Add("User-Agent", "YourAppName/1.0 (your-email@example.com)");
+      request.Headers.Add("Accept", "application/json;q=0.9,*/*;q=0.8");
+      var response = httpClient.SendAsync(request).GetAwaiter().GetResult();
+      using var imageStream = response.Content.ReadAsStream();
+      var image = Image.FromStream(imageStream);
+      return image;
     }
   }
 }

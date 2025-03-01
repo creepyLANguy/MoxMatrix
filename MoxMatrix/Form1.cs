@@ -9,6 +9,7 @@ using HtmlDocument = HtmlAgilityPack.HtmlDocument;
 using Newtonsoft.Json.Linq;
 using System.Runtime.InteropServices;
 using Timer = System.Windows.Forms.Timer;
+using System.Net.Http;
 
 namespace MoxMatrix
 {
@@ -126,6 +127,8 @@ namespace MoxMatrix
     private static extern IntPtr GetForegroundWindow();
 
     private bool performedReorderByStore;
+
+    private List<Card> cardMatches = new();
 
     public Form1()
     {
@@ -328,13 +331,15 @@ namespace MoxMatrix
       }
 
       UnsuspendForm(processingText);
+
+      await Task.Run(() => StartCachingImages(cardMatches));
     }
 
     private async Task DoTheThings()
     {
       RemoveDuplicates(inputBox);
 
-      var cardMatches = await GetCardMatchesListAsync();
+      cardMatches = await GetCardMatchesListAsync();
 
       var priceList = new List<PriceResponse>();
       try
@@ -427,6 +432,19 @@ namespace MoxMatrix
       ReorderColumns(sortedSummaries);
 
       ReorderRows();
+    }
+
+    private void StartCachingImages(List<Card> cardMatches)
+    {
+      foreach (var cardMatch in cardMatches)
+      {
+        if (imageForm.DoesImageCacheContain(cardMatch.Name))
+        {
+          continue;
+        }
+        var image = imageForm.DownloadImage(cardMatch.Name);
+        imageForm.AddImageToCache(cardMatch.Name, image);
+      }
     }
 
     private void RemoveDuplicates(Control control)

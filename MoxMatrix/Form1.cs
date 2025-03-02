@@ -170,6 +170,12 @@ namespace MoxMatrix
 
       void CheckIfMainIsOnlyObscuredByImageForm(object sender, EventArgs e)
       {
+        if (imageForm.Focused)
+        {
+          Focus();
+          return;
+        }
+
         if (imageForm.Visible == false)
         {
           return;
@@ -992,14 +998,14 @@ namespace MoxMatrix
 
       if (dataGridView1.Focused == false)
       {
-        imageForm.Visible = false;
+        //imageForm.Visible = false;
         return;
       }
 
       var cellValue = dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value;
       if (cellValue == null)
       {
-        imageForm.Visible = false;
+        //imageForm.Visible = false;
         return;
       }
 
@@ -1012,18 +1018,29 @@ namespace MoxMatrix
         imageForm.Visible = false;
       }
 
-      if (e.ColumnIndex != 0 || e.RowIndex == dataGridView1.RowCount - 1 || performedReorderByStore) //performedReorderByStore helps avoid issue where old image wants to show. 
+      if (performedReorderByStore) //avoid issue where old image wants to show. 
       {
         imageForm.Visible = false;
         performedReorderByStore = false;
         return;
       }
 
+      if (e.RowIndex == dataGridView1.RowCount - 1)
+      {
+        return;
+      }
+
+      if (e.ColumnIndex != 0)
+      {
+        cellValue = dataGridView1.Rows[e.RowIndex].Cells[0].Value;
+      }
+
       imageForm.Visible = false;
-      var rect = dataGridView1.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, false);
-      var point = dataGridView1.PointToScreen(rect.Location);
-      var pos = new Point(point.X, point.Y + rect.Height);
-      imageForm.Location = pos; 
+      //var rect = dataGridView1.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, false);
+      //var point = dataGridView1.PointToScreen(rect.Location);
+      //var pos = new Point(point.X, point.Y + rect.Height);
+      //imageForm.Location = pos;
+      imageForm.Location = new Point(Cursor.Position.X - imageForm.Width - 10, Cursor.Position.Y + 10);
       imageForm.SetPicture(cellValue.ToString());
       imageForm.Visible = true;
 
@@ -1124,14 +1141,14 @@ namespace MoxMatrix
 
     private void dataGridView1_Leave(object sender, EventArgs e)
     {
-      imageForm.Visible = false;
+      //imageForm.Visible = false;
     }
 
     private void Form1_LocationChanged(object sender, EventArgs e)
     {
       if (imageForm != null)
       {
-        imageForm.Visible = false;
+        //imageForm.Visible = false;
       }
     }
 
@@ -1147,7 +1164,7 @@ namespace MoxMatrix
     {
       if (imageForm != null)
       {
-        imageForm.Visible = false;
+        //imageForm.Visible = false;
       }
     }
 
@@ -1213,13 +1230,13 @@ namespace MoxMatrix
       {
         return;
       }
-
+      
       imageForm.Visible = false;
       dataGridView1.Visible = false;
       Cursor.Current = Cursors.WaitCursor;
 
       SortDataGridView(e.ColumnIndex);
-      
+
       dataGridView1.Visible = true;
       performedReorderByStore = true;
       Cursor.Current = Cursors.Default;
@@ -1265,6 +1282,14 @@ namespace MoxMatrix
     private void Form1_Resize(object sender, EventArgs e)
     {
       if (WindowState == FormWindowState.Minimized)
+      {
+        imageForm.Visible = false;
+      }
+    }
+
+    private void dataGridView1_KeyUp(object sender, KeyEventArgs e)
+    {
+      if (e.KeyCode == Keys.Escape)
       {
         imageForm.Visible = false;
       }

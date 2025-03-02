@@ -17,6 +17,10 @@ namespace MoxMatrix
   {
     private readonly ImageCache _imageCache;
 
+    public bool isMouseDown_Left;
+    private Point mouseDownLocation;
+    private Point lastImagePosition;
+
     public ImageForm()
     {
       InitializeComponent();
@@ -50,24 +54,52 @@ namespace MoxMatrix
 
     private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
     {
-      if (e.Button is MouseButtons.Right or MouseButtons.Middle)
+      if (e.Button == MouseButtons.Left)
       {
-        var url = ImageCache.GetImageUrl((string)Tag!);
-
-        var args = "/C start " + url.Replace("&", "^&");
-
-        var psi = new ProcessStartInfo
-        {
-          FileName = "cmd",
-          WindowStyle = ProcessWindowStyle.Hidden,
-          UseShellExecute = false,
-          CreateNoWindow = true,
-          Arguments = args
-        };
-        Process.Start(psi);
+        mouseDownLocation = e.Location;
+        isMouseDown_Left = true;
       }
+      else if (e.Button == MouseButtons.Middle)
+      {
+        LaunchImageInBrowser();
+      }
+      else if (e.Button == MouseButtons.Right)
+      {
+        Visible = false;
+      }
+    }
 
-      Visible = false;
+    private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
+    {
+      if (isMouseDown_Left)
+      {
+        Location = new Point(Cursor.Position.X - Width / 2, Cursor.Position.Y - Height / 2);
+        //AL.
+        //Location = new Point(mouseDownLocation.X - Cursor.Position.X, mouseDownLocation.Y - Cursor.Position.Y);
+      }
+    }
+
+    private void pictureBox1_MouseUp(object sender, MouseEventArgs e)
+    {
+      if (e.Button is MouseButtons.Left)
+      {
+        isMouseDown_Left = false;
+      }
+    }
+
+    private void LaunchImageInBrowser()
+    {
+      var url = ImageCache.GetImageUrl((string)Tag!);
+      var args = "/C start " + url.Replace("&", "^&");
+      var psi = new ProcessStartInfo
+      {
+        FileName = "cmd",
+        WindowStyle = ProcessWindowStyle.Hidden,
+        UseShellExecute = false,
+        CreateNoWindow = true,
+        Arguments = args
+      };
+      Process.Start(psi);
     }
 
     public async void UpdateImageCache(List<string> cardNames)

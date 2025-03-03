@@ -84,7 +84,7 @@ public class ImageCache
     return image;
   }
 
-  private Image GenerateBrokenImagePlaceholder()
+  private static Image GenerateBrokenImagePlaceholder()
   {
     const int width = 1000;
     const int height = 1000;

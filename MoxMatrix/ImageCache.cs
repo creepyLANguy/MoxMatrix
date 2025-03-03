@@ -26,13 +26,12 @@ public class ImageCache
   {
     if (_imageDictionary.Count >= MaxCachedImages)
     {
-      _imageDictionary.Clear();//AL. //TODO - do something smarter here, like maybe track the last time the image was used and remove the oldest one.
+      _imageDictionary.Clear(); //TODO - do something smarter here, like maybe track the last time the image was used and remove the oldest one.
     }
 
     _imageDictionary[cardName] = image;
   }
 
-  //AL.
   //TODO - implement a way to stop/restart this thread (when the form is closed, when the cardNames list is updated, on exceptions and failures, etc).
   public void StartCachingThread(List<string> cardNames)
   {
@@ -85,16 +84,30 @@ public class ImageCache
     return image;
   }
 
-  private static Image GenerateBrokenImagePlaceholder()
+  private Image GenerateBrokenImagePlaceholder()
   {
-    const int width = 40;
-    const int height = 40;
+    const int width = 1000;
+    const int height = 1000;
+    const int fontSize = 78;
+    const float multiplier = 1.30f;
+    const int linePenWidth = 2;
+    var strokeColour = Color.Gray;
+    var backgroundColour = Color.White;
+    var linePen = new Pen(strokeColour, linePenWidth);
+    var rectPen = new Pen(backgroundColour, fontSize * multiplier);
+    var stringBrush = new SolidBrush(strokeColour);
+    var font = new Font(FontFamily.GenericMonospace, fontSize);
+
     var bmp = new Bitmap(width, height);
     using var g = Graphics.FromImage(bmp);
-    g.Clear(Color.White);
-    var pen = new Pen(Color.Gray, 1);
-    g.DrawLine(pen, 0, 0, width, height);
-    g.DrawLine(pen, width, 0, 0, height);
+    g.Clear(backgroundColour);
+
+    g.DrawLine(linePen, 0, 0, width, height);
+    g.DrawLine(linePen, width, 0, 0, height);
+    g.DrawRectangle(rectPen, 0, height / 2f - fontSize / 2f, width, fontSize * multiplier);
+    g.DrawString("Image Not Found", font, stringBrush, new PointF(0, height / 2f - fontSize / 2f));
+    g.DrawRectangle(linePen, linePenWidth / 2, linePenWidth / 2, width - linePenWidth - 1, height - linePenWidth - 1);
+
     return bmp;
   }
 

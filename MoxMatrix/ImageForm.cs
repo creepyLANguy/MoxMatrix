@@ -30,8 +30,15 @@ namespace MoxMatrix
 
     public void SetPicture(string cardName)
     {
-      pictureBox1.Image = _imageCache.Get(cardName);
       Tag = cardName;
+
+      pictureBox1.Image = _imageCache.Get(cardName);
+
+      //These DON'T seem to help the slight flashing issue: 
+      //pictureBox1.Invalidate();
+      //pictureBox1.Refresh();
+      //Invalidate();
+      //Validate();
     }
 
     private void ImageForm_Leave(object sender, EventArgs e)

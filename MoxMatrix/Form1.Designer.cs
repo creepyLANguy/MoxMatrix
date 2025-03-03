@@ -1,4 +1,3 @@
-using System.Resources;
 using MoxMatrix.Properties;
 
 namespace MoxMatrix
@@ -97,7 +96,6 @@ namespace MoxMatrix
       dataGridView1.ColumnHeaderMouseClick += dataGridView1_ColumnHeaderMouseClick;
       dataGridView1.RowPrePaint += dataGridView1_RowPrePaint;
       dataGridView1.KeyUp += dataGridView1_KeyUp;
-      dataGridView1.Leave += dataGridView1_Leave;
       // 
       // btn_exportCSV
       // 
@@ -418,11 +416,7 @@ namespace MoxMatrix
       StartPosition = FormStartPosition.CenterScreen;
       Text = "Mox Matrix (beta)";
       Load += Form1_Load;
-      ResizeBegin += Form1_ResizeBegin;
       ResizeEnd += Form1_ResizeEnd;
-      ClientSizeChanged += Form1_ClientSizeChanged;
-      LocationChanged += Form1_LocationChanged;
-      RegionChanged += Form1_RegionChanged;
       Resize += Form1_Resize;
       ((System.ComponentModel.ISupportInitialize)dataGridView1).EndInit();
       splitContainer1.Panel1.ResumeLayout(false);

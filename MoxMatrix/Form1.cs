@@ -9,6 +9,7 @@ using HtmlDocument = HtmlAgilityPack.HtmlDocument;
 using Newtonsoft.Json.Linq;
 using System.Runtime.InteropServices;
 using Timer = System.Windows.Forms.Timer;
+using System.Drawing.Imaging;
 
 namespace MoxMatrix
 {
@@ -317,6 +318,8 @@ namespace MoxMatrix
         MessageBox.Show("No vendors selected!", "Mox Matrix (beta) - ERROR");
         return;
       }
+
+      imageForm.Visible = false;
 
       SuspendForm(processingText);
 
@@ -877,14 +880,8 @@ namespace MoxMatrix
       }
     }
 
-    private void Form1_ResizeBegin(object sender, EventArgs e)
-    {
-      //dataGridView1.Visible = false;
-    }
-
     private void Form1_ResizeEnd(object sender, EventArgs e)
     {
-      //dataGridView1.Visible = true;
       splitContainer1.Invalidate();
     }
 
@@ -892,7 +889,6 @@ namespace MoxMatrix
     {
       var dotSize = 4;
 
-      //var control = sender as SplitContainer;
       var control = splitContainer1;
 
       //paint the three dots'
@@ -921,12 +917,10 @@ namespace MoxMatrix
         p.Offset(-2, -2);
         e.Graphics.FillEllipse(SystemBrushes.ControlDark,
           new(p, new Size(dotSize * 3, dotSize / 2)));
-        //new(p, new Size(dotSize, dotSize)));
 
         p.Offset(1, 1);
         e.Graphics.FillEllipse(SystemBrushes.ControlLight,
           new Rectangle(p, new Size(dotSize * 3, dotSize / 2)));
-        //new Rectangle(p, new Size(dotSize, dotSize)));
       }
     }
 
@@ -998,14 +992,12 @@ namespace MoxMatrix
 
       if (dataGridView1.Focused == false)
       {
-        //imageForm.Visible = false;
         return;
       }
 
       var cellValue = dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value;
       if (cellValue == null)
       {
-        //imageForm.Visible = false;
         return;
       }
 
@@ -1041,9 +1033,9 @@ namespace MoxMatrix
       var point = dataGridView1.PointToScreen(rect.Location);
       var cellPos = new Point(point.X, point.Y + rect.Height);
       
-      imageForm.Location = imageForm.lastImagePosition ?? cellPos;//new Point(Cursor.Position.X - imageForm.Width - 10, Cursor.Position.Y + 10);
+      imageForm.Location = imageForm.lastImagePosition ?? cellPos;
       imageForm.SetPicture(cellValue.ToString());
-      
+
       imageForm.Visible = true;
 
       Focus();
@@ -1129,8 +1121,8 @@ namespace MoxMatrix
     private void inputBox_DragOver(object sender, DragEventArgs e)
     {
       if (
-        (e.Data.GetDataPresent(DataFormats.FileDrop, true)) ||
-        (e.Data.GetDataPresent(DataFormats.Text, true))
+        e.Data.GetDataPresent(DataFormats.FileDrop, true) ||
+        e.Data.GetDataPresent(DataFormats.Text, true)
       )
       {
         e.Effect = DragDropEffects.All;
@@ -1138,35 +1130,6 @@ namespace MoxMatrix
       else
       {
         e.Effect = DragDropEffects.None;
-      }
-    }
-
-    private void dataGridView1_Leave(object sender, EventArgs e)
-    {
-      //imageForm.Visible = false;
-    }
-
-    private void Form1_LocationChanged(object sender, EventArgs e)
-    {
-      if (imageForm != null)
-      {
-        //imageForm.Visible = false;
-      }
-    }
-
-    private void Form1_ClientSizeChanged(object sender, EventArgs e)
-    {
-      if (imageForm != null)
-      {
-        imageForm.Visible = false;
-      }
-    }
-
-    private void Form1_RegionChanged(object sender, EventArgs e)
-    {
-      if (imageForm != null)
-      {
-        //imageForm.Visible = false;
       }
     }
 

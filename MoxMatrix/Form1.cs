@@ -9,7 +9,6 @@ using HtmlDocument = HtmlAgilityPack.HtmlDocument;
 using Newtonsoft.Json.Linq;
 using System.Runtime.InteropServices;
 using Timer = System.Windows.Forms.Timer;
-using System.Drawing.Imaging;
 
 namespace MoxMatrix
 {

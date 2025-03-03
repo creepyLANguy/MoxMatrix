@@ -1036,12 +1036,14 @@ namespace MoxMatrix
       }
 
       imageForm.Visible = false;
-      //var rect = dataGridView1.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, false);
-      //var point = dataGridView1.PointToScreen(rect.Location);
-      //var pos = new Point(point.X, point.Y + rect.Height);
-      //imageForm.Location = pos;
-      imageForm.Location = new Point(Cursor.Position.X - imageForm.Width - 10, Cursor.Position.Y + 10);
+
+      var rect = dataGridView1.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, false);
+      var point = dataGridView1.PointToScreen(rect.Location);
+      var cellPos = new Point(point.X, point.Y + rect.Height);
+      
+      imageForm.Location = imageForm.lastImagePosition ?? cellPos;//new Point(Cursor.Position.X - imageForm.Width - 10, Cursor.Position.Y + 10);
       imageForm.SetPicture(cellValue.ToString());
+      
       imageForm.Visible = true;
 
       Focus();

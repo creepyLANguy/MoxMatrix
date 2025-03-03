@@ -19,7 +19,7 @@ namespace MoxMatrix
 
     public bool isMouseDown_Left;
     private Point mouseDownLocation;
-    private Point lastImagePosition;
+    public Point? lastImagePosition;
 
     public ImageForm()
     {
@@ -73,9 +73,9 @@ namespace MoxMatrix
     {
       if (isMouseDown_Left)
       {
-        Location = new Point(Cursor.Position.X - Width / 2, Cursor.Position.Y - Height / 2);
-        //AL.
-        //Location = new Point(mouseDownLocation.X - Cursor.Position.X, mouseDownLocation.Y - Cursor.Position.Y);
+        var newX = Cursor.Position.X - mouseDownLocation.X;
+        var newY = Cursor.Position.Y - mouseDownLocation.Y;
+        lastImagePosition = Location = new Point(newX, newY);
       }
     }
 

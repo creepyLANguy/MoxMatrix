@@ -3,7 +3,7 @@
 public class ImageCache
 {
   private const string ImageEndpoint = "https://api.scryfall.com/cards/named?exact=";
-  private const string ImageParams = "&format=image";
+  private const string ImageParams = "&format=image&version=normal";
 
   private readonly Dictionary<string, Image> _imageDictionary;
   private const int MaxCachedImages = 100;

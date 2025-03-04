@@ -129,6 +129,8 @@ namespace MoxMatrix
 
     private List<Card> cardMatches = new();
 
+    SplashScreen splash;
+
     public Form1()
     {
       InitializeComponent();
@@ -136,6 +138,8 @@ namespace MoxMatrix
 
     private void Form1_Load(object sender, EventArgs e)
     {
+      ShowSplashScreen();
+
       SetupImageForm();
 
       SetupCheckFocusTimer();
@@ -159,6 +163,16 @@ namespace MoxMatrix
       cb_individualsAll.Checked = false;
 
       UnsuspendForm(loadingVendorsText);
+    }
+
+    private void ShowSplashScreen()
+    {
+      splash = new();
+    }
+
+    private void HideSplashScreen()
+    {
+      splash.Close();
     }
 
     private void SetupCheckFocusTimer()
@@ -1031,7 +1045,7 @@ namespace MoxMatrix
       var rect = dataGridView1.GetCellDisplayRectangle(e.ColumnIndex, e.RowIndex, false);
       var point = dataGridView1.PointToScreen(rect.Location);
       var cellPos = new Point(point.X, point.Y + rect.Height);
-      
+
       imageForm.Location = imageForm.lastImagePosition ?? cellPos;
       imageForm.SetPicture(cellValue.ToString());
 
@@ -1194,7 +1208,7 @@ namespace MoxMatrix
       {
         return;
       }
-      
+
       imageForm.Visible = false;
       dataGridView1.Visible = false;
       Cursor.Current = Cursors.WaitCursor;
@@ -1257,6 +1271,11 @@ namespace MoxMatrix
       {
         imageForm.Visible = false;
       }
+    }
+
+    private void Form1_Shown(object sender, EventArgs e)
+    {
+      HideSplashScreen();
     }
   }
 }

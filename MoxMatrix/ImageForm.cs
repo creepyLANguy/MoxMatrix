@@ -15,7 +15,7 @@ namespace MoxMatrix
 
   public partial class ImageForm : Form
   {
-    private readonly ImageCache _imageCache;
+    private readonly ImageCache _imageCache = new();
 
     public bool isMouseDown_Left;
     private Point mouseDownLocation;
@@ -24,8 +24,6 @@ namespace MoxMatrix
     public ImageForm()
     {
       InitializeComponent();
-
-      _imageCache = new ImageCache();
     }
 
     public void SetPicture(string cardName)

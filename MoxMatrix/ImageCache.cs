@@ -2,34 +2,50 @@
 
 public class ImageCache
 {
+  private readonly Dictionary<string, (Image Image, LinkedListNode<string> Node)> _imageDictionary = new();
+  private readonly LinkedList<string> _usageOrder = new();
+  private const int MaxCachedImages = 100;
+
+  private readonly HttpClient _httpClient = new();
   private const string ImageEndpoint = "https://api.scryfall.com/cards/named?exact=";
   private const string ImageParams = "&format=image&version=normal";
 
-  private readonly Dictionary<string, Image> _imageDictionary;
-  private const int MaxCachedImages = 100;
+  private readonly Image _brokenImagePlaceholder = GenerateBrokenImagePlaceholder();
 
-  private readonly HttpClient _httpClient;
-
-  private readonly Image _brokenImagePlaceholder; 
-
-  public ImageCache()
+  
+  private void MoveToFront(string cardName)
   {
-    _imageDictionary = new Dictionary<string, Image>();
-
-    _httpClient = new HttpClient();
-    System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
-
-    _brokenImagePlaceholder = GenerateBrokenImagePlaceholder();
+    var node = _imageDictionary[cardName].Node;
+    _usageOrder.Remove(node);
+    _usageOrder.AddFirst(node);
   }
 
   private void Add(string cardName, Image image)
   {
     if (_imageDictionary.Count >= MaxCachedImages)
     {
-      _imageDictionary.Clear(); //TODO - do something smarter here, like maybe track the last time the image was used and remove the oldest one.
+      var leastUsedCardName = _usageOrder.Last!.Value;
+      _usageOrder.RemoveLast();
+      _imageDictionary.Remove(leastUsedCardName);
     }
 
-    _imageDictionary[cardName] = image;
+    var node = _usageOrder.AddFirst(cardName);
+    _imageDictionary[cardName] = (image, node);
+  }
+
+  public Image Get(string cardName)
+  {
+    if (_imageDictionary.TryGetValue(cardName, out var cachedEntry))
+    {
+      MoveToFront(cardName);
+      return cachedEntry.Image;
+    }
+
+    var downloadedImage = DownloadImage(cardName);
+
+    Add(cardName, downloadedImage);
+
+    return downloadedImage;
   }
 
   //TODO - implement a way to stop/restart this thread (when the form is closed, when the cardNames list is updated, on exceptions and failures, etc).
@@ -37,42 +53,27 @@ public class ImageCache
   {
     foreach (var cardName in cardNames)
     {
-      if (Contains(cardName))
+      if (_imageDictionary.ContainsKey(cardName))
       {
         continue;
       }
 
-      var image = DownloadImage(cardName);
+      var downloadedImage = DownloadImage(cardName);
 
-      Add(cardName, image);
+      Add(cardName, downloadedImage);
     }
   }
-
-  public Image Get(string cardName)
-  {
-    if (Contains(cardName))
-    {
-      return _imageDictionary[cardName];
-    }
-
-    var image = DownloadImage(cardName);
-
-    Add(cardName, image);
-
-    return image;
-  }
-
-  public bool Contains(string cardName)
-    => _imageDictionary.ContainsKey(cardName);
 
   private Image DownloadImage(string cardName)
   {
+    //System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
+
     var imageUrl = ImageEndpoint + Uri.EscapeDataString(cardName) + ImageParams;
 
     var request = new HttpRequestMessage(HttpMethod.Get, imageUrl);
     request.Headers.Add("User-Agent", "YourAppName/1.0 (your-email@example.com)");
     request.Headers.Add("Accept", "application/json;q=0.9,*/*;q=0.8");
-     
+
     var response = _httpClient.SendAsync(request).GetAwaiter().GetResult();
     if (response.IsSuccessStatusCode == false)
     {
@@ -80,8 +81,7 @@ public class ImageCache
     }
 
     using var imageStream = response.Content.ReadAsStream();
-    var image = Image.FromStream(imageStream);
-    return image;
+    return Image.FromStream(imageStream);
   }
 
   private static Image GenerateBrokenImagePlaceholder()

@@ -12,7 +12,11 @@ public class ImageCache
 
   private readonly Image _brokenImagePlaceholder = GenerateBrokenImagePlaceholder();
 
-  
+  //public ImageCache()
+  //{
+  //  System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
+  //}
+
   private void MoveToFront(string cardName)
   {
     var node = _imageDictionary[cardName].Node;

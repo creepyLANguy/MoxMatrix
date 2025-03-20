@@ -24,8 +24,6 @@ namespace MoxMatrix
     public ImageForm()
     {
       InitializeComponent();
-
-      UpgradeUtils.Run();
     }
 
     public void SetPicture(string cardName)

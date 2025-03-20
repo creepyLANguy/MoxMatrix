@@ -19,7 +19,8 @@ namespace MoxMatrix
 
       if (localVersion <= latestVersion)
       {
-        var message = "A newer version is available." +
+        var message = 
+          "A newer version is available." +
           Environment.NewLine + Environment.NewLine +
           "Would you like to install it?";
 
@@ -36,9 +37,10 @@ namespace MoxMatrix
         Log("Upgrading from version v" + localVersion + " to v" + latestVersion);
         if (Upgrade() == false)
         {
-          var message = "Upgrade Failed, please try again later." +
-          Environment.NewLine + Environment.NewLine +
-          "The application will now restart.";
+          var message = 
+            "Upgrade Failed, please try again later." +
+            Environment.NewLine + Environment.NewLine +
+            "The application will now restart.";
 
           var selection = MessageBox.Show(message, AppName, MessageBoxButtons.OK);
 

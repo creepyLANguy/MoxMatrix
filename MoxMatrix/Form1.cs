@@ -173,6 +173,8 @@ namespace MoxMatrix
     private void HideSplashScreen()
     {
       splash.Close();
+
+      UpgradeUtils.Run();
     }
 
     private void SetupCheckFocusTimer()

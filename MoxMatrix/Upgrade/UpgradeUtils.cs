@@ -30,27 +30,27 @@ namespace MoxMatrix
         {
           return;
         }
-      }      
 
-      try
-      {
-        Log("Upgrading from version v" + localVersion + " to v" + latestVersion);
-        if (Upgrade() == false)
+        try
         {
-          var message = 
-            "Upgrade Failed, please try again later." +
-            Environment.NewLine + Environment.NewLine +
-            "The application will now restart.";
+          Log("Upgrading from version v" + localVersion + " to v" + latestVersion);
+          if (Upgrade() == false)
+          {
+            var message_upgradeFailed =
+              "Upgrade Failed, please try again later." +
+              Environment.NewLine + Environment.NewLine +
+              "The application will now restart.";
 
-          var selection = MessageBox.Show(message, AppName, MessageBoxButtons.OK);
+            MessageBox.Show(message, AppName, MessageBoxButtons.OK);
 
-          Application.Restart();
+            Application.Restart();
+          }
         }
-      }
-      catch (Exception ex)
-      {
-        Log(ex.Message);
-      }
+        catch (Exception ex)
+        {
+          Log(ex.Message);
+        }
+      }            
     }
 
     private static void Log(string s)

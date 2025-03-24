@@ -34,24 +34,9 @@ namespace MoxMatrix
         return;
       }
 
-      try
-      {
-        Log("Upgrading from version v" + localVersion + " to v" + latestVersion);
-        if (Upgrade() == false)
-        {
-          var message_upgradeFailed =
-            "Upgrade Failed, please try again later." +
-            Environment.NewLine + Environment.NewLine +
-            "The application will now restart.";
-
-          MessageBox.Show(message, AppName, MessageBoxButtons.OK);            
-        }
-      }
-      catch (Exception ex)
-      {
-        Log(ex.Message);
-      }
-
+      Log("Trying upgrade from version v" + localVersion + " to v" + latestVersion);
+      TryUpgrade();
+      
       Application.Restart();
     }
 
@@ -105,14 +90,34 @@ namespace MoxMatrix
       return new SemanticVersion(latestVersion);
     }
 
-    private static bool Upgrade()
+    private static void TryUpgrade()
+    {
+      try
+      {
+        if (PerformAllUpgradeSteps() == false)
+        {
+          var message_upgradeFailed =
+            "Upgrade Failed, please try again later." +
+            Environment.NewLine + Environment.NewLine +
+            "The application will now restart.";
+
+          MessageBox.Show(message_upgradeFailed, AppName, MessageBoxButtons.OK);
+        }
+      }
+      catch (Exception ex)
+      {
+        Log(ex.Message);
+      }
+    }
+
+    private static bool PerformAllUpgradeSteps()
     {   
       var steps = new List<Func<bool>>
       {
         //AL. //TODO
         //FetchLatestRelease,
         //UnzipLatestRelease,
-        //CopyNewFiles,
+        //Replace old files with new files,
         //Cleanup,
         //LaunchNewVersion,
       };

@@ -17,40 +17,42 @@ namespace MoxMatrix
 
       var latestVersion = GetSemanticVersionFromUrl(LatestReleaseUrl); ;
 
-      if (localVersion <= latestVersion)
+      if (localVersion >= latestVersion)
       {
-        var message = 
-          "A newer version is available." +
-          Environment.NewLine + Environment.NewLine +
-          "Would you like to install it?";
+        return;
+      }
 
-        var selection = MessageBox.Show(message, AppName, MessageBoxButtons.YesNo);
+      var message = 
+        "A newer version is available." +
+        Environment.NewLine + Environment.NewLine +
+        "Would you like to install it?";
 
-        if (selection == DialogResult.No)
+      var selection = MessageBox.Show(message, AppName, MessageBoxButtons.YesNo);
+
+      if (selection == DialogResult.No)
+      {
+        return;
+      }
+
+      try
+      {
+        Log("Upgrading from version v" + localVersion + " to v" + latestVersion);
+        if (Upgrade() == false)
         {
-          return;
-        }
+          var message_upgradeFailed =
+            "Upgrade Failed, please try again later." +
+            Environment.NewLine + Environment.NewLine +
+            "The application will now restart.";
 
-        try
-        {
-          Log("Upgrading from version v" + localVersion + " to v" + latestVersion);
-          if (Upgrade() == false)
-          {
-            var message_upgradeFailed =
-              "Upgrade Failed, please try again later." +
-              Environment.NewLine + Environment.NewLine +
-              "The application will now restart.";
-
-            MessageBox.Show(message, AppName, MessageBoxButtons.OK);
-
-            Application.Restart();
-          }
+          MessageBox.Show(message, AppName, MessageBoxButtons.OK);            
         }
-        catch (Exception ex)
-        {
-          Log(ex.Message);
-        }
-      }            
+      }
+      catch (Exception ex)
+      {
+        Log(ex.Message);
+      }
+
+      Application.Restart();
     }
 
     private static void Log(string s)

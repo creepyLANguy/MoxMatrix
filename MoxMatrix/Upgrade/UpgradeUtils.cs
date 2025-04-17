@@ -2,6 +2,8 @@
 using System.Net;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Management.Automation;
+using System.Diagnostics;
 
 namespace MoxMatrix
 {
@@ -13,9 +15,17 @@ namespace MoxMatrix
     private const string DownloadUrl = "https://github.com/creepyLANguy/MoxMatrix/releases/latest/download/MoxMatrix.zip";
     private const string TempDownloadPath = "MoxMatrix_latest.zip";
     private const string TempExtractPath = "MoxMatrix_latest";
+    private const string OutdatedMarker = "_outdated";
+    private const string DateTimeFormatPattern = "dd-MM-yyyy_HH-mm-ss";
+    private const int CleanupMaxFailures = 5;
+    private const int CleanupSleepMs = 30000;
+    private const string ExecutableExtension = ".exe";
+    private const int KillProcessRetrySleepMs = 3000;
 
     public static void Run()
     {
+      CleanupOutdatedFiles_Async();
+
       var localVersion = GetSemanticVersionFromCurrentExecutable();
 
       var latestVersion = GetSemanticVersionFromUrl(LatestReleaseUrl);
@@ -23,6 +33,7 @@ namespace MoxMatrix
       if (localVersion >= latestVersion)
       {
         //AL.
+        //TODO - uncomment the return
         //return;
       }
 
@@ -42,8 +53,47 @@ namespace MoxMatrix
       TryUpgrade();
     }
 
-    private static void Log(string s)
-     => Console.WriteLine(s + Environment.NewLine);
+    private static async void CleanupOutdatedFiles_Async()
+    {
+      Log();
+
+      await Task.Run(CleanupOutdatedFiles);
+    }
+
+    private static void CleanupOutdatedFiles()
+    {
+      var failures = 0;
+
+      while (failures < CleanupMaxFailures)
+      {
+        var allFiles =
+          Directory.GetFiles(Directory.GetCurrentDirectory(), "*" + OutdatedMarker + "*", SearchOption.AllDirectories)
+            .Select(Path.GetFileName)
+            .ToList();
+
+        if (allFiles.Count == 0)
+        {
+          break;
+        }
+
+        try
+        {
+          foreach (var file in allFiles)
+          {
+            File.Delete(file);
+          }
+        }
+        catch (Exception e)
+        {
+          ++failures;
+          Console.WriteLine(e);
+          Thread.Sleep(CleanupSleepMs);
+        }
+      }
+    }
+
+    private static void Log(string s = "")
+      => Console.WriteLine(s.Length == 0 ? MethodBase.GetCurrentMethod().Name : s + Environment.NewLine);
 
     private static SemanticVersion GetSemanticVersionFromCurrentExecutable()
     {
@@ -96,9 +146,7 @@ namespace MoxMatrix
     {
       if (PerformAllUpgradeSteps())
       {
-        //AL. //TODO - Relaunch
-        //Relaunch();
-        return;
+        KillCurrentProcess();        
       }
 
       var message_upgradeFailed =
@@ -113,13 +161,16 @@ namespace MoxMatrix
 
     private static bool PerformAllUpgradeSteps()
     {
+      Log();
+
       var steps = new List<Func<bool>>
       {
         FetchLatestRelease,
         UnzipLatestRelease,
-        //AL. //TODO
-        //ReplaceOldExeWithNewExe
-        //Cleanup
+        MarkCurrentExeForDeletion,
+        CopyNewFiles,
+        Cleanup,
+        LaunchNewVersion,
       };
 
       foreach (var step in steps)
@@ -144,6 +195,8 @@ namespace MoxMatrix
 
     private static bool FetchLatestRelease()
     {
+      Log();
+
       using WebClient webClient = new();
       webClient.Headers.Add("user-agent", AppName);
       ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
@@ -154,6 +207,8 @@ namespace MoxMatrix
 
     private static bool UnzipLatestRelease()
     {
+      Log();
+
       if (Directory.Exists(TempExtractPath))
       {
         Directory.Delete(TempExtractPath, true);
@@ -163,8 +218,39 @@ namespace MoxMatrix
       return true;
     }
 
+    private static bool MarkCurrentExeForDeletion()
+    {
+      Log();
+
+      var newName = DateTime.Now.ToString(DateTimeFormatPattern) + OutdatedMarker;
+
+      using var ps = PowerShell.Create();
+      ps.AddCommand("Rename-Item");
+      ps.AddParameter("-Path", Application.ExecutablePath);      
+      ps.AddParameter("-NewName", newName);
+      ps.Invoke();
+
+      return true;
+    }
+
+    private static bool CopyNewFiles()
+    {
+      Log();
+
+      var files = Directory.GetFiles(TempExtractPath, "*", SearchOption.AllDirectories);
+      foreach (var file in files)
+      {
+        var newFileName = Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileName(file));
+        File.Copy(file, newFileName, true);
+      }
+
+      return true;
+    }
+
     private static bool Cleanup()
     {
+      Log();
+
       if (File.Exists(TempDownloadPath))
       {
         File.Delete(TempDownloadPath);
@@ -176,6 +262,46 @@ namespace MoxMatrix
       }
 
       return true;
+    }
+
+    private static bool LaunchNewVersion()
+    {
+      Log();
+
+      var exe = Application.ProductName + ExecutableExtension;
+
+      var process = new Process();
+      process.StartInfo.FileName = exe;
+      process.StartInfo.RedirectStandardOutput = true;
+      process.StartInfo.RedirectStandardError = true;
+      process.StartInfo.UseShellExecute = false;
+      process.StartInfo.CreateNoWindow = true;
+      process.StartInfo.Arguments = "";
+      process.Start();
+
+      return true;
+    }
+
+    private static void KillCurrentProcess()
+    {
+      Log();
+
+      var currentProcess = Process.GetCurrentProcess();
+
+      if (currentProcess.Id == 0)
+      {
+        return;
+      }
+
+      try
+      {
+        currentProcess.Kill();
+      }
+      catch (ArgumentException)
+      {
+        Thread.Sleep(KillProcessRetrySleepMs);
+        KillCurrentProcess();
+      }
     }
   }
 }

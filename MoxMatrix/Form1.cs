@@ -1276,6 +1276,7 @@ namespace MoxMatrix
     private void Form1_Shown(object sender, EventArgs e)
     {
       HideSplashScreen();
+
       UpgradeUtils.Run();
     }
   }

@@ -78,7 +78,7 @@ namespace MoxMatrix
       dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
       dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleCenter;
       dataGridViewCellStyle1.BackColor = SystemColors.Window;
-      dataGridViewCellStyle1.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+      dataGridViewCellStyle1.Font = new Font("Segoe UI", 9F);
       dataGridViewCellStyle1.ForeColor = SystemColors.ControlText;
       dataGridViewCellStyle1.Format = "C2";
       dataGridViewCellStyle1.NullValue = null;
@@ -88,8 +88,7 @@ namespace MoxMatrix
       dataGridView1.DefaultCellStyle = dataGridViewCellStyle1;
       dataGridView1.Location = new Point(12, 14);
       dataGridView1.Name = "dataGridView1";
-      dataGridView1.RowTemplate.Height = 25;
-      dataGridView1.Size = new Size(1259, 315);
+      dataGridView1.Size = new Size(1259, 330);
       dataGridView1.TabIndex = 2;
       dataGridView1.CellClick += dataGridView1_CellClick;
       dataGridView1.CellEnter += dataGridView1_CellEnter;
@@ -100,8 +99,8 @@ namespace MoxMatrix
       // btn_exportCSV
       // 
       btn_exportCSV.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-      btn_exportCSV.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
-      btn_exportCSV.Location = new Point(12, 341);
+      btn_exportCSV.Font = new Font("Segoe UI", 12F);
+      btn_exportCSV.Location = new Point(13, 357);
       btn_exportCSV.Name = "btn_exportCSV";
       btn_exportCSV.Size = new Size(1259, 55);
       btn_exportCSV.TabIndex = 3;
@@ -124,7 +123,7 @@ namespace MoxMatrix
       // btn_saveUrls
       // 
       btn_saveUrls.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-      btn_saveUrls.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+      btn_saveUrls.Font = new Font("Segoe UI", 12F);
       btn_saveUrls.Location = new Point(1289, 913);
       btn_saveUrls.Name = "btn_saveUrls";
       btn_saveUrls.Size = new Size(345, 55);
@@ -147,7 +146,7 @@ namespace MoxMatrix
       // 
       btn_foils.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
       btn_foils.AutoSize = true;
-      btn_foils.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+      btn_foils.Font = new Font("Segoe UI", 12F);
       btn_foils.Location = new Point(84, 21);
       btn_foils.Name = "btn_foils";
       btn_foils.Size = new Size(120, 25);
@@ -166,7 +165,7 @@ namespace MoxMatrix
       // 
       // txt_outOfStock
       // 
-      txt_outOfStock.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+      txt_outOfStock.Font = new Font("Segoe UI", 12F);
       txt_outOfStock.Location = new Point(699, 27);
       txt_outOfStock.Multiline = true;
       txt_outOfStock.Name = "txt_outOfStock";
@@ -177,7 +176,7 @@ namespace MoxMatrix
       // 
       // txt_unknownCards
       // 
-      txt_unknownCards.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+      txt_unknownCards.Font = new Font("Segoe UI", 12F);
       txt_unknownCards.ForeColor = SystemColors.WindowText;
       txt_unknownCards.Location = new Point(699, 220);
       txt_unknownCards.Multiline = true;
@@ -202,7 +201,7 @@ namespace MoxMatrix
       // 
       inputBox.AllowDrop = true;
       inputBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
-      inputBox.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+      inputBox.Font = new Font("Segoe UI", 12F);
       inputBox.Location = new Point(12, 27);
       inputBox.Multiline = true;
       inputBox.Name = "inputBox";
@@ -242,7 +241,7 @@ namespace MoxMatrix
       // btn_go
       // 
       btn_go.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-      btn_go.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+      btn_go.Font = new Font("Segoe UI", 12F);
       btn_go.Location = new Point(12, 480);
       btn_go.Name = "btn_go";
       btn_go.Size = new Size(392, 55);
@@ -347,7 +346,7 @@ namespace MoxMatrix
       // txt_errorFetching
       // 
       txt_errorFetching.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
-      txt_errorFetching.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+      txt_errorFetching.Font = new Font("Segoe UI", 12F);
       txt_errorFetching.ForeColor = SystemColors.WindowText;
       txt_errorFetching.Location = new Point(699, 430);
       txt_errorFetching.Multiline = true;

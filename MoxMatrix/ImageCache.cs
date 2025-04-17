@@ -70,8 +70,6 @@ public class ImageCache
 
   private Image DownloadImage(string cardName)
   {
-    //System.Net.ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
-
     var imageUrl = ImageEndpoint + Uri.EscapeDataString(cardName) + ImageParams;
 
     var request = new HttpRequestMessage(HttpMethod.Get, imageUrl);

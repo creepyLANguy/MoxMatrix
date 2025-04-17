@@ -32,9 +32,7 @@ namespace MoxMatrix
 
       if (localVersion >= latestVersion)
       {
-        //AL.
-        //TODO - uncomment the return
-        //return;
+        return;
       }
 
       var message =

@@ -1277,7 +1277,11 @@ namespace MoxMatrix
     {
       HideSplashScreen();
 
+      Hide();
+
       UpgradeUtils.Run();
+
+      Show();
     }
   }
 }

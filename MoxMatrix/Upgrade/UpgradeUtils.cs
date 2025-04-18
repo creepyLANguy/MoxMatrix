@@ -2,8 +2,8 @@
 using System.Net;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using System.Management.Automation;
 using System.Diagnostics;
+using System.Management.Automation;
 
 namespace MoxMatrix
 {
@@ -48,6 +48,7 @@ namespace MoxMatrix
       }
 
       Log("Trying upgrade from version v" + localVersion + " to v" + latestVersion);
+
       TryUpgrade();
     }
 
@@ -88,10 +89,15 @@ namespace MoxMatrix
           Thread.Sleep(CleanupSleepMs);
         }
       }
+
+      Log(
+        "Async Notice: Cleanup of outdated files completed after " + failures + 
+        " failures where max failures threshold is " + CleanupMaxFailures
+        );
     }
 
     private static void Log(string s = "")
-      => Debug.WriteLine(s.Length == 0 ? new StackTrace().GetFrame(1).GetMethod().Name : s);      
+      => Debug.WriteLine(">>>>>>>>\t" + (s.Length == 0 ? new StackTrace().GetFrame(1).GetMethod().Name + "();" : s));      
 
     private static SemanticVersion GetSemanticVersionFromCurrentExecutable()
     {
@@ -188,6 +194,7 @@ namespace MoxMatrix
       }
 
       Log("Upgrade Successful.");
+
       return true;
     }
 
@@ -200,6 +207,9 @@ namespace MoxMatrix
       ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
 
       webClient.DownloadFile(DownloadUrl, TempDownloadPath);
+
+      Log("Downloaded latest release to " + TempDownloadPath);
+
       return true;
     }
 
@@ -213,6 +223,9 @@ namespace MoxMatrix
       }
 
       ZipFile.ExtractToDirectory(TempDownloadPath, TempExtractPath);
+
+      Log("Unzipped to " + TempExtractPath);
+
       return true;
     }
 
@@ -224,9 +237,11 @@ namespace MoxMatrix
 
       using var ps = PowerShell.Create();
       ps.AddCommand("Rename-Item");
-      ps.AddParameter("-Path", Application.ExecutablePath);      
+      ps.AddParameter("-Path", Application.ExecutablePath);
       ps.AddParameter("-NewName", newName);
       ps.Invoke();
+
+      Log("Marked current executable for deletion: " + newName);
 
       return true;
     }
@@ -241,6 +256,8 @@ namespace MoxMatrix
         var newFileName = Path.Combine(Directory.GetCurrentDirectory(), Path.GetFileName(file));
         File.Copy(file, newFileName, true);
       }
+
+      Log("Copied new files to current directory.");
 
       return true;
     }
@@ -259,6 +276,8 @@ namespace MoxMatrix
         Directory.Delete(TempExtractPath, true);
       }
 
+      Log("Cleaned up temporary files.");
+
       return true;
     }
 
@@ -276,6 +295,8 @@ namespace MoxMatrix
       process.StartInfo.CreateNoWindow = true;
       process.StartInfo.Arguments = "";
       process.Start();
+
+      Log("Launched new version: " + exe);
 
       return true;
     }
@@ -300,6 +321,8 @@ namespace MoxMatrix
         Thread.Sleep(KillProcessRetrySleepMs);
         KillCurrentProcess();
       }
+
+      Log("Current process killed: " + currentProcess.ProcessName + " (ID: " + currentProcess.Id + ")");
     }
   }
 }

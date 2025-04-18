@@ -183,7 +183,6 @@ namespace MoxMatrix
         catch (Exception ex)
         {
           Log(ex.ToString());
-          //MessageBox.Show(ex.ToString(), AppName, MessageBoxButtons.OK, MessageBoxIcon.Error);
           return false;
         }
       }

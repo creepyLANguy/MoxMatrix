@@ -91,7 +91,7 @@ namespace MoxMatrix
     }
 
     private static void Log(string s = "")
-      => Console.WriteLine(s.Length == 0 ? MethodBase.GetCurrentMethod().Name : s + Environment.NewLine);
+      => Debug.WriteLine(s.Length == 0 ? new StackTrace().GetFrame(1).GetMethod().Name : s);      
 
     private static SemanticVersion GetSemanticVersionFromCurrentExecutable()
     {
@@ -182,7 +182,8 @@ namespace MoxMatrix
         }
         catch (Exception ex)
         {
-          Log(ex.Message);
+          Log(ex.ToString());
+          //MessageBox.Show(ex.ToString(), AppName, MessageBoxButtons.OK, MessageBoxIcon.Error);
           return false;
         }
       }

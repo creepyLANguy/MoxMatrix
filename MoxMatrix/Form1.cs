@@ -139,6 +139,8 @@ namespace MoxMatrix
 
     private void Form1_Load(object sender, EventArgs e)
     {
+      UpgradeUtils.Run();
+
       ShowSplashScreen();
 
       SetupImageForm();
@@ -1277,12 +1279,6 @@ namespace MoxMatrix
     private void Form1_Shown(object sender, EventArgs e)
     {
       HideSplashScreen();
-
-      Hide();
-
-      UpgradeUtils.Run();
-
-      Show();
     }
   }
 }

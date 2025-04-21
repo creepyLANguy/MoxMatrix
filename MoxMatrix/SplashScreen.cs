@@ -24,7 +24,18 @@ namespace MoxMatrix
 
       CenterToScreen();
 
+      progressBar.Visible = false;
+
       Visible = true;
+    }
+
+    public void SetProgress(int value)
+    {
+      progressBar.Visible = value > 0;
+
+      progressBar.Value = value > 0 && value <= progressBar.Maximum ? value : progressBar.Value;
+
+      Refresh();
     }
   }
 }

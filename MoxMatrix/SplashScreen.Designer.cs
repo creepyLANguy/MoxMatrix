@@ -29,6 +29,7 @@
     private void InitializeComponent()
     {
       pictureBox1 = new PictureBox();
+      progressBar = new ProgressBar();
       ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
       SuspendLayout();
       // 
@@ -42,11 +43,22 @@
       pictureBox1.TabIndex = 0;
       pictureBox1.TabStop = false;
       // 
+      // progressBar
+      // 
+      progressBar.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+      progressBar.Location = new Point(0, 427);
+      progressBar.Name = "progressBar";
+      progressBar.Size = new Size(800, 23);
+      progressBar.Step = 1;
+      progressBar.Style = ProgressBarStyle.Continuous;
+      progressBar.TabIndex = 1;
+      // 
       // SplashScreen
       // 
       AutoScaleDimensions = new SizeF(7F, 15F);
       AutoScaleMode = AutoScaleMode.Font;
       ClientSize = new Size(800, 450);
+      Controls.Add(progressBar);
       Controls.Add(pictureBox1);
       DoubleBuffered = true;
       Name = "SplashScreen";
@@ -58,5 +70,6 @@
     #endregion
 
     private PictureBox pictureBox1;
+    private ProgressBar progressBar;
   }
 }

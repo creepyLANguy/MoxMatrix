@@ -1,13 +1,13 @@
-﻿using System.IO.Compression;
+﻿using System.Diagnostics;
+using System.IO.Compression;
+using System.Management.Automation;
 using System.Net;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using System.Diagnostics;
-using System.Management.Automation;
 
-namespace MoxMatrix
+namespace MoxMatrix.Upgrade
 {
-  public static partial class UpgradeUtils
+  public static class UpgradeUtils
   {
     private const string AppName = "Mox Matrix(beta)";
     private const string VersionPattern = @"\/releases\/tag\/v([0-9]+\.[0-9]+\.[0-9]+)";
@@ -21,6 +21,17 @@ namespace MoxMatrix
     private const int CleanupSleepMs = 30000;
     private const string ExecutableExtension = ".exe";
     private const int KillProcessRetrySleepMs = 3000;
+
+    private static void Log(string s = "")
+      => Debug.WriteLine(">>\t" + (s.Length == 0 ? new StackTrace().GetFrame(1)?.GetMethod()?.Name + "();" : s));
+
+    private static WebClient GetWebClient()
+    {
+      using WebClient webClient = new();
+      webClient.Headers.Add("user-agent", AppName);
+      ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+      return webClient;
+    }
 
     public static void Run()
     {
@@ -77,7 +88,7 @@ namespace MoxMatrix
 
         try
         {
-          foreach (var file in allFiles)
+          foreach (var file in allFiles.OfType<string>())
           {
             File.Delete(file);
           }
@@ -95,9 +106,6 @@ namespace MoxMatrix
         " failures where max failures threshold is " + CleanupMaxFailures
         );
     }
-
-    private static void Log(string s = "")
-      => Debug.WriteLine(">>>>>>>>\t" + (s.Length == 0 ? new StackTrace().GetFrame(1).GetMethod().Name + "();" : s));      
 
     private static SemanticVersion GetSemanticVersionFromCurrentExecutable()
     {
@@ -117,13 +125,9 @@ namespace MoxMatrix
     {
       var html = string.Empty;
 
-      using WebClient webClient = new();
-      webClient.Headers.Add("user-agent", AppName);
-      ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-
       try
       {
-        html = webClient.DownloadString(url);
+        html = GetWebClient().DownloadString(url);
       }
       catch (WebException ex)
       {
@@ -153,12 +157,12 @@ namespace MoxMatrix
         KillCurrentProcess();        
       }
 
-      var message_upgradeFailed =
+      var messageUpgradeFailed =
         "Upgrade Failed, please try again later." +
         Environment.NewLine + Environment.NewLine +
         "The application will now restart.";
 
-      MessageBox.Show(message_upgradeFailed, AppName, MessageBoxButtons.OK);
+      MessageBox.Show(messageUpgradeFailed, AppName, MessageBoxButtons.OK);
 
       Application.Restart();
     }
@@ -202,11 +206,7 @@ namespace MoxMatrix
     {
       Log();
 
-      using WebClient webClient = new();
-      webClient.Headers.Add("user-agent", AppName);
-      ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-
-      webClient.DownloadFile(DownloadUrl, TempDownloadPath);
+      GetWebClient().DownloadFile(DownloadUrl, TempDownloadPath);
 
       Log("Downloaded latest release to " + TempDownloadPath);
 

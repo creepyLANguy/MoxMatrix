@@ -8,6 +8,7 @@ using System.Net.Mime;
 using HtmlDocument = HtmlAgilityPack.HtmlDocument;
 using Newtonsoft.Json.Linq;
 using System.Runtime.InteropServices;
+using MoxMatrix.Upgrade;
 using Timer = System.Windows.Forms.Timer;
 
 namespace MoxMatrix
@@ -1046,7 +1047,7 @@ namespace MoxMatrix
       var point = dataGridView1.PointToScreen(rect.Location);
       var cellPos = new Point(point.X, point.Y + rect.Height);
 
-      imageForm.Location = imageForm.lastImagePosition ?? cellPos;
+      imageForm.Location = imageForm.LastImagePosition ?? cellPos;
       imageForm.SetPicture(cellValue.ToString());
 
       imageForm.Visible = true;

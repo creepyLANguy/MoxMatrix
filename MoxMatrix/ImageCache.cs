@@ -52,7 +52,7 @@ public class ImageCache
     return downloadedImage;
   }
 
-  //TODO - implement a way to stop/restart this thread (when the form is closed, when the cardNames list is updated, on exceptions and failures, etc).
+  //TODO - implement a way to stop/restart this thread (when the form is closed, when the cardNames list is updated, on exceptions and failures, etc.).
   public void StartCachingThread(List<string> cardNames)
   {
     foreach (var cardName in cardNames)

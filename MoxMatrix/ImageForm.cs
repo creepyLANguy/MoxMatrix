@@ -17,9 +17,9 @@ namespace MoxMatrix
   {
     private readonly ImageCache _imageCache = new();
 
-    public bool isMouseDown_Left;
-    private Point mouseDownLocation;
-    public Point? lastImagePosition;
+    public bool IsMouseDownLeft;
+    private Point _mouseDownLocation;
+    public Point? LastImagePosition;
 
     public ImageForm()
     {
@@ -55,8 +55,8 @@ namespace MoxMatrix
     {
       if (e.Button == MouseButtons.Left)
       {
-        mouseDownLocation = e.Location;
-        isMouseDown_Left = true;
+        _mouseDownLocation = e.Location;
+        IsMouseDownLeft = true;
       }
       else if (e.Button == MouseButtons.Middle)
       {
@@ -70,11 +70,11 @@ namespace MoxMatrix
 
     private void pictureBox1_MouseMove(object sender, MouseEventArgs e)
     {
-      if (isMouseDown_Left)
+      if (IsMouseDownLeft)
       {
-        var newX = Cursor.Position.X - mouseDownLocation.X;
-        var newY = Cursor.Position.Y - mouseDownLocation.Y;
-        lastImagePosition = Location = new Point(newX, newY);
+        var newX = Cursor.Position.X - _mouseDownLocation.X;
+        var newY = Cursor.Position.Y - _mouseDownLocation.Y;
+        LastImagePosition = Location = new Point(newX, newY);
       }
     }
 
@@ -82,7 +82,7 @@ namespace MoxMatrix
     {
       if (e.Button is MouseButtons.Left)
       {
-        isMouseDown_Left = false;
+        IsMouseDownLeft = false;
       }
     }
 

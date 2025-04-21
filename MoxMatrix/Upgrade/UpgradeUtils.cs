@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.IO.Compression;
-using System.Management.Automation;
 using System.Net;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -233,13 +232,12 @@ namespace MoxMatrix.Upgrade
     {
       Log();
 
+      var currentExe = Application.ExecutablePath;
+      var dir = Path.GetDirectoryName(currentExe);
       var newName = DateTime.Now.ToString(DateTimeFormatPattern) + OutdatedMarker;
+      var newPath = Path.Combine(dir, newName);
 
-      using var ps = PowerShell.Create();
-      ps.AddCommand("Rename-Item");
-      ps.AddParameter("-Path", Application.ExecutablePath);
-      ps.AddParameter("-NewName", newName);
-      ps.Invoke();
+      File.Move(currentExe, newPath);
 
       Log("Marked current executable for deletion: " + newName);
 

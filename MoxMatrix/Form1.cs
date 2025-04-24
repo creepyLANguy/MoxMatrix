@@ -1312,6 +1312,7 @@ namespace MoxMatrix
       var x = GetStringForCSV();
       Oracle_v1.ExportBuyList(x.Split(Environment.NewLine), fileName + "v1.txt");
       Oracle_v2.ExportBuyList(x.Split(Environment.NewLine), fileName + "v2.txt");
+      Oracle_v3.ExportBuyList(x.Split(Environment.NewLine), fileName + "v3.txt");
 
       OpenFile(fileName);
     }

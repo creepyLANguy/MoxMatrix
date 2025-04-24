@@ -60,6 +60,8 @@ namespace MoxMatrix
 
     private const string DateTimeFormatPattern = "dd-MM-yyyy_HH-mm-ss";
 
+    private const int StoresToConsiderDefault = 10;
+
     private double GetExchangeRateDollar(double defaultExchangeRate)
     {
       try
@@ -166,6 +168,8 @@ namespace MoxMatrix
       GetVendors();
 
       cb_individualsAll.Checked = false;
+
+      txt_TopStoresToConsider.Text = StoresToConsiderDefault.ToString();
 
       UnsuspendForm(loadingVendorsText);
     }
@@ -1295,6 +1299,19 @@ namespace MoxMatrix
         return;
       }
 
+      var storesNum = StoresToConsiderDefault;
+      try
+      {
+        storesNum = int.Parse(txt_TopStoresToConsider.Text);
+      }
+      catch (Exception exception)
+      {
+        MessageBox.Show("Enter a valid number of stores to consider, in range of 1 to 99 inclusive.",
+          "",
+          MessageBoxButtons.OK,
+          MessageBoxIcon.Information);
+        return;
+      }
 
       using var saveFileDialog = new SaveFileDialog();
       saveFileDialog.Filter = "TXT files (*.txt)|*.txt";
@@ -1308,11 +1325,8 @@ namespace MoxMatrix
       }
 
       var fileName = saveFileDialog.FileName;
-
-      var x = GetStringForCSV();
-      Oracle_v1.ExportBuyList(x.Split(Environment.NewLine), fileName + "v1.txt");
-      Oracle_v2.ExportBuyList(x.Split(Environment.NewLine), fileName + "v2.txt");
-      Oracle_v3.ExportBuyList(x.Split(Environment.NewLine), fileName + "v3.txt");
+      var lines = GetStringForCSV().Split(Environment.NewLine);
+      Oracle_v3.ExportBuyList(lines, storesNum, fileName);
 
       OpenFile(fileName);
     }

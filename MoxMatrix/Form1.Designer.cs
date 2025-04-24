@@ -57,6 +57,8 @@ namespace MoxMatrix
       cl_businesses = new CheckedListBox();
       label8 = new Label();
       label7 = new Label();
+      txt_TopStoresToConsider = new MaskedTextBox();
+      lbl_TopStoresToConsider = new Label();
       btn_exportBuyList = new Button();
       ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
       ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
@@ -103,7 +105,7 @@ namespace MoxMatrix
       btn_exportCSV.Font = new Font("Segoe UI", 12F);
       btn_exportCSV.Location = new Point(12, 356);
       btn_exportCSV.Name = "btn_exportCSV";
-      btn_exportCSV.Size = new Size(625, 55);
+      btn_exportCSV.Size = new Size(601, 55);
       btn_exportCSV.TabIndex = 3;
       btn_exportCSV.Text = "Export CSV";
       btn_exportCSV.UseVisualStyleBackColor = true;
@@ -283,6 +285,8 @@ namespace MoxMatrix
       // splitContainer1.Panel2
       // 
       splitContainer1.Panel2.AutoScroll = true;
+      splitContainer1.Panel2.Controls.Add(txt_TopStoresToConsider);
+      splitContainer1.Panel2.Controls.Add(lbl_TopStoresToConsider);
       splitContainer1.Panel2.Controls.Add(btn_exportBuyList);
       splitContainer1.Panel2.Controls.Add(btn_exportCSV);
       splitContainer1.Panel2.Controls.Add(dataGridView1);
@@ -403,13 +407,33 @@ namespace MoxMatrix
       label7.TabIndex = 12;
       label7.Text = "Businesses:";
       // 
+      // txt_TopStoresToConsider
+      // 
+      txt_TopStoresToConsider.Font = new Font("Segoe UI", 18F);
+      txt_TopStoresToConsider.Location = new Point(1130, 366);
+      txt_TopStoresToConsider.Mask = "00";
+      txt_TopStoresToConsider.Name = "txt_TopStoresToConsider";
+      txt_TopStoresToConsider.Size = new Size(141, 39);
+      txt_TopStoresToConsider.TabIndex = 13;
+      txt_TopStoresToConsider.TextAlign = HorizontalAlignment.Center;
+      txt_TopStoresToConsider.ValidatingType = typeof(int);
+      // 
+      // lbl_TopStoresToConsider
+      // 
+      lbl_TopStoresToConsider.AutoSize = true;
+      lbl_TopStoresToConsider.Location = new Point(1130, 350);
+      lbl_TopStoresToConsider.Name = "lbl_TopStoresToConsider";
+      lbl_TopStoresToConsider.Size = new Size(144, 15);
+      lbl_TopStoresToConsider.TabIndex = 6;
+      lbl_TopStoresToConsider.Text = "Top 'n' Stores to Consider:";
+      // 
       // btn_exportBuyList
       // 
       btn_exportBuyList.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
       btn_exportBuyList.Font = new Font("Segoe UI", 12F);
-      btn_exportBuyList.Location = new Point(646, 356);
+      btn_exportBuyList.Location = new Point(619, 356);
       btn_exportBuyList.Name = "btn_exportBuyList";
-      btn_exportBuyList.Size = new Size(625, 55);
+      btn_exportBuyList.Size = new Size(505, 55);
       btn_exportBuyList.TabIndex = 4;
       btn_exportBuyList.Text = "Export Optimised Buy List";
       btn_exportBuyList.UseVisualStyleBackColor = true;
@@ -436,6 +460,7 @@ namespace MoxMatrix
       splitContainer1.Panel1.ResumeLayout(false);
       splitContainer1.Panel1.PerformLayout();
       splitContainer1.Panel2.ResumeLayout(false);
+      splitContainer1.Panel2.PerformLayout();
       ((System.ComponentModel.ISupportInitialize)splitContainer1).EndInit();
       splitContainer1.ResumeLayout(false);
       panel2.ResumeLayout(false);
@@ -473,5 +498,7 @@ namespace MoxMatrix
     private CheckBox cb_businessesAll;
     private Panel panel2;
     private Button btn_exportBuyList;
+    private Label lbl_TopStoresToConsider;
+    private MaskedTextBox txt_TopStoresToConsider;
   }
 }

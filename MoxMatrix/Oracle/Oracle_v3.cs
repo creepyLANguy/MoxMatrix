@@ -5,9 +5,8 @@ namespace MoxMatrix
   public static class Oracle_v3
   {
     private const decimal DeliveryCost = 100m;
-    private const int MaxPreferredStores = 8;
 
-    private static Tuple<Dictionary<string, List<(string cardName, decimal price)>>, decimal> GetOptimisedPurchases(string[] inputCsvLines)
+    private static Tuple<Dictionary<string, List<(string cardName, decimal price)>>, decimal> GetOptimisedPurchases(string[] inputCsvLines, int maxPreferredStores)
     {
       if (inputCsvLines.Length < 2)
       {
@@ -41,7 +40,7 @@ namespace MoxMatrix
 
       var preferredStores = storeAvailability
         .OrderByDescending(kvp => kvp.Value)
-        .Take(Math.Min(MaxPreferredStores, storeAvailability.Count))
+        .Take(Math.Min(maxPreferredStores, storeAvailability.Count))
         .Select(kvp => kvp.Key)
         .ToHashSet();
 
@@ -166,12 +165,12 @@ namespace MoxMatrix
       }
     }
 
-    public static void ExportBuyList(string inputCsvPath, string outputTextPath)
-      => ExportBuyList(File.ReadAllLines(inputCsvPath), outputTextPath);
+    public static void ExportBuyList(string inputCsvPath, int maxPreferredStores, string outputTextPath)
+      => ExportBuyList(File.ReadAllLines(inputCsvPath), maxPreferredStores, outputTextPath);
 
-    public static void ExportBuyList(string[] inputCsvLines, string outputTextPath)
+    public static void ExportBuyList(string[] inputCsvLines, int maxPreferredStores, string outputTextPath)
     {
-      var x = GetOptimisedPurchases(inputCsvLines);
+      var x = GetOptimisedPurchases(inputCsvLines, maxPreferredStores);
       PerformFinalExport(x.Item1, x.Item2, outputTextPath);
     }
 

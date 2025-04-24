@@ -91,7 +91,7 @@ namespace MoxMatrix
       dataGridView1.DefaultCellStyle = dataGridViewCellStyle1;
       dataGridView1.Location = new Point(12, 14);
       dataGridView1.Name = "dataGridView1";
-      dataGridView1.Size = new Size(1259, 330);
+      dataGridView1.Size = new Size(1259, 324);
       dataGridView1.TabIndex = 2;
       dataGridView1.CellClick += dataGridView1_CellClick;
       dataGridView1.CellEnter += dataGridView1_CellEnter;
@@ -103,7 +103,7 @@ namespace MoxMatrix
       // 
       btn_exportCSV.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
       btn_exportCSV.Font = new Font("Segoe UI", 12F);
-      btn_exportCSV.Location = new Point(12, 356);
+      btn_exportCSV.Location = new Point(12, 350);
       btn_exportCSV.Name = "btn_exportCSV";
       btn_exportCSV.Size = new Size(601, 55);
       btn_exportCSV.TabIndex = 3;
@@ -409,6 +409,7 @@ namespace MoxMatrix
       // 
       // txt_TopStoresToConsider
       // 
+      txt_TopStoresToConsider.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
       txt_TopStoresToConsider.Font = new Font("Segoe UI", 18F);
       txt_TopStoresToConsider.Location = new Point(1130, 366);
       txt_TopStoresToConsider.Mask = "00";
@@ -420,6 +421,7 @@ namespace MoxMatrix
       // 
       // lbl_TopStoresToConsider
       // 
+      lbl_TopStoresToConsider.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
       lbl_TopStoresToConsider.AutoSize = true;
       lbl_TopStoresToConsider.Location = new Point(1130, 350);
       lbl_TopStoresToConsider.Name = "lbl_TopStoresToConsider";
@@ -431,7 +433,7 @@ namespace MoxMatrix
       // 
       btn_exportBuyList.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
       btn_exportBuyList.Font = new Font("Segoe UI", 12F);
-      btn_exportBuyList.Location = new Point(619, 356);
+      btn_exportBuyList.Location = new Point(619, 350);
       btn_exportBuyList.Name = "btn_exportBuyList";
       btn_exportBuyList.Size = new Size(505, 55);
       btn_exportBuyList.TabIndex = 4;

@@ -2,21 +2,18 @@
 
 namespace MoxMatrix
 {
-  public static class Oracle
+  public static class Oracle_v1
   {
     private const decimal DeliveryCost = 100m;
 
-    public static void OptimisePurchases(string inputCsvPath, string outputTextPath)
-      => OptimisePurchases(File.ReadAllLines(inputCsvPath), outputTextPath);
-
-    public static void OptimisePurchases(string[] inputCsvLines, string outputTextPath)
+    private static Tuple<Dictionary<string, List<(string cardName, decimal price)>>, decimal> GetOptimisedPurchases(string[] inputCsvLines)
     {
       if (inputCsvLines.Length < 2)
       {
         throw new InvalidOperationException("CSV does not contain enough data.");
       }
 
-      var headers = inputCsvLines[0].Split(';');
+      var headers = inputCsvLines[0].Split(new List<char> {';'}.ToArray());
       var storeNames = headers.Skip(1).ToList();
 
       var cardRows = inputCsvLines
@@ -73,13 +70,21 @@ namespace MoxMatrix
           usedStores.Add(store);
         }
         totalCost += price;
-
       }
 
-      ExportResults(outputTextPath, storeCards, totalCost);
+      return Tuple.Create(storeCards, totalCost);
     }
 
-    private static void ExportResults(string outputTextPath, Dictionary<string, List<(string cardName, decimal price)>> storeCards, decimal totalCost)
+    public static void ExportBuyList(string inputCsvPath, string outputTextPath)
+      => ExportBuyList(File.ReadAllLines(inputCsvPath), outputTextPath);
+
+    public static void ExportBuyList(string[] inputCsvLines, string outputTextPath)
+    {
+      var x = GetOptimisedPurchases(inputCsvLines);
+      PerformFinalExport(x.Item1, x.Item2, outputTextPath);
+    }
+
+    private static void PerformFinalExport(Dictionary<string, List<(string cardName, decimal price)>> storeCards, decimal totalCost, string outputTextPath)
     {
       using var writer = new StreamWriter(outputTextPath);
       foreach (var store in storeCards.Keys.OrderBy(k => k))

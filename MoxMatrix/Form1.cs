@@ -1309,9 +1309,9 @@ namespace MoxMatrix
 
       var fileName = saveFileDialog.FileName;
 
-      ExportDataGridViewToCSV(fileName); 
-
-      Oracle.OptimisePurchases(GetStringForCSV().Split(), fileName);
+      var x = GetStringForCSV();
+      Oracle_v1.ExportBuyList(x.Split(Environment.NewLine), fileName + "v1.txt");
+      Oracle_v2.ExportBuyList(x.Split(Environment.NewLine), fileName + "v2.txt");
 
       OpenFile(fileName);
     }

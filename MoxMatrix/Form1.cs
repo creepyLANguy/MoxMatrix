@@ -58,6 +58,8 @@ namespace MoxMatrix
     private readonly string exchangeRateUrl = "https://v6.exchangerate-api.com/v6/9f7ed2855a8ce2b44d0f9338/pair/USD/ZAR";
     private double exchangeRateDollar = -1; //gets set during form load.
 
+    private const string DateTimeFormatPattern = "dd-MM-yyyy_HH-mm-ss";
+
     private double GetExchangeRateDollar(double defaultExchangeRate)
     {
       try
@@ -838,19 +840,24 @@ namespace MoxMatrix
       using var saveFileDialog = new SaveFileDialog();
       saveFileDialog.Filter = "CSV files (*.csv)|*.csv";
       saveFileDialog.Title = "Save as CSV file";
-      saveFileDialog.FileName = "MoxMatrix_Export.csv";
+      saveFileDialog.FileName = "MoxMatrix_Export_" + DateTime.Now.ToString(DateTimeFormatPattern) + ".csv";
 
-      if (saveFileDialog.ShowDialog() == DialogResult.OK)
+      if (saveFileDialog.ShowDialog() != DialogResult.OK)
       {
-        var fileName = saveFileDialog.FileName;
-
-        ExportDataGridViewToCSV(fileName);
-
-        OpenFile(fileName);
+        return;
       }
+
+      var fileName = saveFileDialog.FileName;
+
+      ExportDataGridViewToCSV(fileName);
+
+      OpenFile(fileName);
     }
 
     public void ExportDataGridViewToCSV(string filePath)
+      => File.WriteAllText(filePath, GetStringForCSV(), Encoding.UTF8);
+
+    private string GetStringForCSV()
     {
       var csvContent = new StringBuilder();
 
@@ -880,11 +887,10 @@ namespace MoxMatrix
         csvContent.AppendLine();
       }
 
-      // Write to file
-      File.WriteAllText(filePath, csvContent.ToString(), Encoding.UTF8);
+      return csvContent.ToString();
     }
 
-    void OpenFile(string fileName)
+    private static void OpenFile(string fileName)
     {
       try
       {
@@ -1279,6 +1285,35 @@ namespace MoxMatrix
     private void Form1_Shown(object sender, EventArgs e)
     {
       HideSplashScreen();
+    }
+
+    private void btn_exportBuyList_Click(object sender, EventArgs e)
+    {
+      if (dataGridView1.Rows.Count == 0)
+      {
+        MessageBox.Show("No data to export.", "", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        return;
+      }
+
+
+      using var saveFileDialog = new SaveFileDialog();
+      saveFileDialog.Filter = "TXT files (*.txt)|*.txt";
+      saveFileDialog.Title = "Save as TXT file";
+      saveFileDialog.FileName = "MoxMatrix_BuyList_" + DateTime.Now.ToString(DateTimeFormatPattern) + ".txt";
+
+
+      if (saveFileDialog.ShowDialog() != DialogResult.OK)
+      {
+        return;
+      }
+
+      var fileName = saveFileDialog.FileName;
+
+      ExportDataGridViewToCSV(fileName); 
+
+      Oracle.OptimisePurchases(GetStringForCSV().Split(), fileName);
+
+      OpenFile(fileName);
     }
   }
 }

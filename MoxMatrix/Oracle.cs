@@ -2,14 +2,14 @@
 
 namespace MoxMatrix
 {
-  public class Oracle
+  public static class Oracle
   {
     private const decimal DeliveryCost = 100m;
 
-    public void OptimisePurchases(string inputCsvPath, string outputTextPath)
+    public static void OptimisePurchases(string inputCsvPath, string outputTextPath)
       => OptimisePurchases(File.ReadAllLines(inputCsvPath), outputTextPath);
 
-    public void OptimisePurchases(string[] inputCsvLines, string outputTextPath)
+    public static void OptimisePurchases(string[] inputCsvLines, string outputTextPath)
     {
       if (inputCsvLines.Length < 2)
       {

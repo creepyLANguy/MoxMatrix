@@ -57,6 +57,7 @@ namespace MoxMatrix
       cl_businesses = new CheckedListBox();
       label8 = new Label();
       label7 = new Label();
+      btn_exportBuyList = new Button();
       ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
       ((System.ComponentModel.ISupportInitialize)splitContainer1).BeginInit();
       splitContainer1.Panel1.SuspendLayout();
@@ -100,11 +101,11 @@ namespace MoxMatrix
       // 
       btn_exportCSV.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
       btn_exportCSV.Font = new Font("Segoe UI", 12F);
-      btn_exportCSV.Location = new Point(13, 357);
+      btn_exportCSV.Location = new Point(12, 356);
       btn_exportCSV.Name = "btn_exportCSV";
-      btn_exportCSV.Size = new Size(1259, 55);
+      btn_exportCSV.Size = new Size(625, 55);
       btn_exportCSV.TabIndex = 3;
-      btn_exportCSV.Text = "Export CSV ";
+      btn_exportCSV.Text = "Export CSV";
       btn_exportCSV.UseVisualStyleBackColor = true;
       btn_exportCSV.Click += btn_exportCSV_Click;
       // 
@@ -282,6 +283,7 @@ namespace MoxMatrix
       // splitContainer1.Panel2
       // 
       splitContainer1.Panel2.AutoScroll = true;
+      splitContainer1.Panel2.Controls.Add(btn_exportBuyList);
       splitContainer1.Panel2.Controls.Add(btn_exportCSV);
       splitContainer1.Panel2.Controls.Add(dataGridView1);
       splitContainer1.Size = new Size(1283, 983);
@@ -401,6 +403,18 @@ namespace MoxMatrix
       label7.TabIndex = 12;
       label7.Text = "Businesses:";
       // 
+      // btn_exportBuyList
+      // 
+      btn_exportBuyList.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+      btn_exportBuyList.Font = new Font("Segoe UI", 12F);
+      btn_exportBuyList.Location = new Point(646, 356);
+      btn_exportBuyList.Name = "btn_exportBuyList";
+      btn_exportBuyList.Size = new Size(625, 55);
+      btn_exportBuyList.TabIndex = 4;
+      btn_exportBuyList.Text = "Export Optimised Buy List";
+      btn_exportBuyList.UseVisualStyleBackColor = true;
+      btn_exportBuyList.Click += btn_exportBuyList_Click;
+      // 
       // Form1
       // 
       AutoScaleDimensions = new SizeF(7F, 15F);
@@ -458,5 +472,6 @@ namespace MoxMatrix
     private CheckBox cb_individualsAll;
     private CheckBox cb_businessesAll;
     private Panel panel2;
+    private Button btn_exportBuyList;
   }
 }

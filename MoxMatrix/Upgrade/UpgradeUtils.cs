@@ -76,9 +76,10 @@ public static class UpgradeUtils
     while (failures < CleanupMaxFailures)
     {
         var allFiles =
-          Directory.GetFiles(Directory.GetCurrentDirectory(), "*" + OutdatedMarker + "*", SearchOption.AllDirectories)
-          .Select(Path.GetFileName)
-          .ToList();
+          Directory
+            .GetFiles(Directory.GetCurrentDirectory(), "*" + OutdatedMarker + "*", SearchOption.AllDirectories)
+            .Select(Path.GetFileName)
+            .ToList();
 
       if (allFiles.Count == 0)
       {
@@ -232,12 +233,9 @@ public static class UpgradeUtils
   {
     Log();
 
-    var currentExe = Application.ExecutablePath;
-    var dir = Path.GetDirectoryName(currentExe);
     var newName = DateTime.Now.ToString(DateTimeFormatPattern) + OutdatedMarker;
-    var newPath = Path.Combine(dir, newName);
 
-    File.Move(currentExe, newPath);
+    File.Move(Application.ExecutablePath, newName);
 
     Log("Marked current executable for deletion: " + newName);
 

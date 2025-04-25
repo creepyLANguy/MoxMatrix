@@ -141,31 +141,13 @@ namespace MoxMatrix
       }
     }
 
-    public static void ExportBuyList(string inputCsvPath, string outputTextPath)
-      => ExportBuyList(File.ReadAllLines(inputCsvPath), outputTextPath);
+    public static void ExportBuyList(string inputCsvPath, string outputTextPath, int unused_param = 0)
+      => ExportBuyList(File.ReadAllLines(inputCsvPath), outputTextPath, unused_param);
 
-    public static void ExportBuyList(string[] inputCsvLines, string outputTextPath)
+    public static void ExportBuyList(string[] inputCsvLines, string outputTextPath, int unused_param = 0)
     {
       var x = GetOptimisedPurchases(inputCsvLines);
-      PerformFinalExport(x.Item1, x.Item2, outputTextPath);
-    }
-
-    private static void PerformFinalExport(Dictionary<string, List<(string cardName, decimal price)>> storeCards, decimal totalCost, string outputTextPath)
-    {
-      using var writer = new StreamWriter(outputTextPath);
-      foreach (var store in storeCards.Keys.OrderBy(k => k))
-      {
-        writer.WriteLine($"Store: {store}");
-        decimal storeTotal = 0;
-        foreach (var (card, price) in storeCards[store])
-        {
-          writer.WriteLine($"  - {card}: R{price}");
-          storeTotal += price;
-        }
-        writer.WriteLine($"  Delivery: R{DeliveryCost}");
-        writer.WriteLine($"  Subtotal: R{storeTotal + DeliveryCost}\n");
-      }
-      writer.WriteLine($"Total Cost: R{totalCost}");
+      Exporter.Run(x.Item1, x.Item2, "Oracle_v2", DeliveryCost, outputTextPath);
     }
   }
 }

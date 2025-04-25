@@ -57,6 +57,8 @@ namespace MoxMatrix
       cl_businesses = new CheckedListBox();
       label8 = new Label();
       label7 = new Label();
+      cb_OracleVersions = new ComboBox();
+      lbl_OracleVersion = new Label();
       txt_TopStoresToConsider = new MaskedTextBox();
       lbl_TopStoresToConsider = new Label();
       btn_exportBuyList = new Button();
@@ -91,7 +93,7 @@ namespace MoxMatrix
       dataGridView1.DefaultCellStyle = dataGridViewCellStyle1;
       dataGridView1.Location = new Point(12, 14);
       dataGridView1.Name = "dataGridView1";
-      dataGridView1.Size = new Size(1259, 324);
+      dataGridView1.Size = new Size(1259, 321);
       dataGridView1.TabIndex = 2;
       dataGridView1.CellClick += dataGridView1_CellClick;
       dataGridView1.CellEnter += dataGridView1_CellEnter;
@@ -103,9 +105,9 @@ namespace MoxMatrix
       // 
       btn_exportCSV.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
       btn_exportCSV.Font = new Font("Segoe UI", 12F);
-      btn_exportCSV.Location = new Point(12, 350);
+      btn_exportCSV.Location = new Point(12, 342);
       btn_exportCSV.Name = "btn_exportCSV";
-      btn_exportCSV.Size = new Size(601, 55);
+      btn_exportCSV.Size = new Size(487, 55);
       btn_exportCSV.TabIndex = 3;
       btn_exportCSV.Text = "Export CSV";
       btn_exportCSV.UseVisualStyleBackColor = true;
@@ -118,7 +120,7 @@ namespace MoxMatrix
       txt_urls.Location = new Point(1289, 27);
       txt_urls.Name = "txt_urls";
       txt_urls.ReadOnly = true;
-      txt_urls.Size = new Size(345, 880);
+      txt_urls.Size = new Size(345, 889);
       txt_urls.TabIndex = 12;
       txt_urls.Text = "";
       txt_urls.LinkClicked += txt_urls_LinkClicked;
@@ -127,7 +129,7 @@ namespace MoxMatrix
       // 
       btn_saveUrls.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
       btn_saveUrls.Font = new Font("Segoe UI", 12F);
-      btn_saveUrls.Location = new Point(1289, 913);
+      btn_saveUrls.Location = new Point(1289, 922);
       btn_saveUrls.Name = "btn_saveUrls";
       btn_saveUrls.Size = new Size(345, 55);
       btn_saveUrls.TabIndex = 11;
@@ -285,6 +287,8 @@ namespace MoxMatrix
       // splitContainer1.Panel2
       // 
       splitContainer1.Panel2.AutoScroll = true;
+      splitContainer1.Panel2.Controls.Add(cb_OracleVersions);
+      splitContainer1.Panel2.Controls.Add(lbl_OracleVersion);
       splitContainer1.Panel2.Controls.Add(txt_TopStoresToConsider);
       splitContainer1.Panel2.Controls.Add(lbl_TopStoresToConsider);
       splitContainer1.Panel2.Controls.Add(btn_exportBuyList);
@@ -407,11 +411,31 @@ namespace MoxMatrix
       label7.TabIndex = 12;
       label7.Text = "Businesses:";
       // 
+      // cb_OracleVersions
+      // 
+      cb_OracleVersions.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+      cb_OracleVersions.Font = new Font("Segoe UI", 18F);
+      cb_OracleVersions.FormattingEnabled = true;
+      cb_OracleVersions.Location = new Point(1003, 356);
+      cb_OracleVersions.Name = "cb_OracleVersions";
+      cb_OracleVersions.Size = new Size(121, 40);
+      cb_OracleVersions.TabIndex = 15;
+      // 
+      // lbl_OracleVersion
+      // 
+      lbl_OracleVersion.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+      lbl_OracleVersion.AutoSize = true;
+      lbl_OracleVersion.Location = new Point(1003, 338);
+      lbl_OracleVersion.Name = "lbl_OracleVersion";
+      lbl_OracleVersion.Size = new Size(105, 15);
+      lbl_OracleVersion.TabIndex = 14;
+      lbl_OracleVersion.Text = "Algorithm Version:";
+      // 
       // txt_TopStoresToConsider
       // 
       txt_TopStoresToConsider.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
       txt_TopStoresToConsider.Font = new Font("Segoe UI", 18F);
-      txt_TopStoresToConsider.Location = new Point(1130, 366);
+      txt_TopStoresToConsider.Location = new Point(1130, 357);
       txt_TopStoresToConsider.Mask = "00";
       txt_TopStoresToConsider.Name = "txt_TopStoresToConsider";
       txt_TopStoresToConsider.Size = new Size(141, 39);
@@ -423,7 +447,7 @@ namespace MoxMatrix
       // 
       lbl_TopStoresToConsider.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
       lbl_TopStoresToConsider.AutoSize = true;
-      lbl_TopStoresToConsider.Location = new Point(1130, 350);
+      lbl_TopStoresToConsider.Location = new Point(1127, 339);
       lbl_TopStoresToConsider.Name = "lbl_TopStoresToConsider";
       lbl_TopStoresToConsider.Size = new Size(144, 15);
       lbl_TopStoresToConsider.TabIndex = 6;
@@ -433,9 +457,9 @@ namespace MoxMatrix
       // 
       btn_exportBuyList.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
       btn_exportBuyList.Font = new Font("Segoe UI", 12F);
-      btn_exportBuyList.Location = new Point(619, 350);
+      btn_exportBuyList.Location = new Point(505, 342);
       btn_exportBuyList.Name = "btn_exportBuyList";
-      btn_exportBuyList.Size = new Size(505, 55);
+      btn_exportBuyList.Size = new Size(492, 55);
       btn_exportBuyList.TabIndex = 4;
       btn_exportBuyList.Text = "Export Optimised Buy List";
       btn_exportBuyList.UseVisualStyleBackColor = true;
@@ -502,5 +526,7 @@ namespace MoxMatrix
     private Button btn_exportBuyList;
     private Label lbl_TopStoresToConsider;
     private MaskedTextBox txt_TopStoresToConsider;
+    private Label lbl_OracleVersion;
+    private ComboBox cb_OracleVersions;
   }
 }

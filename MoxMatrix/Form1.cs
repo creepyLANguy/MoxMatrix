@@ -62,38 +62,13 @@ namespace MoxMatrix
 
     private const int StoresToConsiderDefault = 10;
 
-    private double GetExchangeRateDollar(double defaultExchangeRate)
+    private readonly Dictionary<string, Action<string[], string, int>> _oracleMap = new()
     {
-      try
-      {
-        using var client = new HttpClient();
-        var response = client.GetAsync(exchangeRateUrl).Result;
-        response.EnsureSuccessStatusCode();
-        var responseBody = response.Content.ReadAsStringAsync().Result;
-        var json = JObject.Parse(responseBody);
-
-        var rate = json["conversion_rate"].ToObject<decimal>();
-        return decimal.ToDouble(rate);
-      }
-      catch (Exception ex)
-      {
-        Console.WriteLine($"Request error: {ex.Message}");
-
-        var title = "Mox Matrix (beta) - WARNING";
-
-        var message = "Cannot determine Rand/Dollar exchange rate";
-        message += "\n\nDefaulting to following rate : R" + defaultExchangeRate + " ~ $1";
-        message += "\n\nContinue?";
-
-        var res = MessageBox.Show(message, title, MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
-        if (res == DialogResult.No)
-        {
-          Close();
-        }
-      }
-
-      return defaultExchangeRate;
-    }
+      { "V1", Oracle_v1.ExportBuyList },
+      { "V2", Oracle_v2.ExportBuyList },
+      { "V3", Oracle_v3.ExportBuyList },
+      { "V4", Oracle_v4.ExportBuyList },
+    };
 
     public record Product
     {
@@ -170,6 +145,8 @@ namespace MoxMatrix
       cb_individualsAll.Checked = false;
 
       txt_TopStoresToConsider.Text = StoresToConsiderDefault.ToString();
+
+      SetupOracleVersionDropDown();
 
       UnsuspendForm(loadingVendorsText);
     }
@@ -258,6 +235,39 @@ namespace MoxMatrix
       Cursor.Current = Cursors.Default;
     }
 
+    private double GetExchangeRateDollar(double defaultExchangeRate)
+    {
+      try
+      {
+        using var client = new HttpClient();
+        var response = client.GetAsync(exchangeRateUrl).Result;
+        response.EnsureSuccessStatusCode();
+        var responseBody = response.Content.ReadAsStringAsync().Result;
+        var json = JObject.Parse(responseBody);
+
+        var rate = json["conversion_rate"].ToObject<decimal>();
+        return decimal.ToDouble(rate);
+      }
+      catch (Exception ex)
+      {
+        Console.WriteLine($"Request error: {ex.Message}");
+
+        var title = "Mox Matrix (beta) - WARNING";
+
+        var message = "Cannot determine Rand/Dollar exchange rate";
+        message += "\n\nDefaulting to following rate : R" + defaultExchangeRate + " ~ $1";
+        message += "\n\nContinue?";
+
+        var res = MessageBox.Show(message, title, MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+        if (res == DialogResult.No)
+        {
+          Close();
+        }
+      }
+
+      return defaultExchangeRate;
+    }
+
     private void GetVendors()
     {
       using var httpClient = new HttpClient();
@@ -332,6 +342,17 @@ namespace MoxMatrix
         }
       }
     }
+
+    private void SetupOracleVersionDropDown()
+    {
+      foreach (var item in _oracleMap)
+      {
+        cb_OracleVersions.Items.Add(item.Key);
+      }
+      cb_OracleVersions.SelectedIndex = cb_OracleVersions.Items.Count - 1;
+      cb_OracleVersions.DropDownStyle = ComboBoxStyle.DropDownList;
+    }
+
 
     private async void btn_go_Click(object sender, EventArgs e)
     {
@@ -1326,7 +1347,16 @@ namespace MoxMatrix
 
       var fileName = saveFileDialog.FileName;
       var lines = GetStringForCSV().Split(Environment.NewLine);
-      Oracle_v3.ExportBuyList(lines, storesNum, fileName);
+
+      var selectedVersion = cb_OracleVersions.SelectedItem?.ToString();
+      if (string.IsNullOrEmpty(selectedVersion) || !_oracleMap.ContainsKey(selectedVersion))
+      {
+        MessageBox.Show("Invalid Oracle version selected.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        return;
+      }
+      var oracle = _oracleMap[selectedVersion];
+      oracle.Invoke(lines, fileName, storesNum);
+
 
       OpenFile(fileName);
     }

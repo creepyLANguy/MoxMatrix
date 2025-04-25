@@ -1,19 +1,21 @@
 ﻿using System.Globalization;
+using Newtonsoft.Json.Serialization;
 
 namespace MoxMatrix
 {
-  public static class Oracle_v3
+  public static partial class Oracle_v4
   {
     private const decimal DeliveryCost = 100m;
 
-    private static Tuple<Dictionary<string, List<(string cardName, decimal price)>>, decimal> GetOptimisedPurchases(string[] inputCsvLines, int maxPreferredStores)
+    private static Tuple<Dictionary<string, List<(string cardName, decimal price)>>, decimal> GetOptimisedPurchases(
+      string[] inputCsvLines, int maxPreferredStores)
     {
       if (inputCsvLines.Length < 2)
       {
         throw new InvalidOperationException("CSV does not contain enough data.");
       }
 
-      var headers = inputCsvLines[0].Split(new List<char> { ';' }.ToArray());
+      var headers = inputCsvLines[0].Split(new List<char> {';'}.ToArray());
       var storeNames = headers.Skip(1).ToList();
 
       var cardRows = inputCsvLines
@@ -22,7 +24,6 @@ namespace MoxMatrix
         .Select(line => line.Split(';'))
         .ToList();
 
-      // Determine store availability counts
       var storeAvailability = new Dictionary<string, int>();
       foreach (var row in cardRows)
       {
@@ -90,6 +91,7 @@ namespace MoxMatrix
         {
           storeCards[storeName] = new List<(string, decimal)>();
         }
+
         storeCards[storeName].Add((cardName, price));
 
         if (!usedStores.Contains(storeName))
@@ -97,20 +99,28 @@ namespace MoxMatrix
           totalCost += DeliveryCost;
           usedStores.Add(storeName);
         }
+
         totalCost += price;
       }
 
-      ApplyPostProcessing(cardRows, storeNames, ref storeCards, ref usedStores, ref totalCost, ref cardAssignments);
+      bool changed;
+      do
+      {
+        changed = ApplyPostProcessing(cardRows, storeNames, ref storeCards, ref usedStores, ref totalCost,
+          ref cardAssignments);
+      } while (changed);
 
       return Tuple.Create(storeCards, totalCost);
     }
 
-    private static void ApplyPostProcessing(List<string[]> cardRows, List<string> storeNames,
-        ref Dictionary<string, List<(string cardName, decimal price)>> storeCards,
-        ref HashSet<string> usedStores,
-        ref decimal totalCost,
-        ref Dictionary<string, (string store, decimal price)> cardAssignments)
+    private static bool ApplyPostProcessing(List<string[]> cardRows, List<string> storeNames,
+      ref Dictionary<string, List<(string cardName, decimal price)>> storeCards,
+      ref HashSet<string> usedStores,
+      ref decimal totalCost,
+      ref Dictionary<string, (string store, decimal price)> cardAssignments)
     {
+      bool changed = false;
+
       foreach (var row in cardRows)
       {
         var cardName = row[0];
@@ -145,6 +155,7 @@ namespace MoxMatrix
               usedStores.Remove(currentStore);
               totalCost -= DeliveryCost;
             }
+
             totalCost -= currentPrice;
 
             if (!storeCards.ContainsKey(altStore))
@@ -156,13 +167,17 @@ namespace MoxMatrix
               usedStores.Add(altStore);
               totalCost += DeliveryCost;
             }
+
             totalCost += newPrice;
 
             cardAssignments[cardName] = (altStore, newPrice);
+            changed = true;
             break;
           }
         }
       }
+
+      return changed;
     }
 
     public static void ExportBuyList(string inputCsvPath, string outputTextPath, int maxPreferredStores)
@@ -171,7 +186,7 @@ namespace MoxMatrix
     public static void ExportBuyList(string[] inputCsvLines, string outputTextPath, int maxPreferredStores)
     {
       var x = GetOptimisedPurchases(inputCsvLines, maxPreferredStores);
-      Exporter.Run(x.Item1, x.Item2, "Oracle_v3", DeliveryCost, outputTextPath);
+      Exporter.Run(x.Item1, x.Item2, "Oracle_v4", DeliveryCost, outputTextPath);
     }
   }
 }

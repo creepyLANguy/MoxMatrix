@@ -420,6 +420,7 @@ namespace MoxMatrix
       cb_OracleVersions.Name = "cb_OracleVersions";
       cb_OracleVersions.Size = new Size(121, 40);
       cb_OracleVersions.TabIndex = 15;
+      cb_OracleVersions.DropDownClosed += cb_OracleVersions_DropDownClosed;
       // 
       // lbl_OracleVersion
       // 

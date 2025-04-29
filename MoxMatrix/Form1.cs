@@ -1360,5 +1360,8 @@ namespace MoxMatrix
 
       OpenFile(fileName);
     }
+
+    private void cb_OracleVersions_DropDownClosed(object sender, EventArgs e)
+      => lbl_TopStoresToConsider.Visible = txt_TopStoresToConsider.Visible = cb_OracleVersions.SelectedIndex > 1;
   }
 }

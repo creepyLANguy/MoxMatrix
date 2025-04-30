@@ -15,26 +15,6 @@ namespace MoxMatrix
 {
   public partial class Form1 : Form
   {
-    public class Card
-    {
-      public string Id { get; set; }
-      public string Name { get; set; }
-      public DateTime LastScraped { get; set; }
-      public bool IsScraping { get; set; }
-    }
-
-    public class CardsResponse
-    {
-      public List<Card> Cards { get; set; }
-    }
-
-    class Vendor
-    {
-      public int Id { get; set; }
-      public string Name { get; set; }
-      public string Type { get; set; }
-    }
-
     string NL = Environment.NewLine;
 
     const string loadingVendorsText = @"Loading Vendors...";
@@ -70,28 +50,6 @@ namespace MoxMatrix
       { "V4", Oracle_v4.ExportBuyList },
     };
 
-    public record Product
-    {
-      public int Id { get; set; }
-      public string Name { get; set; }
-      public int? Price { get; set; }
-      public string PriceRead { get; set; }
-      public string Link { get; set; }
-      public int Stock { get; set; }
-      public bool Is_Foil { get; set; }
-      public DateTime LastScraped { get; set; }
-      public string Image { get; set; }
-      public int Retailer_Id { get; set; }
-      public string Retailer_Name { get; set; }
-      public string Currency { get; set; }
-    }
-
-    public class PriceResponse
-    {
-      public List<Product> Products { get; set; }
-      public Card Card { get; set; }
-    }
-
     private readonly char csvDelim = ';';
     private readonly string[] BlackListTerms = { "art card" };
 
@@ -112,6 +70,8 @@ namespace MoxMatrix
     SplashScreen splash;
     private int splashProgress = 0;
 
+    private Panel loadingOverlay;
+
     public Form1()
     {
       InitializeComponent();
@@ -129,12 +89,11 @@ namespace MoxMatrix
 #if DEBUG
         PopulateDebugData,
 #endif  
-        UpdateUI,
-        () => SuspendForm(),
         () => { exchangeRateDollar = GetExchangeRateDollar(); },
         GetVendors,
         SetupOracleVersionDropDown,
-        () => UnsuspendForm()
+        InitializeLoadingOverlay,
+        UpdateUI,
       };
 
       foreach (var step in steps)
@@ -212,6 +171,23 @@ namespace MoxMatrix
       inputBox.Text += @"teferi, master" + NL;
     }
 
+    private void InitializeLoadingOverlay()
+    {
+      loadingOverlay = new Panel
+      {
+        Size = ClientSize,
+        Location = new Point(0, 0),
+        BackColor = Color.FromArgb(128, 0, 0, 0),
+        Visible = false
+      };
+      loadingOverlay.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+
+      //TODO : Add a loading animation here.
+
+      Controls.Add(loadingOverlay);
+      loadingOverlay.BringToFront();
+    }
+
     private void UpdateUI()
     {
       Text = @"Mox Matrix (beta) - v" + UpgradeUtils.GetSemanticVersionFromCurrentExecutable();
@@ -229,20 +205,25 @@ namespace MoxMatrix
 
     private void SuspendForm(string text = loadingVendorsText)
     {
+      Cursor.Current = Cursors.WaitCursor;
       Text += text;
       btn_go.Text = queryingText;
       dataGridView1.Visible = false;
+
+      loadingOverlay.BringToFront();
+      loadingOverlay.Visible = true;
+
       Enabled = false;
-      Cursor.Current = Cursors.WaitCursor;
     }
 
     private void UnsuspendForm(string text = loadingVendorsText)
     {
+      Cursor.Current = Cursors.Default;
       Text = Text.Replace(text, string.Empty);
       btn_go.Text = buttonDefault;
       dataGridView1.Visible = true;
+      loadingOverlay.Visible = false;
       Enabled = true;
-      Cursor.Current = Cursors.Default;
     }
 
     private double GetExchangeRateDollar(double defaultExchangeRate = 18.0)
@@ -1041,7 +1022,6 @@ namespace MoxMatrix
 
     private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
       => FocusOnCorrespondingURL(e);
-
 
     private void dataGridView1_CellEnter(object sender, DataGridViewCellEventArgs e)
     {

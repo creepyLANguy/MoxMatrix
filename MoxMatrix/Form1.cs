@@ -10,6 +10,8 @@ using Newtonsoft.Json.Linq;
 using System.Runtime.InteropServices;
 using MoxMatrix.Upgrade;
 using Timer = System.Windows.Forms.Timer;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
+using System;
 
 namespace MoxMatrix
 {
@@ -70,8 +72,7 @@ namespace MoxMatrix
     SplashScreen splash;
     private int splashProgress;
 
-    private PictureBox overlay;
-    private Label loadingLabel;
+    private Label overlayLabel;
 
     public Form1()
     {
@@ -93,8 +94,8 @@ namespace MoxMatrix
         () => { exchangeRateDollar = GetExchangeRateDollar(); },
         GetVendors,
         SetupOracleVersionDropDown,
+        SetupOverlay,
         UpdateUI,
-        InitializeLoadingOverlay,
       };
 
       foreach (var step in steps)
@@ -187,34 +188,23 @@ namespace MoxMatrix
       txt_TopStoresToConsider.Text = StoresToConsiderDefault.ToString();
     }
 
-    private void InitializeLoadingOverlay()
+    private void SetupOverlay()
     {
-      overlay = new PictureBox
+      overlayLabel = new Label
       {
-        Dock = DockStyle.Fill,
-        Visible = false
+        Text = @"Processing...",
+        BackColor = Color.FromArgb(160, Color.Azure),
+        Font = new Font("Arial", 28, FontStyle.Bold),
+        TextAlign = ContentAlignment.MiddleCenter,
+        Visible = false,
+        AutoSize = false,
+        Size = new Size(500, 150),
+        Location = new Point((ClientSize.Width - 500) / 2, (ClientSize.Height - 150) / 2),
+        Anchor = AnchorStyles.None,
+        UseCompatibleTextRendering = true
       };
 
-      loadingLabel = new Label
-      {
-        Text = "Processing...",
-        Font = new Font("Segoe UI", 28, FontStyle.Bold),
-        ForeColor = Color.White,
-        BackColor = Color.Transparent,
-        AutoSize = true
-      };
-
-      overlay.Controls.Add(loadingLabel);
-      overlay.Resize += (s, e) =>
-      {
-        loadingLabel.Location = new Point(
-          (overlay.Width - loadingLabel.Width) / 2,
-          (overlay.Height - loadingLabel.Height) / 2
-        );
-      };
-
-      Controls.Add(overlay);
-      overlay.BringToFront();
+      Controls.Add(overlayLabel);
     }
 
     private void SuspendForm(string text = loadingVendorsText)
@@ -225,7 +215,9 @@ namespace MoxMatrix
 
       dataGridView1.Visible = false;
 
-      ShowLoadingOverlay();
+      overlayLabel.Visible = true;
+      overlayLabel.BringToFront();
+      overlayLabel.Refresh();
 
       Enabled = false;
     }
@@ -237,38 +229,9 @@ namespace MoxMatrix
       btn_go.Text = buttonDefault;
       dataGridView1.Visible = true;
 
+      overlayLabel.Visible = false;
+
       Enabled = true;
-
-      HideLoadingOverlay();
-    }
-
-    private void ShowLoadingOverlay()
-    {
-      var bmp = new Bitmap(ClientSize.Width/4, ClientSize.Height/4);
-      using (var g = Graphics.FromImage(bmp))
-      {
-        var clientTopLeft = PointToScreen(Point.Empty);
-        g.CopyFromScreen(clientTopLeft, Point.Empty, ClientSize);
-      }
-
-      using (var g = Graphics.FromImage(bmp))
-      {
-        using (Brush b = new SolidBrush(Color.FromArgb(128, 0, 0, 0)))
-        {
-          g.FillRectangle(b, new Rectangle(Point.Empty, bmp.Size));
-        }
-      }
-
-      overlay.Image = bmp;
-      overlay.Visible = true;
-      overlay.BringToFront();
-    }
-
-    private void HideLoadingOverlay()
-    {
-      overlay.Visible = false;
-      overlay.Image?.Dispose();
-      overlay.Image = null;
     }
 
     private double GetExchangeRateDollar(double defaultExchangeRate = 18.0)
@@ -389,7 +352,6 @@ namespace MoxMatrix
       cb_OracleVersions.DropDownStyle = ComboBoxStyle.DropDownList;
     }
 
-
     private async void btn_go_Click(object sender, EventArgs e)
     {
       if (cl_individuals.CheckedItems.Count == 0 && cl_businesses.CheckedItems.Count == 0)
@@ -422,7 +384,11 @@ namespace MoxMatrix
 
     private async Task DoTheThings()
     {
+      UpdateOverlay("Removing duplicates...");
+
       RemoveDuplicates(inputBox);
+
+      UpdateOverlay("Matching card names...");
 
       cardMatches = await GetCardMatchesListAsync();
 
@@ -456,13 +422,18 @@ namespace MoxMatrix
         }
       }
 
-      foreach (var priceGroup in priceList)
+      for (var index = 0; index < priceList.Count; index++)
       {
+        var priceGroup = priceList[index];
         if (priceGroup.Products.Count == 0)
         {
           txt_outOfStock.Text += priceGroup.Card.Name + NL;
         }
+
+        UpdateOverlay("Processing " + (index + 1) + "/" + priceList.Count);
       }
+
+      UpdateOverlay("Generating spreadsheet...");
 
       var csvLines = GenerateCsv(priceList);
 
@@ -473,6 +444,8 @@ namespace MoxMatrix
 
       var fullFilePath = Path.Join(queryOutputFolderFullPath, DateTime.Now.ToFileTime() + ".csv");
       File.WriteAllLines(fullFilePath, csvLines);
+
+      UpdateOverlay("Populating table...");
 
       LoadCsvDataIntoDataGridView(ref csvLines);
 
@@ -519,6 +492,11 @@ namespace MoxMatrix
       ReorderColumns(sortedSummaries);
 
       ReorderRows();
+    }
+    private void UpdateOverlay(string s)
+    {
+      overlayLabel.Text = s;
+      Refresh();
     }
 
     private void RemoveDuplicates(Control control)
@@ -606,6 +584,8 @@ namespace MoxMatrix
 
     public async Task<List<PriceResponse>> GetPriceListAsync(List<Card> cardMatches)
     {
+      UpdateOverlay("Querying prices...");
+
       var tasks = cardMatches.Select(GetPriceAsync).ToList();
       var results = await Task.WhenAll(tasks);
       return results.Where(result => result != null).ToList();

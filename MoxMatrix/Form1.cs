@@ -495,6 +495,7 @@ namespace MoxMatrix
 
       ReorderRows();
     }
+
     private void UpdateOverlay(string s)
     {
       overlayLabel.Text = s;
@@ -1045,7 +1046,6 @@ namespace MoxMatrix
       };
       Process.Start(psi);
     }
-
 
     private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
       => FocusOnCorrespondingURL(e);

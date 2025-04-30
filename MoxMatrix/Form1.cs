@@ -110,6 +110,7 @@ namespace MoxMatrix
     private List<Card> cardMatches = new();
 
     SplashScreen splash;
+    private int splashProgress = 0;
 
     public Form1()
     {
@@ -120,46 +121,40 @@ namespace MoxMatrix
     {
       UpgradeUtils.Run();
 
-      ShowSplashScreen();
-
-      SetupImageForm();
-
-      SetupCheckFocusTimer();
-
-      btn_go.Text = buttonDefault;
-
-      dataGridView1.Columns.Add("Blank", "Results will appear here...");
-      SetDoubleBuffer(dataGridView1, true);
-      DoubleBuffered = true;
-
+      var steps = new List<Action>
+      {
+        ShowSplashScreen,
+        SetupImageForm,
+        SetupCheckFocusTimer,
 #if DEBUG
-      PopulateDebugData();
-#endif
+        PopulateDebugData,
+#endif  
+        UpdateUI,
+        () => SuspendForm(),
+        () => { exchangeRateDollar = GetExchangeRateDollar(); },
+        GetVendors,
+        SetupOracleVersionDropDown,
+        () => UnsuspendForm()
+      };
 
-      SuspendForm(loadingVendorsText);
+      foreach (var step in steps)
+      {
+        step();
+        TickSplash(100 / steps.Count);
+      }
+    }
 
-      exchangeRateDollar = GetExchangeRateDollar(18.0);
-
-      GetVendors();
-
-      cb_individualsAll.Checked = false;
-
-      txt_TopStoresToConsider.Text = StoresToConsiderDefault.ToString();
-
-      SetupOracleVersionDropDown();
-
-      UnsuspendForm(loadingVendorsText);
+    private void TickSplash(int percentageIncrease)
+    {
+      splashProgress += percentageIncrease;
+      splash.SetProgress(splashProgress);
     }
 
     private void ShowSplashScreen()
-    {
-      splash = new();
-    }
+      => splash = new();
 
     private void HideSplashScreen()
-    {
-      splash.Close();
-    }
+      => splash.Close();
 
     private void SetupCheckFocusTimer()
     {
@@ -217,7 +212,22 @@ namespace MoxMatrix
       inputBox.Text += @"teferi, master" + NL;
     }
 
-    private void SuspendForm(string text)
+    private void UpdateUI()
+    {
+      Text = @"Mox Matrix (beta) - v" + UpgradeUtils.GetSemanticVersionFromCurrentExecutable();
+
+      btn_go.Text = buttonDefault;
+
+      dataGridView1.Columns.Add("Blank", "Results will appear here...");
+      SetDoubleBuffer(dataGridView1, true);
+      DoubleBuffered = true;
+
+      cb_individualsAll.Checked = false;
+
+      txt_TopStoresToConsider.Text = StoresToConsiderDefault.ToString();
+    }
+
+    private void SuspendForm(string text = loadingVendorsText)
     {
       Text += text;
       btn_go.Text = queryingText;
@@ -226,7 +236,7 @@ namespace MoxMatrix
       Cursor.Current = Cursors.WaitCursor;
     }
 
-    private void UnsuspendForm(string text)
+    private void UnsuspendForm(string text = loadingVendorsText)
     {
       Text = Text.Replace(text, string.Empty);
       btn_go.Text = buttonDefault;
@@ -235,7 +245,7 @@ namespace MoxMatrix
       Cursor.Current = Cursors.Default;
     }
 
-    private double GetExchangeRateDollar(double defaultExchangeRate)
+    private double GetExchangeRateDollar(double defaultExchangeRate = 18.0)
     {
       try
       {

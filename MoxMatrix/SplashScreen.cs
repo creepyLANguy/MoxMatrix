@@ -1,4 +1,5 @@
 ﻿using MoxMatrix.Properties;
+using MoxMatrix.Upgrade;
 
 namespace MoxMatrix
 {
@@ -26,11 +27,15 @@ namespace MoxMatrix
 
       progressBar.Visible = false;
 
+      lbl_version.Text = @"v" + UpgradeUtils.GetSemanticVersionFromCurrentExecutable();
+
       Visible = true;
     }
 
     public void SetProgress(int value)
     {
+      Refresh();
+
       progressBar.Visible = value > 0;
 
       progressBar.Value = value > 0 && value <= progressBar.Maximum ? value : progressBar.Value;

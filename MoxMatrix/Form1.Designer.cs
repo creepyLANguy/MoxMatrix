@@ -478,7 +478,7 @@ namespace MoxMatrix
       Icon = Resources.icon;
       Name = "Form1";
       StartPosition = FormStartPosition.CenterScreen;
-      Text = "Mox Matrix (beta)";
+      Text = "Mox Matrix (beta) - v0.0.0";
       Load += Form1_Load;
       Shown += Form1_Shown;
       ResizeEnd += Form1_ResizeEnd;

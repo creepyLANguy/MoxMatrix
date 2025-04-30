@@ -46,8 +46,10 @@ public static class UpgradeUtils
     }
 
     var message =
-      "A newer version is available." +
-      Environment.NewLine + Environment.NewLine +
+      "A newer version is available." + Environment.NewLine + Environment.NewLine +
+      "Current version :\t" + localVersion + Environment.NewLine +
+      "Updated version :\t" + latestVersion + Environment.NewLine +
+      Environment.NewLine +
       "Would you like to install it?";
 
     var selection = MessageBox.Show(message, AppName, MessageBoxButtons.YesNo);
@@ -107,11 +109,9 @@ public static class UpgradeUtils
     );
   }
 
-  private static SemanticVersion GetSemanticVersionFromCurrentExecutable()
+  public static SemanticVersion GetSemanticVersionFromCurrentExecutable()
   {
-    var entryAssembly = Assembly.GetEntryAssembly();
-    var version = entryAssembly?.GetName().Version;
-
+    var version = Assembly.GetEntryAssembly()?.GetName().Version;
     return version == null ? new SemanticVersion() : new SemanticVersion(version.ToString());
   }
 

@@ -68,9 +68,10 @@ namespace MoxMatrix
     private List<Card> cardMatches = new();
 
     SplashScreen splash;
-    private int splashProgress = 0;
+    private int splashProgress;
 
-    private Panel loadingOverlay;
+    private PictureBox overlay;
+    private Label loadingLabel;
 
     public Form1()
     {
@@ -92,8 +93,8 @@ namespace MoxMatrix
         () => { exchangeRateDollar = GetExchangeRateDollar(); },
         GetVendors,
         SetupOracleVersionDropDown,
-        InitializeLoadingOverlay,
         UpdateUI,
+        InitializeLoadingOverlay,
       };
 
       foreach (var step in steps)
@@ -171,23 +172,6 @@ namespace MoxMatrix
       inputBox.Text += @"teferi, master" + NL;
     }
 
-    private void InitializeLoadingOverlay()
-    {
-      loadingOverlay = new Panel
-      {
-        Size = ClientSize,
-        Location = new Point(0, 0),
-        BackColor = Color.FromArgb(128, 0, 0, 0),
-        Visible = false
-      };
-      loadingOverlay.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-
-      //TODO : Add a loading animation here.
-
-      Controls.Add(loadingOverlay);
-      loadingOverlay.BringToFront();
-    }
-
     private void UpdateUI()
     {
       Text = @"Mox Matrix (beta) - v" + UpgradeUtils.GetSemanticVersionFromCurrentExecutable();
@@ -203,15 +187,45 @@ namespace MoxMatrix
       txt_TopStoresToConsider.Text = StoresToConsiderDefault.ToString();
     }
 
+    private void InitializeLoadingOverlay()
+    {
+      overlay = new PictureBox
+      {
+        Dock = DockStyle.Fill,
+        Visible = false
+      };
+
+      loadingLabel = new Label
+      {
+        Text = "Processing...",
+        Font = new Font("Segoe UI", 28, FontStyle.Bold),
+        ForeColor = Color.White,
+        BackColor = Color.Transparent,
+        AutoSize = true
+      };
+
+      overlay.Controls.Add(loadingLabel);
+      overlay.Resize += (s, e) =>
+      {
+        loadingLabel.Location = new Point(
+          (overlay.Width - loadingLabel.Width) / 2,
+          (overlay.Height - loadingLabel.Height) / 2
+        );
+      };
+
+      Controls.Add(overlay);
+      overlay.BringToFront();
+    }
+
     private void SuspendForm(string text = loadingVendorsText)
     {
       Cursor.Current = Cursors.WaitCursor;
       Text += text;
       btn_go.Text = queryingText;
+
       dataGridView1.Visible = false;
 
-      loadingOverlay.BringToFront();
-      loadingOverlay.Visible = true;
+      ShowLoadingOverlay();
 
       Enabled = false;
     }
@@ -222,8 +236,39 @@ namespace MoxMatrix
       Text = Text.Replace(text, string.Empty);
       btn_go.Text = buttonDefault;
       dataGridView1.Visible = true;
-      loadingOverlay.Visible = false;
+
       Enabled = true;
+
+      HideLoadingOverlay();
+    }
+
+    private void ShowLoadingOverlay()
+    {
+      var bmp = new Bitmap(ClientSize.Width/4, ClientSize.Height/4);
+      using (var g = Graphics.FromImage(bmp))
+      {
+        var clientTopLeft = PointToScreen(Point.Empty);
+        g.CopyFromScreen(clientTopLeft, Point.Empty, ClientSize);
+      }
+
+      using (var g = Graphics.FromImage(bmp))
+      {
+        using (Brush b = new SolidBrush(Color.FromArgb(128, 0, 0, 0)))
+        {
+          g.FillRectangle(b, new Rectangle(Point.Empty, bmp.Size));
+        }
+      }
+
+      overlay.Image = bmp;
+      overlay.Visible = true;
+      overlay.BringToFront();
+    }
+
+    private void HideLoadingOverlay()
+    {
+      overlay.Visible = false;
+      overlay.Image?.Dispose();
+      overlay.Image = null;
     }
 
     private double GetExchangeRateDollar(double defaultExchangeRate = 18.0)

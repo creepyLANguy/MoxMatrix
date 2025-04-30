@@ -10,8 +10,6 @@ using Newtonsoft.Json.Linq;
 using System.Runtime.InteropServices;
 using MoxMatrix.Upgrade;
 using Timer = System.Windows.Forms.Timer;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
-using System;
 
 namespace MoxMatrix
 {
@@ -192,7 +190,7 @@ namespace MoxMatrix
     {
       overlayLabel = new Label
       {
-        Text = @"Processing...",
+        Text = @"",
         BackColor = Color.FromArgb(160, Color.Azure),
         Font = new Font("Arial", 28, FontStyle.Bold),
         TextAlign = ContentAlignment.MiddleCenter,
@@ -354,6 +352,14 @@ namespace MoxMatrix
 
     private async void btn_go_Click(object sender, EventArgs e)
     {
+      RemoveDuplicates(inputBox);
+      var cardsDetected = inputBox.Text.Split(NL).Where(it => it.Trim().Length > 0).ToList();
+      if (cardsDetected.Count == 0)
+      {
+        MessageBox.Show("No cards were detected in input box.", "Mox Matrix (beta) - ERROR");
+        return;
+      }
+
       if (cl_individuals.CheckedItems.Count == 0 && cl_businesses.CheckedItems.Count == 0)
       {
         MessageBox.Show("No vendors selected!", "Mox Matrix (beta) - ERROR");
@@ -384,10 +390,6 @@ namespace MoxMatrix
 
     private async Task DoTheThings()
     {
-      UpdateOverlay("Removing duplicates...");
-
-      RemoveDuplicates(inputBox);
-
       UpdateOverlay("Matching card names...");
 
       cardMatches = await GetCardMatchesListAsync();
@@ -500,7 +502,7 @@ namespace MoxMatrix
     }
 
     private void RemoveDuplicates(Control control)
-      => control.Text = string.Join(NL, control.Text.Split(NL).Distinct());
+      => control.Text = string.Join(NL, control.Text.Split(NL).Select(s => s.Trim()).Distinct());
 
     private static bool IsMostLikelyFoil(Product product) =>
       product.Is_Foil || product.Name.ToLower().Contains("foil");

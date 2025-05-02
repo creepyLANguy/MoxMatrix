@@ -169,6 +169,9 @@ namespace MoxMatrix
       inputBox.Text += @"clara" + NL;
       inputBox.Text += @"the ur" + NL;
       inputBox.Text += @"teferi, master" + NL;
+      inputBox.Text += @"Dollmaker's Shop/Porcelain Gallery" + NL;
+      inputBox.Text += @"Dusk/Dawn" + NL;
+      inputBox.Text += @"Response/Resurgence" + NL;
     }
 
     private void UpdateUI()
@@ -520,6 +523,13 @@ namespace MoxMatrix
 
     private async Task<Card?> GetCardMatchAsync(string input)
     {
+      if (input.Contains(" // ") == false)
+      {
+        input = input.Replace("/", " // ");
+      }
+
+      input = Uri.EscapeDataString(input);
+
       using var httpClient = new HttpClient();
       var uri = BaseUrl + CardMatchEndpoint + input;
       var response = await httpClient.GetAsync(uri);

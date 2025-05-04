@@ -27,7 +27,7 @@ namespace MoxMatrix
 
       progressBar.Visible = false;
 
-      lbl_version.Text = @"v" + UpgradeUtils.GetSemanticVersionFromCurrentExecutable();
+      lbl_version.Text = @"v" + UpgradeUtils.GetVersionFromCurrentExecutable();
 
       Visible = true;
     }

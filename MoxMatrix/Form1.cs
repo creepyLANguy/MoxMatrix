@@ -84,18 +84,10 @@ namespace MoxMatrix
       var steps = new List<Action>
       {
         ShowSplashScreen,
-        SetupImageForm,
-        SetupCheckFocusTimer,
-#if DEBUG
-        PopulateDebugData,
-#endif  
-        () => { exchangeRateDollar = GetExchangeRateDollar(); },
         GetVendors,
-        SetupOracleVersionDropDown,
-        SetupOverlay,
         UpdateUI,
       };
-
+      
       foreach (var step in steps)
       {
         step();
@@ -176,7 +168,7 @@ namespace MoxMatrix
 
     private void UpdateUI()
     {
-      Text = @"Mox Matrix (beta) - v" + UpgradeUtils.GetSemanticVersionFromCurrentExecutable();
+      Text = @"Mox Matrix (beta) - v" + UpgradeUtils.GetVersionFromCurrentExecutable();
 
       btn_go.Text = buttonDefault;
 
@@ -187,6 +179,16 @@ namespace MoxMatrix
       cb_individualsAll.Checked = false;
 
       txt_TopStoresToConsider.Text = StoresToConsiderDefault.ToString();
+
+      SetupOracleVersionDropDown();
+
+      SetupOverlay();
+
+#if DEBUG
+      PopulateDebugData();
+#endif
+
+      PopulateVendors();
     }
 
     private void SetupOverlay()
@@ -235,7 +237,7 @@ namespace MoxMatrix
       Enabled = true;
     }
 
-    private double GetExchangeRateDollar(double defaultExchangeRate = 18.0)
+    private async Task<double> GetExchangeRateDollar(double defaultExchangeRate = 18.0)
     {
       try
       {
@@ -329,7 +331,10 @@ namespace MoxMatrix
         };
         _vendorsList.Add(v);
       }
+    }
 
+    private void PopulateVendors()
+    {
       foreach (var vendor in _vendorsList)
       {
         if (vendor.Type == "business")
@@ -1339,6 +1344,23 @@ namespace MoxMatrix
       HideSplashScreen();
     }
 
+    protected override void OnShown(EventArgs e)
+    {
+      base.OnShown(e);
+
+      new List<Action>
+      {
+        async () => { exchangeRateDollar = await GetExchangeRateDollar(); },
+        SetupImageForm,
+        SetupCheckFocusTimer,
+      }.ForEach(async step => {
+        await Task.Run(step);
+      });
+    }
+
+    private void cb_OracleVersions_DropDownClosed(object sender, EventArgs e)
+      => lbl_TopStoresToConsider.Visible = txt_TopStoresToConsider.Visible = cb_OracleVersions.SelectedIndex > 1;
+
     private void btn_exportBuyList_Click(object sender, EventArgs e)
     {
       if (dataGridView1.Rows.Count == 0)
@@ -1384,11 +1406,7 @@ namespace MoxMatrix
       var oracle = _oracleMap[selectedVersion];
       oracle.Invoke(lines, fileName, storesNum);
 
-
       OpenFile(fileName);
     }
-
-    private void cb_OracleVersions_DropDownClosed(object sender, EventArgs e)
-      => lbl_TopStoresToConsider.Visible = txt_TopStoresToConsider.Visible = cb_OracleVersions.SelectedIndex > 1;
   }
 }

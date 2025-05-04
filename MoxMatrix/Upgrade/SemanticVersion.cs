@@ -1,10 +1,10 @@
 ﻿/*
 SemanticVersion
-https://github.com/creepyLANguy/SemanticVersion 
+https://github.com/creepyLANguy/SemanticVersion
 
 | Test Case                | Input String   | Major | Minor | Patch | Expected Behavior
 |--------------------------|----------------|-------|-------|-------|----------------------------------------
-| **Valid Cases**          |                |       |       |       |                                        
+| **Valid Cases**          |                |       |       |       |
 | Standard version         | "1.2.3"        |   1   |   2   |   3   | ✅ Parses correctly
 | No patch                 | "1.2"          |   1   |   2   |   0   | ✅ Defaults patch to 0
 | No minor & patch         | "1"            |   1   |   0   |   0   | ✅ Defaults minor & patch to 0
@@ -25,7 +25,9 @@ https://github.com/creepyLANguy/SemanticVersion
 | Spaces in version        | " 1.2.3 "      |   1   |   2   |   3   | ✅ Trims spaces and parses correctly
 */
 
-public struct SemanticVersion : IEquatable<SemanticVersion>
+namespace MoxMatrix.Upgrade;
+
+public readonly struct SemanticVersion : IEquatable<SemanticVersion>
 {
   public int Major { get; }
   public int Minor { get; }
@@ -35,9 +37,11 @@ public struct SemanticVersion : IEquatable<SemanticVersion>
   {
     if (string.IsNullOrWhiteSpace(versionString))
     {
-      throw new ArgumentException("Version string cannot be null or empty.", nameof(versionString));
+      throw new ArgumentException(@"Version string cannot be null or empty.", nameof(versionString));
     }
-        
+
+    versionString = versionString.Trim().ToLower().Replace("v", string.Empty);
+
     var delimiters = new[] { '.', '-' };
     var parts = versionString.Split(delimiters, StringSplitOptions.None);
 
@@ -46,22 +50,22 @@ public struct SemanticVersion : IEquatable<SemanticVersion>
       throw new FormatException($"Invalid version format: {versionString}");
     }        
 
-    Major = int.TryParse(parts.ElementAtOrDefault(0), out int major) && major >= 0 ? major : 0;
-    Minor = int.TryParse(parts.ElementAtOrDefault(1), out int minor) && minor >= 0 ? minor : 0;
-    Patch = int.TryParse(parts.ElementAtOrDefault(2), out int patch) && patch >= 0 ? patch : 0;
+    Major = int.TryParse(parts.ElementAtOrDefault(0), out var major) && major >= 0 ? major : 0;
+    Minor = int.TryParse(parts.ElementAtOrDefault(1), out var minor) && minor >= 0 ? minor : 0;
+    Patch = int.TryParse(parts.ElementAtOrDefault(2), out var patch) && patch >= 0 ? patch : 0;
   }
 
   public SemanticVersion(int major = 0, int minor = 0, int patch = 0)
   {
-    Major = major >= 0 ? major : throw new ArgumentOutOfRangeException(nameof(major), "Major version cannot be negative.");
-    Minor = minor >= 0 ? minor : throw new ArgumentOutOfRangeException(nameof(minor), "Minor version cannot be negative.");
-    Patch = patch >= 0 ? patch : throw new ArgumentOutOfRangeException(nameof(patch), "Patch version cannot be negative.");
+    Major = major >= 0 ? major : throw new ArgumentOutOfRangeException(nameof(major),@"Major version cannot be negative.");
+    Minor = minor >= 0 ? minor : throw new ArgumentOutOfRangeException(nameof(minor),@"Minor version cannot be negative.");
+    Patch = patch >= 0 ? patch : throw new ArgumentOutOfRangeException(nameof(patch),@"Patch version cannot be negative.");
   }
 
   public bool Equals(SemanticVersion other)
     => Major == other.Major && Minor == other.Minor && Patch == other.Patch;
 
-  public override bool Equals(object obj)
+  public override bool Equals(object? obj)
     => obj is SemanticVersion other && Equals(other);
 
   public override int GetHashCode()

@@ -1,17 +1,16 @@
 using System.Diagnostics;
 using System.IO.Compression;
-using System.Net;
 using System.Reflection;
-using System.Text.RegularExpressions;
+using System.Text.Json;
 
 namespace MoxMatrix.Upgrade;
 
 public static class UpgradeUtils
 {
   private const string AppName = "Mox Matrix(beta)";
-  private const string VersionPattern = @"\/releases\/tag\/v([0-9]+\.[0-9]+\.[0-9]+)";
-  private const string LatestReleaseUrl = "https://github.com/creepyLANguy/MoxMatrix/releases/latest/";
+  private const string LatestVersionEndpoint = "https://api.github.com/repos/creepyLANguy/MoxMatrix/releases/latest";
   private const string DownloadUrl = "https://github.com/creepyLANguy/MoxMatrix/releases/latest/download/MoxMatrix.zip";
+  private const string UserAgent = "MoxMatrixUpdater/1.0";
   private const string TempDownloadPath = "MoxMatrix_latest.zip";
   private const string TempExtractPath = "MoxMatrix_latest";
   private const string OutdatedMarker = "_outdated";
@@ -24,21 +23,13 @@ public static class UpgradeUtils
   private static void Log(string s = "")
     => Debug.WriteLine(">>\t" + (s.Length == 0 ? new StackTrace().GetFrame(1)?.GetMethod()?.Name + "();" : s));
 
-  private static WebClient GetWebClient()
-  {
-    using WebClient webClient = new();
-    webClient.Headers.Add("user-agent", AppName);
-    ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-    return webClient;
-  }
-
   public static void Run()
   {
     CleanupOutdatedFiles_Async();
 
-    var localVersion = GetSemanticVersionFromCurrentExecutable();
-
-    var latestVersion = GetSemanticVersionFromUrl(LatestReleaseUrl);
+    var localVersion = GetVersionFromCurrentExecutable();
+    
+    var latestVersion = GetLatestVersionInfo();
 
     if (localVersion >= latestVersion)
     {
@@ -109,45 +100,37 @@ public static class UpgradeUtils
     );
   }
 
-  public static SemanticVersion GetSemanticVersionFromCurrentExecutable()
+  public static SemanticVersion GetVersionFromCurrentExecutable()
   {
     var version = Assembly.GetEntryAssembly()?.GetName().Version;
     return version == null ? new SemanticVersion() : new SemanticVersion(version.ToString());
   }
 
-  private static SemanticVersion GetSemanticVersionFromUrl(string url)
+  private static SemanticVersion GetLatestVersionInfo()
   {
-    var html = GetHtmlFromUrl(url);
-    return GetSemanticVersionFromHtml(html);
-  }
-
-  private static string GetHtmlFromUrl(string url)
-  {
-    var html = string.Empty;
+    using var client = new HttpClient();
+    client.DefaultRequestHeaders.UserAgent.ParseAdd(UserAgent);
 
     try
     {
-      html = GetWebClient().DownloadString(url);
+      var response = client.GetAsync(LatestVersionEndpoint).GetAwaiter().GetResult();
+      response.EnsureSuccessStatusCode();
+
+      using var stream = response.Content.ReadAsStreamAsync().GetAwaiter().GetResult();
+      using var json = JsonDocument.Parse(stream);
+
+
+      if (json.RootElement.TryGetProperty("tag_name", out var tag) && tag.GetString() is { } tagString)
+      {
+        return new SemanticVersion(tagString);
+      }
     }
-    catch (WebException ex)
+    catch (Exception ex)
     {
-      Console.WriteLine(ex);
+      Log("Error fetching latest version info: " + ex.Message);
     }
 
-    return html;
-  }
-
-  private static SemanticVersion GetSemanticVersionFromHtml(string html)
-  {
-    var match = Regex.Match(html, VersionPattern);
-
-    if (match.Success == false)
-    {
-      return new SemanticVersion();
-    }
-
-    var latestVersion = match.Groups[1].Value;
-    return new SemanticVersion(latestVersion);
+    return new SemanticVersion();
   }
 
   private static void TryUpgrade()
@@ -206,11 +189,29 @@ public static class UpgradeUtils
   {
     Log();
 
-    GetWebClient().DownloadFile(DownloadUrl, TempDownloadPath);
+    var client = new HttpClient();
 
-    Log("Downloaded latest release to " + TempDownloadPath);
+    try
+    {
+      var response = client
+        .GetAsync(DownloadUrl, HttpCompletionOption.ResponseHeadersRead)
+        .GetAwaiter()
+        .GetResult();
+      response.EnsureSuccessStatusCode();
 
-    return true;
+      using var stream = response.Content.ReadAsStreamAsync().GetAwaiter().GetResult();
+      using var fileStream = new FileStream(TempDownloadPath, FileMode.Create, FileAccess.Write, FileShare.None);
+      stream.CopyTo(fileStream);
+
+      Log("Downloaded latest release to " + TempDownloadPath);
+
+      return true;
+    }
+    catch (Exception ex)
+    {
+      Log("Error downloading release: " + ex.Message);
+      return false;
+    }
   }
 
   private static bool UnzipLatestRelease()

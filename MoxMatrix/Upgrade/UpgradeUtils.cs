@@ -25,7 +25,7 @@ public static class UpgradeUtils
 
   public static void Run()
   {
-    CleanupOutdatedFiles_Async();
+    Task.Run(CleanupOutdatedFiles);
 
     var localVersion = GetVersionFromCurrentExecutable();
     
@@ -53,13 +53,6 @@ public static class UpgradeUtils
     Log("Trying upgrade from version v" + localVersion + " to v" + latestVersion);
 
     TryUpgrade();
-  }
-
-  private static async void CleanupOutdatedFiles_Async()
-  {
-    Log();
-
-    await Task.Run(CleanupOutdatedFiles);
   }
 
   private static void CleanupOutdatedFiles()

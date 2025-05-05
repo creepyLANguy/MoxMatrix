@@ -30,7 +30,7 @@ namespace MoxMatrix
     /// </summary>
     private void InitializeComponent()
     {
-      DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+      DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
       dataGridView1 = new DataGridView();
       btn_exportCSV = new Button();
       txt_urls = new RichTextBox();
@@ -57,6 +57,7 @@ namespace MoxMatrix
       cl_businesses = new CheckedListBox();
       label8 = new Label();
       label7 = new Label();
+      btn_importCSV = new Button();
       cb_OracleVersions = new ComboBox();
       lbl_OracleVersion = new Label();
       txt_TopStoresToConsider = new MaskedTextBox();
@@ -81,16 +82,16 @@ namespace MoxMatrix
       dataGridView1.BackgroundColor = SystemColors.Control;
       dataGridView1.BorderStyle = BorderStyle.None;
       dataGridView1.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-      dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleCenter;
-      dataGridViewCellStyle1.BackColor = SystemColors.Window;
-      dataGridViewCellStyle1.Font = new Font("Segoe UI", 9F);
-      dataGridViewCellStyle1.ForeColor = SystemColors.ControlText;
-      dataGridViewCellStyle1.Format = "C2";
-      dataGridViewCellStyle1.NullValue = null;
-      dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
-      dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
-      dataGridViewCellStyle1.WrapMode = DataGridViewTriState.False;
-      dataGridView1.DefaultCellStyle = dataGridViewCellStyle1;
+      dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleCenter;
+      dataGridViewCellStyle2.BackColor = SystemColors.Window;
+      dataGridViewCellStyle2.Font = new Font("Segoe UI", 9F);
+      dataGridViewCellStyle2.ForeColor = SystemColors.ControlText;
+      dataGridViewCellStyle2.Format = "C2";
+      dataGridViewCellStyle2.NullValue = null;
+      dataGridViewCellStyle2.SelectionBackColor = SystemColors.Highlight;
+      dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
+      dataGridViewCellStyle2.WrapMode = DataGridViewTriState.False;
+      dataGridView1.DefaultCellStyle = dataGridViewCellStyle2;
       dataGridView1.Location = new Point(12, 14);
       dataGridView1.Name = "dataGridView1";
       dataGridView1.Size = new Size(1259, 340);
@@ -105,9 +106,9 @@ namespace MoxMatrix
       // 
       btn_exportCSV.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
       btn_exportCSV.Font = new Font("Segoe UI", 12F);
-      btn_exportCSV.Location = new Point(12, 360);
+      btn_exportCSV.Location = new Point(268, 360);
       btn_exportCSV.Name = "btn_exportCSV";
-      btn_exportCSV.Size = new Size(487, 55);
+      btn_exportCSV.Size = new Size(250, 55);
       btn_exportCSV.TabIndex = 3;
       btn_exportCSV.Text = "Export CSV";
       btn_exportCSV.UseVisualStyleBackColor = true;
@@ -176,14 +177,14 @@ namespace MoxMatrix
       txt_outOfStock.Name = "txt_outOfStock";
       txt_outOfStock.ReadOnly = true;
       txt_outOfStock.ScrollBars = ScrollBars.Both;
-      txt_outOfStock.Size = new Size(283, 172);
+      txt_outOfStock.Size = new Size(283, 219);
       txt_outOfStock.TabIndex = 5;
       // 
       // txt_unknownCards
       // 
       txt_unknownCards.Font = new Font("Segoe UI", 12F);
       txt_unknownCards.ForeColor = SystemColors.WindowText;
-      txt_unknownCards.Location = new Point(699, 220);
+      txt_unknownCards.Location = new Point(699, 267);
       txt_unknownCards.Multiline = true;
       txt_unknownCards.Name = "txt_unknownCards";
       txt_unknownCards.ReadOnly = true;
@@ -219,7 +220,7 @@ namespace MoxMatrix
       // label2
       // 
       label2.AutoSize = true;
-      label2.Location = new Point(699, 202);
+      label2.Location = new Point(699, 249);
       label2.Name = "label2";
       label2.Size = new Size(202, 15);
       label2.TabIndex = 7;
@@ -287,6 +288,7 @@ namespace MoxMatrix
       // splitContainer1.Panel2
       // 
       splitContainer1.Panel2.AutoScroll = true;
+      splitContainer1.Panel2.Controls.Add(btn_importCSV);
       splitContainer1.Panel2.Controls.Add(cb_OracleVersions);
       splitContainer1.Panel2.Controls.Add(lbl_OracleVersion);
       splitContainer1.Panel2.Controls.Add(txt_TopStoresToConsider);
@@ -347,7 +349,7 @@ namespace MoxMatrix
       // label6
       // 
       label6.AutoSize = true;
-      label6.Location = new Point(699, 412);
+      label6.Location = new Point(699, 459);
       label6.Name = "label6";
       label6.Size = new Size(278, 15);
       label6.TabIndex = 11;
@@ -358,12 +360,12 @@ namespace MoxMatrix
       txt_errorFetching.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
       txt_errorFetching.Font = new Font("Segoe UI", 12F);
       txt_errorFetching.ForeColor = SystemColors.WindowText;
-      txt_errorFetching.Location = new Point(699, 430);
+      txt_errorFetching.Location = new Point(699, 480);
       txt_errorFetching.Multiline = true;
       txt_errorFetching.Name = "txt_errorFetching";
       txt_errorFetching.ReadOnly = true;
       txt_errorFetching.ScrollBars = ScrollBars.Both;
-      txt_errorFetching.Size = new Size(283, 105);
+      txt_errorFetching.Size = new Size(283, 55);
       txt_errorFetching.TabIndex = 10;
       // 
       // cl_individuals
@@ -410,6 +412,18 @@ namespace MoxMatrix
       label7.Size = new Size(66, 15);
       label7.TabIndex = 12;
       label7.Text = "Businesses:";
+      // 
+      // btn_importCSV
+      // 
+      btn_importCSV.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+      btn_importCSV.Font = new Font("Segoe UI", 12F);
+      btn_importCSV.Location = new Point(12, 360);
+      btn_importCSV.Name = "btn_importCSV";
+      btn_importCSV.Size = new Size(250, 55);
+      btn_importCSV.TabIndex = 16;
+      btn_importCSV.Text = "Import CSV";
+      btn_importCSV.UseVisualStyleBackColor = true;
+      btn_importCSV.Click += btn_importCSV_Click;
       // 
       // cb_OracleVersions
       // 
@@ -458,9 +472,9 @@ namespace MoxMatrix
       // 
       btn_exportBuyList.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
       btn_exportBuyList.Font = new Font("Segoe UI", 12F);
-      btn_exportBuyList.Location = new Point(505, 360);
+      btn_exportBuyList.Location = new Point(524, 360);
       btn_exportBuyList.Name = "btn_exportBuyList";
-      btn_exportBuyList.Size = new Size(492, 55);
+      btn_exportBuyList.Size = new Size(473, 55);
       btn_exportBuyList.TabIndex = 4;
       btn_exportBuyList.Text = "Export Optimised Buy List";
       btn_exportBuyList.UseVisualStyleBackColor = true;
@@ -529,5 +543,6 @@ namespace MoxMatrix
     private MaskedTextBox txt_TopStoresToConsider;
     private Label lbl_OracleVersion;
     private ComboBox cb_OracleVersions;
+    private Button btn_importCSV;
   }
 }

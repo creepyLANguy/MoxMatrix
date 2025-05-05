@@ -17,11 +17,14 @@ namespace MoxMatrix
   {
     string NL = Environment.NewLine;
 
-    const string loadingVendorsText = @"Loading Vendors...";
+    private const string AppTitle = @"Mox Matrix (beta)";
 
-    const string buttonDefault = @"Query Prices";
-    const string processingText = @" - Processing...";
-    const string queryingText = @"Querying prices from each store...";
+    const string ButtonDefault = @"Query Prices";
+    const string ProcessingText = @" - Processing...";
+    const string QueryingText = @"Querying prices from each store...";
+
+    const string ImportingCSVTitle = " - Importing CSV...";
+    const string ImportingCSVMessage = "Importing CSV file...";
 
     private const string BaseUrl = "https://moxmonolith.com";
 
@@ -87,7 +90,7 @@ namespace MoxMatrix
         GetVendors,
         UpdateUI,
       };
-      
+
       foreach (var step in steps)
       {
         step();
@@ -168,15 +171,13 @@ namespace MoxMatrix
 
     private void UpdateUI()
     {
-      Text = @"Mox Matrix (beta) - v" + UpgradeUtils.GetVersionFromCurrentExecutable();
+      Text = AppTitle + @" - v" + UpgradeUtils.GetVersionFromCurrentExecutable();
 
-      btn_go.Text = buttonDefault;
+      btn_go.Text = ButtonDefault;
 
       dataGridView1.Columns.Add("Blank", "Results will appear here...");
       SetDoubleBuffer(dataGridView1, true);
       DoubleBuffered = true;
-
-      cb_individualsAll.Checked = false;
 
       txt_TopStoresToConsider.Text = StoresToConsiderDefault.ToString();
 
@@ -189,6 +190,8 @@ namespace MoxMatrix
 #endif
 
       PopulateVendors();
+
+      cb_individualsAll.Checked = false;
     }
 
     private void SetupOverlay()
@@ -210,29 +213,40 @@ namespace MoxMatrix
       Controls.Add(overlayLabel);
     }
 
-    private void SuspendForm(string text = loadingVendorsText)
+    private void SuspendForm(string titleText = AppTitle, string overlayText = "")
     {
       Cursor.Current = Cursors.WaitCursor;
-      Text += text;
-      btn_go.Text = queryingText;
+      Text += titleText;
+      btn_go.Text = QueryingText;
 
       dataGridView1.Visible = false;
 
+      overlayLabel.Text = overlayText == "" ? overlayLabel.Text : overlayText;
       overlayLabel.Visible = true;
       overlayLabel.BringToFront();
       overlayLabel.Refresh();
 
+      cl_businesses.Enabled = false;
+      cl_individuals.Enabled = false;
+      cb_OracleVersions.Enabled = false;
+      txt_TopStoresToConsider.Enabled = false;
+
       Enabled = false;
     }
 
-    private void UnsuspendForm(string text = loadingVendorsText)
+    private void UnsuspendForm(string textToRemoveFromTitle)
     {
       Cursor.Current = Cursors.Default;
-      Text = Text.Replace(text, string.Empty);
-      btn_go.Text = buttonDefault;
+      Text = Text.Replace(textToRemoveFromTitle, string.Empty);
+      btn_go.Text = ButtonDefault;
       dataGridView1.Visible = true;
 
       overlayLabel.Visible = false;
+
+      cl_businesses.Enabled = true;
+      cl_individuals.Enabled = true;
+      cb_OracleVersions.Enabled = true;
+      txt_TopStoresToConsider.Enabled = true;
 
       Enabled = true;
     }
@@ -254,7 +268,7 @@ namespace MoxMatrix
       {
         Console.WriteLine($"Request error: {ex.Message}");
 
-        var title = "Mox Matrix (beta) - WARNING";
+        var title = AppTitle + " - WARNING";
 
         var message = "Cannot determine Rand/Dollar exchange rate";
         message += "\n\nDefaulting to following rate : R" + defaultExchangeRate + " ~ $1";
@@ -282,7 +296,7 @@ namespace MoxMatrix
       {
         MessageBox.Show(
           "Failed to retrieve a list of vendors.\n\nThe application will now close.",
-          "Mox Matrix (beta) - ERROR",
+          AppTitle + " - ERROR",
           MessageBoxButtons.OK,
           MessageBoxIcon.Error);
 
@@ -364,19 +378,19 @@ namespace MoxMatrix
       var cardsDetected = inputBox.Text.Split(NL).Where(it => it.Trim().Length > 0).ToList();
       if (cardsDetected.Count == 0)
       {
-        MessageBox.Show("No cards were detected in input box.", "Mox Matrix (beta) - ERROR");
+        MessageBox.Show("No cards were detected in input box.", AppTitle + " - ERROR");
         return;
       }
 
       if (cl_individuals.CheckedItems.Count == 0 && cl_businesses.CheckedItems.Count == 0)
       {
-        MessageBox.Show("No vendors selected!", "Mox Matrix (beta) - ERROR");
+        MessageBox.Show("No vendors selected!", AppTitle + " - ERROR");
         return;
       }
 
       imageForm.Visible = false;
 
-      SuspendForm(processingText);
+      SuspendForm(ProcessingText);
 
       txt_unknownCards.Text = string.Empty;
       txt_outOfStock.Text = string.Empty;
@@ -393,7 +407,7 @@ namespace MoxMatrix
         MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
       }
 
-      UnsuspendForm(processingText);
+      UnsuspendForm(ProcessingText);
     }
 
     private async Task DoTheThings()
@@ -817,7 +831,7 @@ namespace MoxMatrix
         dataGridView1.Columns.Add($"Column{i}", rows[0][i]);
       }
 
-      // Add rows from the CSV data (skip the first row as it's headers)
+      // Add rows from the CSV data (skip the first row as it contains headers)
       for (var i = 1; i < rows.Length; i++)
       {
         dataGridView1.Rows.Add(rows[i]);
@@ -1353,7 +1367,8 @@ namespace MoxMatrix
         async () => { exchangeRateDollar = await GetExchangeRateDollar(); },
         SetupImageForm,
         SetupCheckFocusTimer,
-      }.ForEach(async step => {
+      }.ForEach(async step =>
+      {
         await Task.Run(step);
       });
     }
@@ -1407,6 +1422,51 @@ namespace MoxMatrix
       oracle.Invoke(lines, fileName, storesNum);
 
       OpenFile(fileName);
+    }
+
+    private void btn_importCSV_Click(object sender, EventArgs e)
+    {
+      using var openFileDialog = new OpenFileDialog
+      {
+        Filter = "CSV files (*.csv)|*.csv",
+        Title = "Open CSV File"
+      };
+
+      if (openFileDialog.ShowDialog() != DialogResult.OK)
+      {
+        return;
+      }
+
+      try
+      {
+        var csvLines = File.ReadAllLines(openFileDialog.FileName).ToList();
+        if (csvLines.Count == 0)
+        {
+          MessageBox.Show(
+            "The selected file is empty.", 
+            "Error", 
+            MessageBoxButtons.OK, 
+            MessageBoxIcon.Error
+            );
+
+          return;
+        }
+
+        SuspendForm(ImportingCSVTitle, ImportingCSVMessage);
+
+        LoadCsvDataIntoDataGridView(ref csvLines);
+
+        UnsuspendForm(ImportingCSVTitle);
+      }
+      catch (Exception ex)
+      {
+        MessageBox.Show(
+          "An error occurred while reading the file.\n" + ex.Message, 
+          "Error", 
+          MessageBoxButtons.OK, 
+          MessageBoxIcon.Error
+          );
+      }
     }
   }
 }

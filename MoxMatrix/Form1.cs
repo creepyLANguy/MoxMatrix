@@ -1366,11 +1366,12 @@ namespace MoxMatrix
       {
         async () => { exchangeRateDollar = await GetExchangeRateDollar(); },
         SetupImageForm,
-        SetupCheckFocusTimer,
       }.ForEach(async step =>
       {
         await Task.Run(step);
       });
+
+      SetupCheckFocusTimer();
     }
 
     private void cb_OracleVersions_DropDownClosed(object sender, EventArgs e)

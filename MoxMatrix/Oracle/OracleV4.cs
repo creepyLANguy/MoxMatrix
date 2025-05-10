@@ -1,19 +1,21 @@
 ﻿using System.Globalization;
 
-namespace MoxMatrix
+namespace MoxMatrix.Oracle
 {
-  public static class Oracle_v3
+  public static class OracleV4
   {
     private const decimal DeliveryCost = 100m;
 
-    private static Tuple<Dictionary<string, List<(string cardName, decimal price)>>, decimal> GetOptimisedPurchases(string[] inputCsvLines, int maxPreferredStores)
+    private static Tuple<decimal, Dictionary<string, List<(string cardName, decimal price)>>> GetOptimisedPurchases(
+      string[] inputCsvLines,
+      int maxPreferredStores)
     {
       if (inputCsvLines.Length < 2)
       {
         throw new InvalidOperationException("CSV does not contain enough data.");
       }
 
-      var headers = inputCsvLines[0].Split(new List<char> { ';' }.ToArray());
+      var headers = inputCsvLines[0].Split(new List<char> {';'}.ToArray());
       var storeNames = headers.Skip(1).ToList();
 
       var cardRows = inputCsvLines
@@ -22,19 +24,19 @@ namespace MoxMatrix
         .Select(line => line.Split(';'))
         .ToList();
 
-      // Determine store availability counts
       var storeAvailability = new Dictionary<string, int>();
       foreach (var row in cardRows)
       {
         for (var i = 1; i < row.Length; i++)
         {
-          if (!string.IsNullOrWhiteSpace(row[i].Replace("✨", "").Trim()))
+          if (string.IsNullOrWhiteSpace(row[i].Replace("✨", "").Trim()))
           {
-            var store = storeNames[i - 1];
-            if (!storeAvailability.ContainsKey(store))
-              storeAvailability[store] = 0;
-            storeAvailability[store]++;
+            continue;
           }
+
+          var store = storeNames[i - 1];
+          storeAvailability.TryAdd(store, 0);
+          storeAvailability[store]++;
         }
       }
 
@@ -82,7 +84,7 @@ namespace MoxMatrix
         }
 
         var storeName = storeNames[bestStoreIndex];
-        var price = decimal.Parse(row[bestStoreIndex + 1].Replace("✨", "").Trim(), CultureInfo.InvariantCulture);
+        var price = decimal.Parse(row[bestStoreIndex + 1].Replace("✨", "").Trim());
 
         cardAssignments[cardName] = (storeName, price);
 
@@ -90,6 +92,7 @@ namespace MoxMatrix
         {
           storeCards[storeName] = new List<(string, decimal)>();
         }
+
         storeCards[storeName].Add((cardName, price));
 
         if (!usedStores.Contains(storeName))
@@ -97,27 +100,35 @@ namespace MoxMatrix
           totalCost += DeliveryCost;
           usedStores.Add(storeName);
         }
+
         totalCost += price;
       }
 
-      ApplyPostProcessing(cardRows, storeNames, ref storeCards, ref usedStores, ref totalCost, ref cardAssignments);
+      bool changed;
+      do
+      {
+        changed = ApplyPostProcessing(cardRows, storeNames, ref storeCards, ref usedStores, ref totalCost,
+          ref cardAssignments);
+      } while (changed);
 
-      return Tuple.Create(storeCards, totalCost);
+      return Tuple.Create(totalCost, storeCards);
     }
 
-    private static void ApplyPostProcessing(List<string[]> cardRows, List<string> storeNames,
-        ref Dictionary<string, List<(string cardName, decimal price)>> storeCards,
-        ref HashSet<string> usedStores,
-        ref decimal totalCost,
-        ref Dictionary<string, (string store, decimal price)> cardAssignments)
+    private static bool ApplyPostProcessing(List<string[]> cardRows, List<string> storeNames,
+      ref Dictionary<string, List<(string cardName, decimal price)>> storeCards,
+      ref HashSet<string> usedStores,
+      ref decimal totalCost,
+      ref Dictionary<string, (string store, decimal price)> cardAssignments)
     {
+      var changed = false;
+
       foreach (var row in cardRows)
       {
         var cardName = row[0];
         if (!cardAssignments.ContainsKey(cardName)) continue;
 
         var (currentStore, currentPrice) = cardAssignments[cardName];
-        decimal currentTotalImpact = currentPrice;
+        var currentTotalImpact = currentPrice;
         if (storeCards[currentStore].Count == 1) currentTotalImpact += DeliveryCost;
 
         foreach (var i in Enumerable.Range(1, row.Length - 1))
@@ -134,44 +145,57 @@ namespace MoxMatrix
           var alreadyUsed = usedStores.Contains(altStore);
           var deliveryPenalty = alreadyUsed ? 0 : DeliveryCost;
 
-          decimal newTotalImpact = newPrice + deliveryPenalty;
 
-          if (newTotalImpact + 0.01m < currentTotalImpact)
+          if (newPrice + deliveryPenalty + 0.01m >= currentTotalImpact)
           {
-            storeCards[currentStore].RemoveAll(x => x.cardName == cardName);
-            if (storeCards[currentStore].Count == 0)
-            {
-              storeCards.Remove(currentStore);
-              usedStores.Remove(currentStore);
-              totalCost -= DeliveryCost;
-            }
-            totalCost -= currentPrice;
-
-            if (!storeCards.ContainsKey(altStore))
-              storeCards[altStore] = new List<(string, decimal)>();
-
-            storeCards[altStore].Add((cardName, newPrice));
-            if (!alreadyUsed)
-            {
-              usedStores.Add(altStore);
-              totalCost += DeliveryCost;
-            }
-            totalCost += newPrice;
-
-            cardAssignments[cardName] = (altStore, newPrice);
-            break;
+            continue;
           }
+
+          storeCards[currentStore].RemoveAll(x => x.cardName == cardName);
+          if (storeCards[currentStore].Count == 0)
+          {
+            storeCards.Remove(currentStore);
+            usedStores.Remove(currentStore);
+            totalCost -= DeliveryCost;
+          }
+
+          totalCost -= currentPrice;
+
+          if (!storeCards.ContainsKey(altStore))
+            storeCards[altStore] = new List<(string, decimal)>();
+
+          storeCards[altStore].Add((cardName, newPrice));
+          if (!alreadyUsed)
+          {
+            usedStores.Add(altStore);
+            totalCost += DeliveryCost;
+          }
+
+          totalCost += newPrice;
+
+          cardAssignments[cardName] = (altStore, newPrice);
+          changed = true;
+          break;
         }
       }
+
+      return changed;
     }
-
-    public static void ExportBuyList(string inputCsvPath, string outputTextPath, int maxPreferredStores)
-      => ExportBuyList(File.ReadAllLines(inputCsvPath), outputTextPath, maxPreferredStores);
-
     public static void ExportBuyList(string[] inputCsvLines, string outputTextPath, int maxPreferredStores)
     {
-      var x = GetOptimisedPurchases(inputCsvLines, maxPreferredStores);
-      Exporter.Run(x.Item1, x.Item2, "Oracle_v3", DeliveryCost, outputTextPath);
+      var optimisedPurchasesResult = GetOptimisedPurchases(inputCsvLines, maxPreferredStores);
+      Exporter.Run("Oracle_v4",
+        optimisedPurchasesResult.Item1,
+        optimisedPurchasesResult.Item2,
+        DeliveryCost,
+        outputTextPath,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1);
     }
   }
 }

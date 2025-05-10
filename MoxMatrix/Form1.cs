@@ -8,6 +8,7 @@ using System.Net.Mime;
 using HtmlDocument = HtmlAgilityPack.HtmlDocument;
 using Newtonsoft.Json.Linq;
 using System.Runtime.InteropServices;
+using MoxMatrix.Oracle;
 using MoxMatrix.Upgrade;
 using Timer = System.Windows.Forms.Timer;
 
@@ -47,10 +48,10 @@ namespace MoxMatrix
 
     private readonly Dictionary<string, Action<string[], string, int>> _oracleMap = new()
     {
-      { "V1", Oracle_v1.ExportBuyList },
-      { "V2", Oracle_v2.ExportBuyList },
-      { "V3", Oracle_v3.ExportBuyList },
-      { "V4", Oracle_v4.ExportBuyList },
+      //{ "V1", Oracle_v1.ExportBuyList },
+      //{ "V2", Oracle_v2.ExportBuyList },
+      //{ "V3", Oracle_v3.ExportBuyList },
+      { "V4", OracleV4.ExportBuyList },
     };
 
     private readonly char csvDelim = ';';
@@ -181,7 +182,7 @@ namespace MoxMatrix
 
       txt_TopStoresToConsider.Text = StoresToConsiderDefault.ToString();
 
-      SetupOracleVersionDropDown();
+      //SetupOracleVersionDropDown();
 
       SetupOverlay();
 
@@ -228,7 +229,7 @@ namespace MoxMatrix
 
       cl_businesses.Enabled = false;
       cl_individuals.Enabled = false;
-      cb_OracleVersions.Enabled = false;
+      //cb_OracleVersions.Enabled = false;
       txt_TopStoresToConsider.Enabled = false;
 
       Enabled = false;
@@ -245,7 +246,7 @@ namespace MoxMatrix
 
       cl_businesses.Enabled = true;
       cl_individuals.Enabled = true;
-      cb_OracleVersions.Enabled = true;
+      //cb_OracleVersions.Enabled = true;
       txt_TopStoresToConsider.Enabled = true;
 
       Enabled = true;
@@ -362,15 +363,15 @@ namespace MoxMatrix
       }
     }
 
-    private void SetupOracleVersionDropDown()
-    {
-      foreach (var item in _oracleMap)
-      {
-        cb_OracleVersions.Items.Add(item.Key);
-      }
-      cb_OracleVersions.SelectedIndex = cb_OracleVersions.Items.Count - 1;
-      cb_OracleVersions.DropDownStyle = ComboBoxStyle.DropDownList;
-    }
+    //private void SetupOracleVersionDropDown()
+    //{
+    //  foreach (var item in _oracleMap)
+    //  {
+    //    cb_OracleVersions.Items.Add(item.Key);
+    //  }
+    //  cb_OracleVersions.SelectedIndex = cb_OracleVersions.Items.Count - 1;
+    //  cb_OracleVersions.DropDownStyle = ComboBoxStyle.DropDownList;
+    //}
 
     private async void btn_go_Click(object sender, EventArgs e)
     {
@@ -1374,8 +1375,8 @@ namespace MoxMatrix
       SetupCheckFocusTimer();
     }
 
-    private void cb_OracleVersions_DropDownClosed(object sender, EventArgs e)
-      => lbl_TopStoresToConsider.Visible = txt_TopStoresToConsider.Visible = cb_OracleVersions.SelectedIndex > 1;
+    //private void cb_OracleVersions_DropDownClosed(object sender, EventArgs e)
+    //  => lbl_TopStoresToConsider.Visible = txt_TopStoresToConsider.Visible = cb_OracleVersions.SelectedIndex > 1;
 
     private void btn_exportBuyList_Click(object sender, EventArgs e)
     {
@@ -1413,14 +1414,15 @@ namespace MoxMatrix
       var fileName = saveFileDialog.FileName;
       var lines = GetStringForCSV().Split(Environment.NewLine);
 
-      var selectedVersion = cb_OracleVersions.SelectedItem?.ToString();
-      if (string.IsNullOrEmpty(selectedVersion) || !_oracleMap.ContainsKey(selectedVersion))
-      {
-        MessageBox.Show("Invalid Oracle version selected.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        return;
-      }
-      var oracle = _oracleMap[selectedVersion];
-      oracle.Invoke(lines, fileName, storesNum);
+      //var selectedVersion = cb_OracleVersions.SelectedItem?.ToString();
+      //if (string.IsNullOrEmpty(selectedVersion) || !_oracleMap.ContainsKey(selectedVersion))
+      //{
+      //  MessageBox.Show("Invalid Oracle version selected.", "", MessageBoxButtons.OK, MessageBoxIcon.Error);
+      //  return;
+      //}
+      //var oracle = _oracleMap[selectedVersion];
+      //oracle.Invoke(lines, fileName, storesNum);
+      OracleV4.ExportBuyList(lines, fileName, storesNum);
 
       OpenFile(fileName);
     }

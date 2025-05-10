@@ -18,7 +18,7 @@ public static class Exporter
   {
     using var writer = new StreamWriter(outputTextPath);
 
-    var cardsChosen = storesAndTheirCards.Sum(satc => satc.Value.Count);
+    var cardsChosen = storesAndTheirCards.Sum(sc => sc.Value.Count);
     var storesUtilised = storesAndTheirCards.Keys.Count;
 
     writer.WriteLine($"Algorithm Version:{algorithmVersion}");

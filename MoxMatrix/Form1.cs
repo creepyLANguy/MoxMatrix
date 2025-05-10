@@ -46,13 +46,13 @@ namespace MoxMatrix
 
     private const int StoresToConsiderDefault = 10;
 
-    private readonly Dictionary<string, Action<string[], string, int>> _oracleMap = new()
-    {
-      //{ "V1", Oracle_v1.ExportBuyList },
-      //{ "V2", Oracle_v2.ExportBuyList },
-      //{ "V3", Oracle_v3.ExportBuyList },
-      { "V4", OracleV4.ExportBuyList },
-    };
+    //private readonly Dictionary<string, Action<string[], string, int>> _oracleMap = new()
+    //{
+    //  { "V1", Oracle_v1.ExportBuyList },
+    //  { "V2", Oracle_v2.ExportBuyList },
+    //  { "V3", Oracle_v3.ExportBuyList },
+    //  { "V4", OracleV4.ExportBuyList },
+    //};
 
     private readonly char csvDelim = ';';
     private readonly string[] BlackListTerms = { "art card" };

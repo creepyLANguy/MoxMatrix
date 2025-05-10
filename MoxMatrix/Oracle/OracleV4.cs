@@ -61,7 +61,10 @@ namespace MoxMatrix.Oracle
         for (var i = 1; i < row.Length; i++)
         {
           var store = storeNames[i - 1];
-          if (!preferredStores.Contains(store)) continue;
+          if (!preferredStores.Contains(store))
+          {
+            continue;
+          }
 
           var rawValue = row[i].Replace("✨", "").Trim();
           if (!decimal.TryParse(rawValue, NumberStyles.Number, CultureInfo.InvariantCulture, out var currentPrice))
@@ -71,11 +74,13 @@ namespace MoxMatrix.Oracle
 
           var effectiveCost = currentPrice + (usedStores.Contains(store) ? 0 : DeliveryCost);
 
-          if (effectiveCost < minEffectiveCost)
+          if (effectiveCost >= minEffectiveCost)
           {
-            minEffectiveCost = effectiveCost;
-            bestStoreIndex = i - 1;
+            continue;
           }
+
+          minEffectiveCost = effectiveCost;
+          bestStoreIndex = i - 1;
         }
 
         if (bestStoreIndex < 0)
@@ -107,8 +112,14 @@ namespace MoxMatrix.Oracle
       bool changed;
       do
       {
-        changed = ApplyPostProcessing(cardRows, storeNames, ref storeCards, ref usedStores, ref totalCost,
-          ref cardAssignments);
+        changed =
+          ApplyPostProcessing(
+            cardRows,
+            storeNames,
+            ref storeCards,
+            ref usedStores,
+            ref totalCost,
+            ref cardAssignments);
       } while (changed);
 
       return Tuple.Create(totalCost, storeCards);
@@ -181,6 +192,7 @@ namespace MoxMatrix.Oracle
 
       return changed;
     }
+
     public static void ExportBuyList(string[] inputCsvLines, string outputTextPath, int maxPreferredStores)
     {
       var optimisedPurchasesResult = GetOptimisedPurchases(inputCsvLines, maxPreferredStores);

@@ -8,7 +8,6 @@ using System.Net.Mime;
 using HtmlDocument = HtmlAgilityPack.HtmlDocument;
 using Newtonsoft.Json.Linq;
 using System.Runtime.InteropServices;
-using MoxMatrix.Oracle;
 using MoxMatrix.Upgrade;
 using Timer = System.Windows.Forms.Timer;
 
@@ -1422,7 +1421,7 @@ namespace MoxMatrix
       //}
       //var oracle = _oracleMap[selectedVersion];
       //oracle.Invoke(lines, fileName, storesNum);
-      OracleV4.ExportBuyList(lines, fileName, storesNum);
+      Oracle.ExportBuyList(lines, fileName, storesNum);
 
       OpenFile(fileName);
     }

@@ -1,8 +1,11 @@
-﻿using System.Globalization;
+﻿//Version: 4.0
+//Date: 14/05/2025
 
-namespace MoxMatrix.Oracle
+using System.Globalization;
+
+namespace MoxMatrix
 {
-  public static class OracleV4
+  public static class Oracle
   {
     private const decimal DeliveryCost = 100m;
 

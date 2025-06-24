@@ -204,8 +204,8 @@ namespace MoxMatrix
         optimisedPurchasesResult.Item2,
         DeliveryCost,
         outputTextPath,
-        -1,
-        -1,
+        -1, //TODO - take a list of string and display them
+        -1, //TODO - take a list of string and display them
         -1,
         -1,
         -1,
